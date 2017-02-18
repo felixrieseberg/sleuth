@@ -1,0 +1,16 @@
+doctype html
+html(style='width: 100%; height: 100%;')
+  head
+    title
+    link(rel='stylesheet', type='text/css', href='lato.less')
+    link(rel='stylesheet', type='text/css', href='slack-icons-font.less')
+    link(rel='import', href='../renderer/styles/styles.html')
+  body(tabindex='-1', style='width: 100%; height: 100%; margin: 0; overflow: hidden')
+    div#SlackApp
+  script(type='text/tsx').
+    import * as React from 'react';
+    import * as ReactDOM from 'react-dom';
+    import { App } from '../renderer/components/app';
+    ReactDOM.render(<App />, document.getElementById('SlackApp'));
+
+

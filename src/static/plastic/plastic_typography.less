@@ -1,0 +1,25 @@
+/*
+ * PLASTIC
+ * Fonts
+ * Site-wide fonts and helpers
+ */
+
+@font-face {
+	font-family: "appleLogo";
+	src: local("Lucida Grande");
+	unicode-range: U+F8FF;
+}
+
+/* Double-quotes are required to get Helvetica Neue to load properly */
+@lato: 'Slack-Lato', 'appleLogo', sans-serif;
+@helvetica: "Helvetica Neue", Helvetica, "Segoe UI", Tahoma, Arial, sans-serif;
+
+/*
+ * Explanation of font-family choice / sequence ...
+ * consolas is a MSFT font included with Windows XP and is designed for legibility,
+ * ClearType-friendly etc. https://en.wikipedia.org/wiki/Consolas
+ * `courier` is next as it looks nice on the Mac, which won't have Consolas.
+ * there is `Menlo` on the Mac, but it's quite tall and long compared to courier.
+ * as a fallback, `monospace` is the generic family we want to render snippets with.
+ */
+@monospace: Consolas, monaco, courier, monospace !important;

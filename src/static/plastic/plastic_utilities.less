@@ -1,0 +1,59 @@
+/*
+ * PLASTIC
+ * Utilities
+ * Mixins for common styles.
+ *
+ * To be used in other stylesheets in the form:
+ * .selector {
+ *     .name_of_mixin;
+ * }
+ *
+ * plastic_helpers.source.less defines helper classes for these mixins, to be used as inline classes in markup:
+ * <div class="name_of_helper"></div>
+ *
+ */
+
+@import "./plastic_typography";
+@import "./plastic_colors";
+
+// Fonts
+.helvetica() { font-family: @helvetica; }
+.lato() { font-family: @lato; font-weight: 400; -webkit-font-smoothing: antialiased; }
+.lato_black() { font-family: @lato; font-weight: 900; }
+.lato_bold() { font-family: @lato; font-weight: 700; }
+.lato_regular() { font-family: @lato; font-weight: 500; }
+.lato_light() { font-family: @lato; font-weight: 300; }
+.monospace() { font-family: @monospace; -webkit-font-variant-ligatures: none; font-variant-ligatures: none; }
+
+// Unit conversion
+.px_to_rem(@property, @px_value) when (ispixel(@px_value)) {
+	@{property}: unit(@px_value / 16, rem);
+}
+
+/* Font Size Mixin
+ * For example:
+ * 	.font_size(16px);		// 16 is in px unit and will output in rem unit: `font-size: 1rem;`
+*/
+.font_size(@px_value) when (ispixel(@px_value)) {
+	.px_to_rem(font-size, @px_value);
+}
+
+/* Line Height Mixin
+ * For example:
+ * 	.line_height(24px);	// 24 is in px unit and will output in rem unit: `line-height: 1.5rem;`
+*/
+.line_height(@px_value) when (ispixel(@px_value)) {
+	.px_to_rem(line-height, @px_value);
+}
+
+// Font Styles
+.normal() { font-weight: normal; }
+.black() { font-weight: 900; }
+.bold() { font-weight: 700; }
+.medium() { font-weight: 500; }
+.light() { font-weight: 300; }
+.italic() { font-style: italic; }
+.underline() { text-decoration: underline; }
+.no_underline() { text-decoration: none; }
+.tiny { font-size: 0.7rem; }
+.small { font-size: 0.9rem; }
