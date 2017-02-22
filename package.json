@@ -1,8 +1,8 @@
 {
-  "name": "slack-log-viewer",
-  "productName": "slack-log-viewer",
+  "name": "sleuth",
+  "productName": "Sleuth",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "Slack Log Viewer",
   "main": "src/main/index.ts",
   "scripts": {
     "start": "electron-forge start",
@@ -11,7 +11,7 @@
     "lint": "tslint src"
   },
   "keywords": [],
-  "author": "felixr",
+  "author": "Felix Rieseberg <felix@felixrieseberg.com>",
   "license": "MIT",
   "config": {
     "forge": {
@@ -29,7 +29,7 @@
       },
       "electronPackagerConfig": {},
       "electronWinstallerConfig": {
-        "name": "slack_log_viewer"
+        "name": "sleuth"
       },
       "electronInstallerDebian": {},
       "electronInstallerRedhat": {},
@@ -38,7 +38,7 @@
       },
       "windowsStoreConfig": {
         "packageName": "",
-        "name": "slacklogviewer"
+        "name": "Sleuth"
       }
     }
   },
