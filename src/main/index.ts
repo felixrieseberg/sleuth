@@ -16,6 +16,7 @@ const createWindow = async () => {
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
+    titleBarStyle: process.platform === 'darwin' ? 'hidden-inset' : undefined;
   });
 
   // and load the index.html of the app.

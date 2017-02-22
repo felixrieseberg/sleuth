@@ -31,9 +31,7 @@ export interface UnzippedFile {
   fullPath: string;
 }
 
-export interface UnzippedFiles {
-  [index: number]: UnzippedFile;
-}
+export interface UnzippedFiles extends Array<UnzippedFile> { }
 
 export class Unzipper {
   public readonly url: string;
@@ -63,9 +61,10 @@ export class Unzipper {
   public unzip() {
     return new Promise(async (resolve, reject) => {
       if (this.zipfile) {
-        this.output = await promisify(tmp.dir)();
+        tmp.setGracefulCleanup();
+        this.output = await promisify(tmp.dir)({ unsafeCleanup: true });
 
-        this.zipfile.on('end', () => resolve());
+        this.zipfile.on('end', () => resolve(this.files));
         this.zipfile.readEntry();
       } else {
         console.log('Unzipper: Tried to unzip file, but file does not exist');

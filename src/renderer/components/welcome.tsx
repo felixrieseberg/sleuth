@@ -8,8 +8,8 @@ export class Welcome extends React.Component<undefined, undefined> {
   public render() {
     return (
       <div className="welcome">
-        <h2>👋 Hey there!</h2>
-        <h4>Just drop a logs.zip file here.</h4>
+          <h2>👋 Hey there!</h2>
+          <h4>Just drop a logs.zip file here.</h4>
       </div>
     );
   }

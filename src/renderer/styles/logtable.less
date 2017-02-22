@@ -1,0 +1,51 @@
+@import "../../static/plastic/plastic_colors.less";
+
+.LogTable {
+  padding-top: 100px;
+  height: 100%;
+  padding: 6.2rem 0 0 0;
+  height: 100vh;
+
+  &::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(50,50,50,.25);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    background-clip: padding-box;
+
+    &:hover {
+      background-color: rgba(50,50,50,.5);
+    }
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: @off_white;
+  }
+
+  .HasData {
+    color: @dark_purple;
+  }
+
+  .ReactVirtualized__Table__row {
+    font-size: 1rem;
+  }
+
+  .ReactVirtualized__Table__headerColumn:first-of-type, .ReactVirtualized__Table__rowColumn:first-of-type {
+    margin-left: 2rem;
+  }
+
+  .ReactVirtualized__Table__row:nth-child(even) {
+    background: @soft_grey;
+  }
+
+  .ReactVirtualized__Table__row:nth-child(odd) {
+  }
+}
+
+.LogTable.Collapsed {
+  height: calc(~"100vh - 300px");
+}

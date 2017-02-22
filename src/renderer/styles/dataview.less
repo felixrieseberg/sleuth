@@ -1,0 +1,30 @@
+@import "../../static/plastic/plastic_colors.less";
+
+.DataView {
+  padding: .5rem 1.5rem 1rem;
+  font-family: 'Inconsolata', monospace;
+  font-size: 1rem;
+  background: white;
+  border-top: 1px solid @neutral_grey;
+  overflow: auto;
+
+  &::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(50,50,50,.25);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    background-clip: padding-box;
+
+    &:hover {
+      background-color: rgba(50,50,50,.5);
+    }
+  }
+
+  &::-webkit-scrollbar-track {
+    background: white;
+  }
+}
