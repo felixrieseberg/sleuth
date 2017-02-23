@@ -55,6 +55,7 @@
     "es6-promisify": "^5.0.0",
     "fs-promise": "^2.0.0",
     "jsonic": "^0.2.2",
+    "moment": "^2.17.1",
     "react": "^15.4.1",
     "react-dom": "^15.4.1",
     "react-json-tree": "^0.10.3",
@@ -67,6 +68,7 @@
   "devDependencies": {
     "@types/classnames": "0.0.32",
     "@types/debug": "0.0.29",
+    "@types/moment": "^2.13.0",
     "@types/react-virtualized": "^8.9.2",
     "@types/tmp": "0.0.32",
     "babel-plugin-transform-async-to-generator": "^6.22.0",

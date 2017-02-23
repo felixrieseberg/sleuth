@@ -60,6 +60,11 @@ export class DataView extends React.Component<DataViewProps, DataViewState> {
     );
   }
 
+  /**
+   * A super-cool Base16 theme using Slack's 2016 colors.
+   *
+   * @returns {Object}
+   */
   private getTheme() {
     return {
       base00: '#2C2D30',

@@ -1,7 +1,8 @@
+import { MergedLogFile } from '../processor';
 import * as React from 'react';
 import * as classNames from 'classnames';
 
-import { LogEntry, ProcessedLogFile } from './logview';
+import { LogEntry, ProcessedLogFile } from '../processor';
 import { DataView } from './dataview';
 import { Column, Table, AutoSizer } from 'react-virtualized';
 
@@ -11,7 +12,7 @@ export interface RowClickEvent {
 }
 
 export interface LogTableProps {
-  logFile: ProcessedLogFile;
+  logFile: ProcessedLogFile | MergedLogFile;
 }
 
 export interface LogTableState {
@@ -32,7 +33,8 @@ export class LogTable extends React.Component<LogTableProps, LogTableState> {
 
   public onRowClick({ index }: RowClickEvent) {
     const selectedEntry = this.props.logFile.logEntries[index] || null;
-    this.setState({ selectedEntry, isDataViewVisible: true })
+    const isDataViewVisible = !!selectedEntry.meta;
+    this.setState({ selectedEntry, isDataViewVisible });
   }
 
   public cellRenderer({ cellData, columnData, dataKey, rowData, rowIndex }) {
@@ -67,7 +69,7 @@ export class LogTable extends React.Component<LogTableProps, LogTableState> {
           <AutoSizer>
             {({ width, height }) => (
               <Table {...tableOptions} height={height} width={width}>
-                <Column width={150} label="Timestamp" dataKey="timestamp" />
+                <Column width={180} label="Timestamp" dataKey="timestamp" />
                 <Column width={70} label="Level" dataKey="level" />
                 <Column width={200} label="Message" dataKey="message" flexGrow={1} cellRenderer={this.cellRenderer}/>
               </Table>

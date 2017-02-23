@@ -1,8 +1,10 @@
 import * as React from 'react';
 import { ipcRenderer } from 'electron';
 import * as classNames from 'classnames';
+import * as fs from 'fs-promise';
+import * as path from 'path';
 
-import { Unzipper, UnzippedFiles } from '../unzip';
+import { UnzippedFile, UnzippedFiles, Unzipper } from '../unzip';
 import { Welcome } from './welcome';
 import { LogView } from './logview';
 import { MacTitlebar } from './mac-titlebar';
@@ -24,6 +26,47 @@ export class App extends React.Component<undefined, AppState> {
 
   public openFile(url: string) {
     console.log(`Received open-url for ${url}`);
+
+    const isZipFile = /[\s\S]*\.zip$/.test(url);
+    if (isZipFile) {
+      return this.openZip(url);
+    }
+
+    // Let's look at the url a little closer
+    fs.stat(url).then((stats: fs.Stats) => {
+      if (stats.isDirectory()) {
+        return this.openDirectory(url);
+      }
+    });
+  }
+
+  public openDirectory(url: string) {
+    console.log(`Now opening directory ${url}`);
+
+    fs.readdir(url)
+      .then((dir) => {
+        const logFiles: UnzippedFiles = [];
+        const promises: Array<Promise<any>> = [];
+
+        dir.forEach((fileName) => {
+          const fullPath = path.join(url, fileName);
+          console.log(`Checking out file ${fileName}`);
+
+          const promise = fs.stat(fullPath)
+            .then((stats: fs.Stats) => {
+              const logFile: UnzippedFile = { fileName, fullPath, size: stats.size };
+              console.log('Found file, adding to result.', logFile);
+              logFiles.push(logFile);
+            });
+
+          promises.push(promise);
+        });
+
+        Promise.all(promises).then(() => this.setState({ logFiles }));
+      });
+  }
+
+  public openZip(url: string) {
     const unzipper = new Unzipper(url);
     unzipper.open()
       .then(() => unzipper.unzip())

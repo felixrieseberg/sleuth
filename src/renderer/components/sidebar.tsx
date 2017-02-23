@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as classNames from 'classnames';
 
-import { ProcessedLogFile } from './logview';
+import { ProcessedLogFile } from '../processor';
 
 export interface SortedLogFiles {
   renderer: Array<ProcessedLogFile>;
@@ -13,6 +13,7 @@ export interface SortedLogFiles {
 export interface SidebarProps {
   logFiles: Array<ProcessedLogFile>;
   isOpen: boolean;
+  selectedLogFileName: string;
   selectLogFile: Function;
 }
 
@@ -33,13 +34,13 @@ export class Sidebar extends React.Component<SidebarProps, undefined> {
     };
 
     logFiles.forEach((logFile) => {
-      if (logFile.type === 'renderer') {
+      if (logFile.logType === 'renderer') {
         result.renderer.push(logFile);
-      } else if (logFile.type === 'browser') {
+      } else if (logFile.logType === 'browser') {
         result.browser.push(logFile);
-      } else if (logFile.type === 'webapp') {
+      } else if (logFile.logType === 'webapp') {
         result.webapp.push(logFile);
-      } else if (logFile.type === 'webview') {
+      } else if (logFile.logType === 'webview') {
         result.webview.push(logFile);
       }
     });
@@ -48,20 +49,25 @@ export class Sidebar extends React.Component<SidebarProps, undefined> {
   }
 
   renderFile(file: ProcessedLogFile) {
-    const { selectLogFile } = this.props;
+    const { selectLogFile, selectedLogFileName } = this.props;
+    const isSelected = (selectedLogFileName === file.logFile.fileName);
+    const className = classNames({ Selected: isSelected });
 
     return (
-        <li key={file.logFile.fileName}><a onClick={() => selectLogFile(file)}>
-            <i className="ts_icon ts_icon_file LogFile"></i>{file.logFile.fileName}
-        </a></li>
+        <li key={file.logFile.fileName}>
+          <a onClick={() => selectLogFile(file)} className={className}>
+              <i className="ts_icon ts_icon_file LogFile"></i>{file.logFile.fileName}
+          </a>
+        </li>
         );
   }
 
   public render() {
-    const { isOpen } = this.props;
+    const { isOpen, selectLogFile, selectedLogFileName } = this.props;
     const sortedLogFiles = this.getSortedLogFiles();
     const className = classNames('Sidebar', { 'nav_open': isOpen });
 
+    const getSelectedClassName = (logType: string) => classNames({ Selected: (selectedLogFileName === logType) });
     const browserFiles = sortedLogFiles.browser.map(this.renderFile.bind(this));
     const rendererFiles = sortedLogFiles.renderer.map(this.renderFile.bind(this));
     const webappFiles = sortedLogFiles.webapp.map(this.renderFile.bind(this));
@@ -73,19 +79,42 @@ export class Sidebar extends React.Component<SidebarProps, undefined> {
           <div id="site_nav_contents">
             <div className="nav_contents">
               <ul className="primary_nav">
-                <li className="MenuTitle MenuTitle-browser"><i className="ts_icon ts_icon_power_off"></i>Browser Process</li>
+                <li className="MenuTitle MenuTitle-all">
+                  <a onClick={() => selectLogFile(null, 'all')} className={getSelectedClassName('all')}>
+                    <i className="ts_icon ts_icon_archive"></i>All Log Files
+                  </a>
+                </li>
+              </ul>
+              <ul className="primary_nav">
+                <li className="MenuTitle MenuTitle-browser">
+                  <a onClick={() => selectLogFile(null, 'browser')} className={getSelectedClassName('browser')}>
+                    <i className="ts_icon ts_icon_power_off"></i>Browser Process
+                  </a>
+                </li>
                 {browserFiles}
               </ul>
               <ul className="primary_nav">
-                <li className="MenuTitle MenuTitle-renderer"><i className="ts_icon ts_icon_laptop"></i>Renderer Process</li>
+                <li className="MenuTitle MenuTitle-renderer">
+                  <a onClick={() => selectLogFile(null, 'renderer')} className={getSelectedClassName('renderer')}>
+                    <i className="ts_icon ts_icon_laptop"></i>Renderer Process
+                  </a>
+                </li>
                 {rendererFiles}
               </ul>
               <ul className="primary_nav">
-                <li className="MenuTitle MenuTitle-webview"><i className="ts_icon ts_icon_all_files_alt"></i>WebView Process</li>
+                <li className="MenuTitle MenuTitle-webview">
+                  <a onClick={() => selectLogFile(null, 'webview')} className={getSelectedClassName('webview')}>
+                    <i className="ts_icon ts_icon_all_files_alt"></i>WebView Process
+                  </a>
+                </li>
                 {webviewFiles}
               </ul>
               <ul className="primary_nav">
-                <li className="MenuTitle MenuTitle-webapp"><i className="ts_icon ts_icon_globe"></i>WebApp</li>
+                <li className="MenuTitle MenuTitle-webapp">
+                  <a onClick={() => selectLogFile(null, 'webapp')} className={getSelectedClassName('webapp')}>
+                    <i className="ts_icon ts_icon_globe"></i>WebApp
+                  </a>
+                </li>
                 {webappFiles}
               </ul>
             </div>
@@ -95,14 +124,3 @@ export class Sidebar extends React.Component<SidebarProps, undefined> {
     );
   }
 }
-
-// <li><a href="/messages" data-qa="app"><i className="ts_icon ts_icon_angle_arrow_up_left"></i>Back to Slack</a></li>
-// <li><a href="/home" data-qa="home"><i className="ts_icon ts_icon_home"></i>Home</a></li>
-// <li><a href="/account" data-qa="account_profile"><i className="ts_icon ts_icon_user"></i>Account &amp; Profile</a></li>
-// <li><a href="/apps/manage" data-qa="configure_apps" target="_blank"><i className="ts_icon ts_icon_plug"></i>Configure Apps</a></li>
-// <li><a href="/archives" data-qa="archives"><i className="ts_icon ts_icon_archive"></i>Message Archives</a></li>
-//
-// <li><a href="/team" data-qa="team_directory"><i className="ts_icon ts_icon_team_directory"></i>Directory</a></li>
-// <li><a href="/stats" data-qa="statistics"><i className="ts_icon ts_icon_dashboard"></i>Statistics</a></li>
-// <li><a href="/customize" data-qa="customize"><i className="ts_icon ts_icon_magic"></i>Customize</a></li>
-// <li><a href="/account/team" data-qa="team_settings"><i className="ts_icon ts_icon_cog_o"></i>Team Settings</a></li>
