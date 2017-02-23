@@ -1,29 +1,32 @@
-@import "../../static/plastic/plastic_colors.less";
+@import "./colors.less";
 
 .Sidebar {
   .MenuTitle {
     color: #fff;
     text-decoration: none;
-    padding: .25rem 0;
     display: block;
     font-size: 1rem;
     font-weight: 700;
   }
 
-  .MenuTitle-browser .ts_icon {
-    color: @miami_pink;
+  nav#site_nav ul a {
+    padding: .25rem 0 .25rem .25rem;
   }
 
-  .MenuTitle-renderer .ts_icon {
-    color: @dusty_shale;
+  .MenuTitle-Browser .ts_icon {
+    color: @browser_color;
   }
 
-  .MenuTitle-webapp .ts_icon {
-    color: @seafoam_neue;
+  .MenuTitle-Renderer .ts_icon {
+    color: @renderer_color;
   }
 
-  .MenuTitle-webview .ts_icon {
-    color: @aussie_yellow;
+  .MenuTitle-Webapp .ts_icon {
+    color: @webapp_color;
+  }
+
+  .MenuTitle-Webview .ts_icon {
+    color: @webview_color;
   }
 
   .ts_icon {

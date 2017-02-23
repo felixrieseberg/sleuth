@@ -21,15 +21,22 @@ export interface LogTableState {
 }
 
 export class LogTable extends React.Component<LogTableProps, LogTableState> {
+  private tableElement: Table;
+
   constructor(props: LogTableProps) {
     super(props);
 
     this.state = { isDataViewVisible: false };
 
     this.onRowClick = this.onRowClick.bind(this);
-    this.cellRenderer = this.cellRenderer.bind(this);
+    this.messageCellRenderer = this.messageCellRenderer.bind(this);
+    this.prefixTypeCellRenderer = this.prefixTypeCellRenderer.bind(this);
     this.toggleDataView = this.toggleDataView.bind(this);
   }
+
+  private readonly refHandlers = {
+    table: (ref: Table) => this.tableElement = ref,
+  };
 
   public onRowClick({ index }: RowClickEvent) {
     const selectedEntry = this.props.logFile.logEntries[index] || null;
@@ -37,7 +44,7 @@ export class LogTable extends React.Component<LogTableProps, LogTableState> {
     this.setState({ selectedEntry, isDataViewVisible });
   }
 
-  public cellRenderer({ cellData, columnData, dataKey, rowData, rowIndex }) {
+  public messageCellRenderer({ cellData, columnData, dataKey, rowData, rowIndex }) {
     if (rowData.meta) {
       return (<span><i className='ts_icon ts_icon_all_files_alt HasData'/> {cellData}</span>);
     } else {
@@ -45,22 +52,51 @@ export class LogTable extends React.Component<LogTableProps, LogTableState> {
     }
   }
 
+  componentDidUpdate(prevProps: LogTableProps, prevState: LogTableState) {
+    if (prevProps.logFile.type !== this.props.logFile.type) {
+      // TODO: RERENDER!
+    }
+  }
+
+  /**
+   * Renders a cell, prefixing the log entries type.
+   *
+   * @param {any} { cellData, columnData, dataKey, rowData, rowIndex }
+   * @returns {JSX.Element}
+   */
+  public prefixTypeCellRenderer({ cellData, columnData, dataKey, rowData, rowIndex }): JSX.Element | String {
+    let prefix = <i className='Meta ts_icon ts_icon_question'/>;
+
+    if ((rowData as LogEntry).logType === 'browser') {
+      prefix = <i title='Browser Log' className='Meta Color-Browser ts_icon ts_icon_power_off'/>;
+    } else if ((rowData as LogEntry).logType === 'renderer') {
+      prefix = <i title='Renderer Log' className='Meta Color-Renderer ts_icon ts_icon_laptop'/>;
+    } else if ((rowData as LogEntry).logType === 'webapp') {
+      prefix = <i title='Webapp Log' className='Meta Color-Webapp ts_icon ts_icon_globe'/>;
+    } else if ((rowData as LogEntry).logType === 'webview') {
+      prefix = <i title='Webview Log' className='Meta Color-Webview ts_icon ts_icon_all_files_alt'/>;
+    }
+
+    return (<span>{prefix}{cellData}</span>);
+  }
+
   public toggleDataView() {
     this.setState({ isDataViewVisible: !this.state.isDataViewVisible });
   }
 
-  public render() {
+  public render(): JSX.Element {
     const { logFile } = this.props;
     const { isDataViewVisible, selectedEntry } = this.state;
     const { logEntries } = logFile;
-    const className = classNames('LogTable', { Collapsed: isDataViewVisible })
+    const typeClassName = logFile.type === 'MergedLogFile' ? 'Merged' : 'Single';
+    const className = classNames('LogTable', typeClassName, { Collapsed: isDataViewVisible });
     const tableOptions = {
-      ref: 'Table',
       headerHeight: 20,
       rowHeight: 30,
       rowGetter: (r: any) => logEntries[r.index],
       rowCount: logEntries.length,
-      onRowClick: (event: RowClickEvent) => this.onRowClick(event)
+      onRowClick: (event: RowClickEvent) => this.onRowClick(event),
+      ref: this.refHandlers.table
     };
 
     return (
@@ -69,9 +105,9 @@ export class LogTable extends React.Component<LogTableProps, LogTableState> {
           <AutoSizer>
             {({ width, height }) => (
               <Table {...tableOptions} height={height} width={width}>
-                <Column width={180} label="Timestamp" dataKey="timestamp" />
-                <Column width={70} label="Level" dataKey="level" />
-                <Column width={200} label="Message" dataKey="message" flexGrow={1} cellRenderer={this.cellRenderer}/>
+                <Column width={190} label='Timestamp' dataKey='timestamp' cellRenderer={this.prefixTypeCellRenderer} />
+                <Column width={70} label='Level' dataKey='level' />
+                <Column width={200} label='Message' dataKey='message' flexGrow={1} cellRenderer={this.messageCellRenderer} />
               </Table>
             )}
           </AutoSizer>

@@ -6,19 +6,28 @@ import * as readline from 'readline';
 import * as moment from 'moment';
 
 import { UnzippedFiles } from '../unzip';
-import { MergedLogFile, MergedLogFiles, mergeLogFiles, ProcessedLogFile, processLogFiles } from '../processor';
+import {
+  MergedLogFile,
+  MergedLogFiles,
+  mergeLogFiles,
+  ProcessedFiles,
+  ProcessedLogFile,
+  ProcessedLogFiles,
+  processFiles
+} from '../processor';
 import { LogViewHeader } from './logview-header';
 import { LogTable } from './logtable';
 import { Sidebar } from './sidebar';
 
 
 export interface LogViewProps {
-  logFiles: UnzippedFiles;
+  unzippedFiles: UnzippedFiles;
 }
 
 export interface LogViewState {
   sidebarIsOpen: boolean;
-  processedLogFiles: Array<ProcessedLogFile>;
+  processedLogFiles: ProcessedLogFiles;
+  stateFiles: UnzippedFiles;
   selectedLogFile?: ProcessedLogFile | MergedLogFile;
   mergedLogFiles?: MergedLogFiles;
 }
@@ -36,17 +45,17 @@ export class LogView extends React.Component<LogViewProps, LogViewState> {
   }
 
   public componentDidMount() {
-    this.processLogFiles();
+    this.processFiles();
   }
 
-  public processLogFiles() {
-    const { logFiles } = this.props;
+  public processFiles() {
+    const { unzippedFiles } = this.props;
 
-    processLogFiles(logFiles)
-      .then((processedLogFiles: Array<ProcessedLogFile>) => {
+    processFiles(unzippedFiles)
+      .then(({ processedLogFiles, stateFiles }: ProcessedFiles) => {
         const selectedLogFile = processedLogFiles.length > 0 ? processedLogFiles[0] : null;
 
-        this.setState({ processedLogFiles, selectedLogFile });
+        this.setState({ processedLogFiles, selectedLogFile, stateFiles });
       });
   }
 
@@ -82,7 +91,7 @@ export class LogView extends React.Component<LogViewProps, LogViewState> {
     if (selectedLogFile && selectedLogFile.type === 'ProcessedLogFile') {
       return (selectedLogFile as ProcessedLogFile).logFile.fileName;
     } else if (selectedLogFile && selectedLogFile.type === 'MergedLogFile') {
-      return (selectedLogFile as MergedLogFile).type;
+      return (selectedLogFile as MergedLogFile).logType;
     } else {
       return '';
     }

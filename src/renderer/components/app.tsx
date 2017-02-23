@@ -10,7 +10,7 @@ import { LogView } from './logview';
 import { MacTitlebar } from './mac-titlebar';
 
 export interface AppState {
-  logFiles: UnzippedFiles;
+  unzippedFiles: UnzippedFiles;
 }
 
 export class App extends React.Component<undefined, AppState> {
@@ -18,7 +18,7 @@ export class App extends React.Component<undefined, AppState> {
     super();
 
     this.state = {
-      logFiles: []
+      unzippedFiles: [],
     };
 
     ipcRenderer.on('file-dropped', (_e, url) => this.openFile(url));
@@ -45,7 +45,7 @@ export class App extends React.Component<undefined, AppState> {
 
     fs.readdir(url)
       .then((dir) => {
-        const logFiles: UnzippedFiles = [];
+        const unzippedFiles: UnzippedFiles = [];
         const promises: Array<Promise<any>> = [];
 
         dir.forEach((fileName) => {
@@ -54,15 +54,15 @@ export class App extends React.Component<undefined, AppState> {
 
           const promise = fs.stat(fullPath)
             .then((stats: fs.Stats) => {
-              const logFile: UnzippedFile = { fileName, fullPath, size: stats.size };
-              console.log('Found file, adding to result.', logFile);
-              logFiles.push(logFile);
+              const file: UnzippedFile = { fileName, fullPath, size: stats.size };
+              console.log('Found file, adding to result.', file);
+              unzippedFiles.push(file);
             });
 
           promises.push(promise);
         });
 
-        Promise.all(promises).then(() => this.setState({ logFiles }));
+        Promise.all(promises).then(() => this.setState({ unzippedFiles }));
       });
   }
 
@@ -70,17 +70,17 @@ export class App extends React.Component<undefined, AppState> {
     const unzipper = new Unzipper(url);
     unzipper.open()
       .then(() => unzipper.unzip())
-      .then((logFiles: UnzippedFiles) => this.setState({logFiles}));
+      .then((unzippedFiles: UnzippedFiles) => this.setState({unzippedFiles}));
   }
 
   public render(): JSX.Element | null {
-    const { logFiles } = this.state;
+    const { unzippedFiles } = this.state;
     const className = classNames('App', { Darwin: process.platform === 'darwin' });
     const titleBar = process.platform === 'darwin' ? <MacTitlebar /> : '';
     let content: JSX.Element | null = <Welcome />;
 
-    if (logFiles && logFiles.length > 0) {
-      content = <LogView logFiles={logFiles} />;
+    if (unzippedFiles && unzippedFiles.length > 0) {
+      content = <LogView unzippedFiles={unzippedFiles} />;
     }
 
     return (

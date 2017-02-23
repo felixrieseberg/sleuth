@@ -6,6 +6,39 @@
   padding: 6.2rem 0 0 0;
   height: 100vh;
 
+  &.Single {
+    .Meta {
+      display: none;
+    }
+  }
+
+  .HasData {
+    color: @dark_purple;
+  }
+
+  .Meta {
+    padding-right: 5px;
+  }
+
+  .ReactVirtualized__Table__row {
+    font-size: 1rem;
+  }
+
+  .ReactVirtualized__Table__headerColumn:first-of-type, .ReactVirtualized__Table__rowColumn:first-of-type {
+    margin-left: 2rem;
+  }
+
+  .ReactVirtualized__Table__row:nth-child(even) {
+    background: @neutral_white;
+  }
+
+  .ReactVirtualized__Table__row:nth-child(odd) {
+  }
+}
+
+.ReactVirtualized__Table,
+.ReactVirtualized__Grid,
+.ReactVirtualized__Table__Grid {
   &::-webkit-scrollbar {
     width: 10px;
     height: 10px;
@@ -22,27 +55,14 @@
     }
   }
 
-  &::-webkit-scrollbar-track {
-    background-color: @off_white;
+  &::-webkit-scrollbar-button {
+      width: 0;
+      height: 0;
+      display: none;
   }
 
-  .HasData {
-    color: @dark_purple;
-  }
-
-  .ReactVirtualized__Table__row {
-    font-size: 1rem;
-  }
-
-  .ReactVirtualized__Table__headerColumn:first-of-type, .ReactVirtualized__Table__rowColumn:first-of-type {
-    margin-left: 2rem;
-  }
-
-  .ReactVirtualized__Table__row:nth-child(even) {
-    background: @soft_grey;
-  }
-
-  .ReactVirtualized__Table__row:nth-child(odd) {
+  &::-webkit-scrollbar-corner {
+      background-color: transparent;
   }
 }
 

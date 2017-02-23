@@ -4,14 +4,14 @@ import * as classNames from 'classnames';
 import { ProcessedLogFile } from '../processor';
 
 export interface SortedLogFiles {
-  renderer: Array<ProcessedLogFile>;
-  webapp: Array<ProcessedLogFile>;
-  browser: Array<ProcessedLogFile>;
-  webview: Array<ProcessedLogFile>;
+  renderer: ProcessedLogFiles;
+  webapp: ProcessedLogFiles;
+  browser: ProcessedLogFiles;
+  webview: ProcessedLogFiles;
 }
 
 export interface SidebarProps {
-  logFiles: Array<ProcessedLogFile>;
+  logFiles: ProcessedLogFiles;
   isOpen: boolean;
   selectedLogFileName: string;
   selectLogFile: Function;
@@ -86,7 +86,7 @@ export class Sidebar extends React.Component<SidebarProps, undefined> {
                 </li>
               </ul>
               <ul className="primary_nav">
-                <li className="MenuTitle MenuTitle-browser">
+                <li className="MenuTitle MenuTitle-Browser">
                   <a onClick={() => selectLogFile(null, 'browser')} className={getSelectedClassName('browser')}>
                     <i className="ts_icon ts_icon_power_off"></i>Browser Process
                   </a>
@@ -94,7 +94,7 @@ export class Sidebar extends React.Component<SidebarProps, undefined> {
                 {browserFiles}
               </ul>
               <ul className="primary_nav">
-                <li className="MenuTitle MenuTitle-renderer">
+                <li className="MenuTitle MenuTitle-Renderer">
                   <a onClick={() => selectLogFile(null, 'renderer')} className={getSelectedClassName('renderer')}>
                     <i className="ts_icon ts_icon_laptop"></i>Renderer Process
                   </a>
@@ -102,7 +102,7 @@ export class Sidebar extends React.Component<SidebarProps, undefined> {
                 {rendererFiles}
               </ul>
               <ul className="primary_nav">
-                <li className="MenuTitle MenuTitle-webview">
+                <li className="MenuTitle MenuTitle-Webview">
                   <a onClick={() => selectLogFile(null, 'webview')} className={getSelectedClassName('webview')}>
                     <i className="ts_icon ts_icon_all_files_alt"></i>WebView Process
                   </a>
@@ -110,7 +110,7 @@ export class Sidebar extends React.Component<SidebarProps, undefined> {
                 {webviewFiles}
               </ul>
               <ul className="primary_nav">
-                <li className="MenuTitle MenuTitle-webapp">
+                <li className="MenuTitle MenuTitle-Webapp">
                   <a onClick={() => selectLogFile(null, 'webapp')} className={getSelectedClassName('webapp')}>
                     <i className="ts_icon ts_icon_globe"></i>WebApp
                   </a>
