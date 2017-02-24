@@ -2,8 +2,6 @@
 
 .DataView {
   padding: .5rem 1.5rem 1rem;
-  font-family: 'Inconsolata', monospace;
-  font-size: 1rem;
   background: white;
   border-top: 1px solid @neutral_grey;
   overflow: auto;
@@ -27,4 +25,17 @@
   &::-webkit-scrollbar-track {
     background: white;
   }
+
+  ul {
+    font-family: 'Inconsolata', monospace;
+    font-size: 1rem;
+  }
+}
+
+.DataView-LogEntry {
+  .DataView-MetaInfo {
+    display: flex;
+  }
+
+
 }

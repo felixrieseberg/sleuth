@@ -95,7 +95,8 @@ export class LogTable extends React.Component<LogTableProps, LogTableState> {
       rowGetter: (r: any) => logEntries[r.index],
       rowCount: logEntries.length,
       onRowClick: (event: RowClickEvent) => this.onRowClick(event),
-      ref: this.refHandlers.table
+      ref: this.refHandlers.table,
+      overscanRowCount: 200
     };
 
     return (

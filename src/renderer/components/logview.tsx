@@ -7,6 +7,7 @@ import { getTypesForFiles, mergeLogFiles, processLogFiles } from '../processor';
 import { MergedLogFile, MergedLogFiles, ProcessedLogFile, ProcessedLogFiles } from '../interfaces';
 import { LogViewHeader } from './logview-header';
 import { LogTable } from './logtable';
+import { StateTable } from './statetable';
 import { Sidebar } from './sidebar';
 import { Loading } from './loading';
 
@@ -17,7 +18,7 @@ export interface LogViewProps {
 export interface LogViewState {
   sidebarIsOpen: boolean;
   processedLogFiles: ProcessedLogFiles;
-  selectedLogFile?: ProcessedLogFile | MergedLogFile;
+  selectedLogFile?: ProcessedLogFile | MergedLogFile | UnzippedFile;
   mergedLogFiles?: MergedLogFiles;
   loadingMessage: string;
   doneProcessing: boolean;
@@ -154,8 +155,8 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
       return (selectedLogFile as ProcessedLogFile).logFile.fileName;
     } else if (selectedLogFile && selectedLogFile.type === 'MergedLogFile') {
       return (selectedLogFile as MergedLogFile).logType;
-    } else {
-      return '';
+    } else if (selectedLogFile) {
+      return (selectedLogFile as UnzippedFile).fileName;
     }
   }
 
@@ -175,19 +176,30 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
     return Math.round(alreadyLoaded / toLoad * 100);
   }
 
+  public renderTableOrData() {
+    const { selectedLogFile } = this.state;
+
+    if ((selectedLogFile as ProcessedLogFile).type === 'ProcessedLogFile' ||
+        (selectedLogFile as MergedLogFile).type === 'MergedLogFile') {
+      return (<LogTable logFile={selectedLogFile as ProcessedLogFile} />);
+    } else {
+      return (<StateTable file={selectedLogFile as UnzippedFile} />);
+    }
+  }
+
   public render() {
     const { sidebarIsOpen, processedLogFiles, selectedLogFile, loadingMessage } = this.state;
     const logViewClassName = classNames('LogView');
     const logContentClassName = classNames({ SidebarIsOpen: sidebarIsOpen });
-    const logTable = selectedLogFile ? (<LogTable logFile={selectedLogFile} />) : '';
     const selectedLogFileName = this.getSelectedFileName();
     const percentageLoaded = this.getPercentageLoaded();
-    const tableOrLoading = selectedLogFile ? logTable : <Loading percentage={percentageLoaded} message={loadingMessage} />;
+    const loading = <Loading percentage={percentageLoaded} message={loadingMessage} />;
+    const tableOrLoading = selectedLogFile ? this.renderTableOrData() : loading;
 
     return (
       <div className={logViewClassName}>
         <Sidebar isOpen={sidebarIsOpen || true}
-          logFiles={processedLogFiles}
+          logFiles={processedLogFiles as ProcessedLogFiles}
           selectLogFile={this.selectLogFile}
           selectedLogFileName={selectedLogFileName} />
         <div id='content' className={logContentClassName}>

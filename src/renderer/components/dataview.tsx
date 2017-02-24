@@ -64,14 +64,17 @@ export class DataView extends React.Component<DataViewProps, DataViewState> {
    */
   public renderLogEntry(logEntry: LogEntry): JSX.Element | null {
     const { level, logType, message, timestamp } = logEntry;
+    const type = `${logType.charAt(0).toUpperCase() + logType.slice(1)} Process`;
     const datetime = logEntry.moment ? moment(logEntry.moment).format("dddd, MMMM Do YYYY, h:mm:ss a") : timestamp;
 
     return (
       <div className='DataView-LogEntry'>
         <div className='DataView-MetaInfo'>
           <div className='DataView-Moment'>{datetime}</div>
-          <div className='DataView-LogType'>{logType}</div>
-          <div className='DataView-Message'>{level}</div>
+          <div className='DataView-LogType'>
+            	<i className="ts_icon ts_icon_volume_medium"></i>{level}
+              <i className="ts_icon ts_icon_volume_medium"></i>{type}
+          </div>
         </div>
         <div className='DataView-Message'>{message}</div>
       </div>
@@ -99,7 +102,7 @@ export class DataView extends React.Component<DataViewProps, DataViewState> {
    *
    * @returns {Object}
    */
-  private getTheme() {
+  public getTheme() {
     return {
       base00: '#2C2D30',
       base01: '#555459',

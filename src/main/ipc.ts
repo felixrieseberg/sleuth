@@ -1,4 +1,4 @@
-import { ipcMain } from 'electron';
+import { ipcMain, shell } from 'electron';
 
 export class IpcManager {
   constructor(readonly mainWindow: Electron.BrowserWindow) {
@@ -15,6 +15,10 @@ export class IpcManager {
   setupFileDrop() {
     this.mainWindow.webContents.on('will-navigate', (e, url) => {
       e.preventDefault();
+
+      if (!url.startsWith('file:///')) {
+        shell.openExternal((e as any).target.href);
+      }
 
       url = url.replace('file:///', '/');
       this.mainWindow.webContents.send('file-dropped', decodeURIComponent(url));

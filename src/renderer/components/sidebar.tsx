@@ -1,3 +1,4 @@
+import { UnzippedFile } from '../unzip';
 import * as React from 'react';
 import * as classNames from 'classnames';
 
@@ -23,7 +24,7 @@ export class Sidebar extends React.Component<SidebarProps, undefined> {
    * @param {ProcessedLogFile} file
    * @returns {JSX.Element}
    */
-  renderFile(file: ProcessedLogFile): JSX.Element {
+  renderLogFile(file: ProcessedLogFile): JSX.Element {
     const { selectLogFile, selectedLogFileName } = this.props;
     const isSelected = (selectedLogFileName === file.logFile.fileName);
     const className = classNames({ Selected: isSelected });
@@ -37,11 +38,39 @@ export class Sidebar extends React.Component<SidebarProps, undefined> {
         );
   }
 
+  renderStateFile(file: UnzippedFile): JSX.Element {
+    const { selectLogFile, selectedLogFileName } = this.props;
+    const isSelected = (selectedLogFileName === file.fileName);
+    const className = classNames({ Selected: isSelected });
+
+    const nameMatch = file.fileName.match(/slack-(\w*)/);
+    const name = nameMatch && nameMatch.length > 1 ? nameMatch[1] : file.fileName;
+
+    return (
+        <li key={file.fileName}>
+          <a onClick={() => selectLogFile(file)} className={className}>
+              <i className="ts_icon ts_icon_file LogFile"></i>{name}
+          </a>
+        </li>
+        );
+  }
+
+  renderFile(file: ProcessedLogFile | UnzippedFile) {
+    if ((file as ProcessedLogFile).type === 'ProcessedLogFile') {
+      // It's a log file
+      return this.renderLogFile(file as ProcessedLogFile);
+    } else {
+      // it's a state file
+      return this.renderStateFile(file as UnzippedFile);
+    }
+  }
+
   public render(): JSX.Element | null {
     const { isOpen, selectLogFile, selectedLogFileName, logFiles } = this.props;
     const className = classNames('Sidebar', { 'nav_open': isOpen });
 
     const getSelectedClassName = (logType: string) => classNames({ Selected: (selectedLogFileName === logType) });
+    const stateFiles = logFiles.state.map(this.renderFile.bind(this));
     const browserFiles = logFiles.browser.map(this.renderFile.bind(this));
     const rendererFiles = logFiles.renderer.map(this.renderFile.bind(this));
     const webappFiles = logFiles.webapp.map(this.renderFile.bind(this));
@@ -52,6 +81,14 @@ export class Sidebar extends React.Component<SidebarProps, undefined> {
         <nav id="site_nav">
           <div id="site_nav_contents">
             <div className="nav_contents">
+              <ul className="primary_nav">
+                <li className="MenuTitle MenuTitle-Webapp">
+                  <a>
+                    <i className="ts_icon ts_icon_filter"></i>State
+                  </a>
+                </li>
+                {stateFiles}
+              </ul>
               <ul className="primary_nav">
                 <li className="MenuTitle MenuTitle-all">
                   <a onClick={() => selectLogFile(null, 'all')} className={getSelectedClassName('all')}>
