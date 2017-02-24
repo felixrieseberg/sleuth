@@ -22,7 +22,7 @@ export class Alert extends React.Component<AlertProps, undefined> {
       icon = 'ts_icon_info_circle';
     }
 
-    return <i className={`ts-icon ${icon}`}></i>;
+    return <i className={`ts_icon ${icon}`}></i>;
   }
 
   public render() {

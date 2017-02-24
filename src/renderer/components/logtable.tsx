@@ -3,6 +3,7 @@ import * as classNames from 'classnames';
 
 import { LogEntry, MergedLogFile, ProcessedLogFile } from '../interfaces';
 import { DataView } from './dataview';
+import { Alert } from './alert';
 import { Column, Table, AutoSizer } from 'react-virtualized';
 
 export interface RowClickEvent {
@@ -37,23 +38,28 @@ export class LogTable extends React.Component<LogTableProps, LogTableState> {
     table: (ref: Table) => this.tableElement = ref,
   };
 
+  /**
+   * Handles a single click onto a row
+   *
+   * @param {RowClickEvent} { index }
+   */
   public onRowClick({ index }: RowClickEvent) {
     const selectedEntry = this.props.logFile.logEntries[index] || null;
     const isDataViewVisible = !!selectedEntry.meta;
     this.setState({ selectedEntry, isDataViewVisible });
   }
 
-  public messageCellRenderer({ cellData, columnData, dataKey, rowData, rowIndex }) {
+  /**
+   * Renders the "message" cell
+   *
+   * @param {any} { cellData, columnData, dataKey, rowData, rowIndex }
+   * @returns {(JSX.Element | string)}
+   */
+  public messageCellRenderer({ cellData, columnData, dataKey, rowData, rowIndex }): JSX.Element | string {
     if (rowData.meta) {
       return (<span><i className='ts_icon ts_icon_all_files_alt HasData'/> {cellData}</span>);
     } else {
       return String(cellData);
-    }
-  }
-
-  componentDidUpdate(prevProps: LogTableProps, prevState: LogTableState) {
-    if (prevProps.logFile.type !== this.props.logFile.type) {
-      // TODO: RERENDER!
     }
   }
 
@@ -79,8 +85,24 @@ export class LogTable extends React.Component<LogTableProps, LogTableState> {
     return (<span>{prefix}{cellData}</span>);
   }
 
+  /**
+   * Toggles the data view
+   */
   public toggleDataView() {
     this.setState({ isDataViewVisible: !this.state.isDataViewVisible });
+  }
+
+  /**
+   * Checks if we're looking at a web app log and returns a warning, so that users know
+   * the app didn't all over
+   *
+   * @returns {(JSX.Element | null)}
+   */
+  public renderWebAppWarning(): JSX.Element | null {
+    const { logFile } = this.props;
+
+    const text = `The web app logs are difficult to parse for a computer - proceed with caution.`;
+    return logFile.logType === 'webapp' ? <Alert text={text} level='warning' /> : null;
   }
 
   public render(): JSX.Element {
@@ -89,6 +111,7 @@ export class LogTable extends React.Component<LogTableProps, LogTableState> {
     const { logEntries } = logFile;
     const typeClassName = logFile.type === 'MergedLogFile' ? 'Merged' : 'Single';
     const className = classNames('LogTable', typeClassName, { Collapsed: isDataViewVisible });
+    const warning = this.renderWebAppWarning();
     const tableOptions = {
       headerHeight: 20,
       rowHeight: 30,
@@ -102,6 +125,7 @@ export class LogTable extends React.Component<LogTableProps, LogTableState> {
     return (
       <div>
         <div className={className}>
+          {warning}
           <AutoSizer>
             {({ width, height }) => (
               <Table {...tableOptions} height={height} width={width}>
