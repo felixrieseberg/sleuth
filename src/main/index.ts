@@ -1,11 +1,12 @@
 import { app, BrowserWindow } from 'electron';
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
 
-import { setupFileDrop } from './window-helpers';
+import { IpcManager } from './ipc';
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
+let ipcManager;
 
 const isDevMode = process.execPath.match(/[\\/]electron/);
 
@@ -36,7 +37,7 @@ const createWindow = async () => {
     mainWindow = null;
   });
 
-  setupFileDrop(mainWindow);
+  ipcManager = new IpcManager(mainWindow);
 };
 
 // This method will be called when Electron has finished

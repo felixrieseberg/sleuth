@@ -1,6 +1,8 @@
 import * as React from 'react';
 import * as classNames from 'classnames';
 
+import { remote } from 'electron';
+
 export interface LogViewHeaderProps {
   menuToggle: Function;
 }
@@ -13,6 +15,11 @@ export class LogViewHeader extends React.Component<LogViewHeaderProps, LogViewHe
     super(props);
 
     this.state = {};
+    this.refresh = this.refresh.bind(this);
+  }
+
+  public refresh() {
+    remote.getCurrentWindow().reload();
   }
 
   public render() {
@@ -26,7 +33,7 @@ export class LogViewHeader extends React.Component<LogViewHeaderProps, LogViewHe
           <span className="vert_divider"></span>
         </a>
         <h1 id="header_team_name" className="inline_block" data-qa="header_team_name">
-          <a href="/home">
+          <a onClick={this.refresh}>
             <i className="ts_icon ts_icon_home"></i> Slack Log Viewer
           </a>
         </h1>

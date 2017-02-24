@@ -112,7 +112,7 @@ export class LogTable extends React.Component<LogTableProps, LogTableState> {
             )}
           </AutoSizer>
         </div>
-        <DataView isVisible={isDataViewVisible} entry={selectedEntry} toggle={this.toggleDataView} />
+        <DataView isVisible={isDataViewVisible} entry={selectedEntry} toggle={this.toggleDataView} logEntry={selectedEntry} />
       </div>
     );
   }

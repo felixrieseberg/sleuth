@@ -3,13 +3,14 @@ import * as classNames from 'classnames';
 import * as dirtyJSON from 'jsonic';
 import JSONTree from 'react-json-tree';
 
-import { LogEntry } from './logview';
+import { LogEntry } from '../processor';
 
 export interface DataViewProps {
   isVisible: boolean;
   entry?: LogEntry;
   height?: number;
   toggle: Function;
+  logEntry?: LogEntry;
 }
 
 export interface DataViewState {
@@ -47,7 +48,7 @@ export class DataView extends React.Component<DataViewProps, DataViewState> {
   }
 
   public render() {
-    const { entry, isVisible, height } = this.props;
+    const { entry, isVisible, height, logEntry } = this.props;
     const style = { height: `${height || 300}px` };
     const meta = entry ? entry.meta : '';
     const className = classNames('DataView', { IsVisible: isVisible });
@@ -55,6 +56,9 @@ export class DataView extends React.Component<DataViewProps, DataViewState> {
 
     return (
       <div className={className} style={style} onDoubleClick={this.onDoubleClick}>
+        <div>
+          <JSONTree data={logEntry || {}} theme={this.getTheme()} />
+        </div>
         {prettyMeta}
       </div>
     );

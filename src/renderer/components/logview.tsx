@@ -1,24 +1,24 @@
-import { LogEntry } from './logview';
 import * as React from 'react';
 import * as classNames from 'classnames';
 import * as fs from 'fs-promise';
 import * as readline from 'readline';
 import * as moment from 'moment';
+import { requireTaskPool } from 'electron-remote';
 
-import { UnzippedFiles } from '../unzip';
+import { ipcRenderer } from 'electron';
+import { UnzippedFile, UnzippedFiles } from '../unzip';
 import {
+  getTypesForFiles,
   MergedLogFile,
   MergedLogFiles,
   mergeLogFiles,
-  ProcessedFiles,
   ProcessedLogFile,
-  ProcessedLogFiles,
-  processFiles
+  ProcessedLogFiles
 } from '../processor';
 import { LogViewHeader } from './logview-header';
 import { LogTable } from './logtable';
 import { Sidebar } from './sidebar';
-
+import { Loading } from './loading';
 
 export interface LogViewProps {
   unzippedFiles: UnzippedFiles;
@@ -27,36 +27,66 @@ export interface LogViewProps {
 export interface LogViewState {
   sidebarIsOpen: boolean;
   processedLogFiles: ProcessedLogFiles;
-  stateFiles: UnzippedFiles;
   selectedLogFile?: ProcessedLogFile | MergedLogFile;
   mergedLogFiles?: MergedLogFiles;
+  loadingMessage: string;
+  doneProcessing: boolean;
 }
 
-export class LogView extends React.Component<LogViewProps, LogViewState> {
+export class LogView extends React.Component<LogViewProps, Partial<LogViewState>> {
   constructor(props: LogViewProps) {
     super(props);
 
     this.state = {
       sidebarIsOpen: true,
-      processedLogFiles: []
+      processedLogFiles: {
+        browser: [],
+        renderer: [],
+        webview: [],
+        webapp: [],
+        state: []
+      },
+      loadingMessage: '',
+      doneProcessing: false
     };
 
     this.selectLogFile = this.selectLogFile.bind(this);
+
+    ipcRenderer.on('processing-status', (_event, loadingMessage: string) => {
+      this.setState({ loadingMessage })
+    });
   }
 
   public componentDidMount() {
     this.processFiles();
   }
 
-  public processFiles() {
+  public addFilesToState(files: Array<ProcessedLogFile|UnzippedFile>, logType: string) {
+    const { processedLogFiles } = this.state;
+    const newProcessedLogFiles = {...processedLogFiles};
+    newProcessedLogFiles[logType] = newProcessedLogFiles[logType].concat(files);
+
+    this.setState({
+      processedLogFiles: newProcessedLogFiles
+    });
+  }
+
+  public async processFiles() {
+    const remoteProcessor = requireTaskPool(require.resolve('../processor'));
     const { unzippedFiles } = this.props;
+    const sortedUnzippedFiles = getTypesForFiles(unzippedFiles);
 
-    processFiles(unzippedFiles)
-      .then(({ processedLogFiles, stateFiles }: ProcessedFiles) => {
-        const selectedLogFile = processedLogFiles.length > 0 ? processedLogFiles[0] : null;
+    this.addFilesToState(sortedUnzippedFiles.state, 'state');
 
-        this.setState({ processedLogFiles, selectedLogFile, stateFiles });
-      });
+    // We'll process files using electron-remote. We'll also do it step-by-step.
+    await remoteProcessor.processLogFiles(sortedUnzippedFiles.renderer)
+      .then((newFiles: Array<ProcessedLogFile>) => this.addFilesToState(newFiles, 'renderer'));
+    await remoteProcessor.processLogFiles(sortedUnzippedFiles.browser)
+      .then((newFiles: Array<ProcessedLogFile>) => this.addFilesToState(newFiles, 'browser'));
+    await remoteProcessor.processLogFiles(sortedUnzippedFiles.webapp)
+      .then((newFiles: Array<ProcessedLogFile>) => this.addFilesToState(newFiles, 'webapp'));
+    await remoteProcessor.processLogFiles(sortedUnzippedFiles.webview)
+      .then((newFiles: Array<ProcessedLogFile>) => this.addFilesToState(newFiles, 'webview'));
   }
 
   public menuToggled() {
@@ -70,7 +100,17 @@ export class LogView extends React.Component<LogViewProps, LogViewState> {
       if (!mergedLogFiles || !mergedLogFiles[logType]) {
         // Requested for the first time? Let's sort them real quick
         console.log(`Requested the merged log format for '${logType}', but it hasn't been created yet.`);
-        const filesToMerge = processedLogFiles.filter((logFile) => logFile.logType === logType || logType === 'all');
+        let filesToMerge;
+
+        if (logType === 'all') {
+          filesToMerge = Object.keys(processedLogFiles)
+            .filter((k) => k !== 'state' && k !== 'webapp')
+            .map((k) => processedLogFiles[k])
+            .reduce((p, c) => p.concat(c), []);
+        } else {
+          filesToMerge = processedLogFiles[logType];
+        }
+
         const freshlyMerged = mergeLogFiles(filesToMerge, logType);
         const newMergedLogFiles = {...mergedLogFiles};
 
@@ -97,19 +137,32 @@ export class LogView extends React.Component<LogViewProps, LogViewState> {
     }
   }
 
+  public getPercentageLoaded() {
+    const { unzippedFiles } = this.props;
+    const { processedLogFiles } = this.state;
+    const alreadyLoaded = Object.keys(processedLogFiles)
+      .map((k) => processedLogFiles[k])
+      .reduce((p, c) => p + c.length, 0);
+    const toLoad = unzippedFiles.length;
+
+    return Math.round(alreadyLoaded / toLoad * 100);
+  }
+
   public render() {
-    const { sidebarIsOpen, processedLogFiles, selectedLogFile } = this.state;
+    const { sidebarIsOpen, processedLogFiles, selectedLogFile, loadingMessage } = this.state;
     const logViewClassName = classNames('LogView');
     const logContentClassName = classNames({ SidebarIsOpen: sidebarIsOpen });
     const logTable = selectedLogFile ? (<LogTable logFile={selectedLogFile} />) : '';
     const selectedLogFileName = this.getSelectedFileName();
+    const percentageLoaded = this.getPercentageLoaded();
+    const tableOrLoading = selectedLogFile ? logTable : <Loading percentage={percentageLoaded} message={loadingMessage} />;
 
     return (
       <div className={logViewClassName}>
         <Sidebar isOpen={sidebarIsOpen} logFiles={processedLogFiles} selectLogFile={this.selectLogFile} selectedLogFileName={selectedLogFileName} />
         <div id='content' className={logContentClassName}>
           <LogViewHeader menuToggle={() => this.menuToggled()} />
-          {logTable}
+          {tableOrLoading}
         </div>
       </div>
     );

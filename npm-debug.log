@@ -1,0 +1,118 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/Users/felixr/.nvm/versions/node/v7.4.0/bin/node',
+1 verbose cli   '/Users/felixr/.nvm/versions/node/v7.4.0/bin/npm',
+1 verbose cli   'i',
+1 verbose cli   '--save-dev',
+1 verbose cli   '@types/electron-remote' ]
+2 info using npm@4.0.5
+3 info using node@v7.4.0
+4 silly loadCurrentTree Starting
+5 silly install loadCurrentTree
+6 silly install readLocalPackageData
+7 silly fetchPackageMetaData @types/electron-remote
+8 silly fetchNamedPackageData @types/electron-remote
+9 silly mapToRegistry name @types/electron-remote
+10 silly mapToRegistry scope (from package name) @types
+11 verbose mapToRegistry no registry URL found in name for scope @types
+12 silly mapToRegistry using default registry
+13 silly mapToRegistry registry https://registry.npmjs.org/
+14 silly mapToRegistry data Result {
+14 silly mapToRegistry   raw: '@types/electron-remote',
+14 silly mapToRegistry   scope: '@types',
+14 silly mapToRegistry   escapedName: '@types%2felectron-remote',
+14 silly mapToRegistry   name: '@types/electron-remote',
+14 silly mapToRegistry   rawSpec: '',
+14 silly mapToRegistry   spec: 'latest',
+14 silly mapToRegistry   type: 'tag' }
+15 silly mapToRegistry uri https://registry.npmjs.org/@types%2felectron-remote
+16 verbose request uri https://registry.npmjs.org/@types%2felectron-remote
+17 verbose request no auth needed
+18 info attempt registry request try #1 at 2:11:00 PM
+19 verbose request using bearer token for auth
+20 verbose request id 3a84cc791528c4d1
+21 http request GET https://registry.npmjs.org/@types%2felectron-remote
+22 info retry will retry, error on last attempt: Error: getaddrinfo ENOTFOUND registry.npmjs.org registry.npmjs.org:443
+23 info attempt registry request try #2 at 2:11:41 PM
+24 verbose request using bearer token for auth
+25 http request GET https://registry.npmjs.org/@types%2felectron-remote
+26 http 404 https://registry.npmjs.org/@types%2felectron-remote
+27 verbose headers { 'content-type': 'application/json',
+27 verbose headers   'cache-control': 'max-age=0',
+27 verbose headers   'content-length': '2',
+27 verbose headers   'accept-ranges': 'bytes',
+27 verbose headers   date: 'Thu, 23 Feb 2017 22:11:41 GMT',
+27 verbose headers   via: '1.1 varnish',
+27 verbose headers   connection: 'keep-alive',
+27 verbose headers   'x-served-by': 'cache-sjc3631-SJC',
+27 verbose headers   'x-cache': 'MISS',
+27 verbose headers   'x-cache-hits': '0',
+27 verbose headers   'x-timer': 'S1487887901.061003,VS0,VE107',
+27 verbose headers   vary: 'Accept-Encoding' }
+28 silly get cb [ 404,
+28 silly get   { 'content-type': 'application/json',
+28 silly get     'cache-control': 'max-age=0',
+28 silly get     'content-length': '2',
+28 silly get     'accept-ranges': 'bytes',
+28 silly get     date: 'Thu, 23 Feb 2017 22:11:41 GMT',
+28 silly get     via: '1.1 varnish',
+28 silly get     connection: 'keep-alive',
+28 silly get     'x-served-by': 'cache-sjc3631-SJC',
+28 silly get     'x-cache': 'MISS',
+28 silly get     'x-cache-hits': '0',
+28 silly get     'x-timer': 'S1487887901.061003,VS0,VE107',
+28 silly get     vary: 'Accept-Encoding' } ]
+29 silly fetchPackageMetaData Error: Registry returned 404 for GET on https://registry.npmjs.org/@types%2felectron-remote
+29 silly fetchPackageMetaData     at makeError (/Users/felixr/.nvm/versions/node/v7.4.0/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:302:12)
+29 silly fetchPackageMetaData     at CachingRegistryClient.<anonymous> (/Users/felixr/.nvm/versions/node/v7.4.0/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:280:14)
+29 silly fetchPackageMetaData     at Request._callback (/Users/felixr/.nvm/versions/node/v7.4.0/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:210:14)
+29 silly fetchPackageMetaData     at Request.self.callback (/Users/felixr/.nvm/versions/node/v7.4.0/lib/node_modules/npm/node_modules/request/request.js:186:22)
+29 silly fetchPackageMetaData     at emitTwo (events.js:106:13)
+29 silly fetchPackageMetaData     at Request.emit (events.js:191:7)
+29 silly fetchPackageMetaData     at Request.<anonymous> (/Users/felixr/.nvm/versions/node/v7.4.0/lib/node_modules/npm/node_modules/request/request.js:1081:10)
+29 silly fetchPackageMetaData     at emitOne (events.js:96:13)
+29 silly fetchPackageMetaData     at Request.emit (events.js:188:7)
+29 silly fetchPackageMetaData     at IncomingMessage.<anonymous> (/Users/felixr/.nvm/versions/node/v7.4.0/lib/node_modules/npm/node_modules/request/request.js:1001:12)
+29 silly fetchPackageMetaData  error for @types/electron-remote { Error: Registry returned 404 for GET on https://registry.npmjs.org/@types%2felectron-remote
+29 silly fetchPackageMetaData     at makeError (/Users/felixr/.nvm/versions/node/v7.4.0/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:302:12)
+29 silly fetchPackageMetaData     at CachingRegistryClient.<anonymous> (/Users/felixr/.nvm/versions/node/v7.4.0/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:280:14)
+29 silly fetchPackageMetaData     at Request._callback (/Users/felixr/.nvm/versions/node/v7.4.0/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:210:14)
+29 silly fetchPackageMetaData     at Request.self.callback (/Users/felixr/.nvm/versions/node/v7.4.0/lib/node_modules/npm/node_modules/request/request.js:186:22)
+29 silly fetchPackageMetaData     at emitTwo (events.js:106:13)
+29 silly fetchPackageMetaData     at Request.emit (events.js:191:7)
+29 silly fetchPackageMetaData     at Request.<anonymous> (/Users/felixr/.nvm/versions/node/v7.4.0/lib/node_modules/npm/node_modules/request/request.js:1081:10)
+29 silly fetchPackageMetaData     at emitOne (events.js:96:13)
+29 silly fetchPackageMetaData     at Request.emit (events.js:188:7)
+29 silly fetchPackageMetaData     at IncomingMessage.<anonymous> (/Users/felixr/.nvm/versions/node/v7.4.0/lib/node_modules/npm/node_modules/request/request.js:1001:12)
+29 silly fetchPackageMetaData   pkgid: '@types/electron-remote',
+29 silly fetchPackageMetaData   statusCode: 404,
+29 silly fetchPackageMetaData   code: 'E404' }
+30 silly rollbackFailedOptional Starting
+31 silly rollbackFailedOptional Finishing
+32 silly runTopLevelLifecycles Finishing
+33 silly install printInstalled
+34 verbose stack Error: Registry returned 404 for GET on https://registry.npmjs.org/@types%2felectron-remote
+34 verbose stack     at makeError (/Users/felixr/.nvm/versions/node/v7.4.0/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:302:12)
+34 verbose stack     at CachingRegistryClient.<anonymous> (/Users/felixr/.nvm/versions/node/v7.4.0/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:280:14)
+34 verbose stack     at Request._callback (/Users/felixr/.nvm/versions/node/v7.4.0/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:210:14)
+34 verbose stack     at Request.self.callback (/Users/felixr/.nvm/versions/node/v7.4.0/lib/node_modules/npm/node_modules/request/request.js:186:22)
+34 verbose stack     at emitTwo (events.js:106:13)
+34 verbose stack     at Request.emit (events.js:191:7)
+34 verbose stack     at Request.<anonymous> (/Users/felixr/.nvm/versions/node/v7.4.0/lib/node_modules/npm/node_modules/request/request.js:1081:10)
+34 verbose stack     at emitOne (events.js:96:13)
+34 verbose stack     at Request.emit (events.js:188:7)
+34 verbose stack     at IncomingMessage.<anonymous> (/Users/felixr/.nvm/versions/node/v7.4.0/lib/node_modules/npm/node_modules/request/request.js:1001:12)
+35 verbose statusCode 404
+36 verbose pkgid @types/electron-remote
+37 verbose cwd /Users/felixr/Code/sleuth
+38 error Darwin 16.4.0
+39 error argv "/Users/felixr/.nvm/versions/node/v7.4.0/bin/node" "/Users/felixr/.nvm/versions/node/v7.4.0/bin/npm" "i" "--save-dev" "@types/electron-remote"
+40 error node v7.4.0
+41 error npm  v4.0.5
+42 error code E404
+43 error 404 Registry returned 404 for GET on https://registry.npmjs.org/@types%2felectron-remote
+44 error 404
+45 error 404 '@types/electron-remote' is not in the npm registry.
+46 error 404 You should bug the author to publish it (or use the name yourself!)
+47 error 404 Note that you can also install from a
+48 error 404 tarball, folder, http url, or git url.
+49 verbose exit [ 1, true ]

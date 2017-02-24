@@ -1,14 +1,7 @@
 import * as React from 'react';
 import * as classNames from 'classnames';
 
-import { ProcessedLogFile } from '../processor';
-
-export interface SortedLogFiles {
-  renderer: ProcessedLogFiles;
-  webapp: ProcessedLogFiles;
-  browser: ProcessedLogFiles;
-  webview: ProcessedLogFiles;
-}
+import { ProcessedLogFile, ProcessedLogFiles } from '../processor';
 
 export interface SidebarProps {
   logFiles: ProcessedLogFiles;
@@ -22,30 +15,6 @@ export class Sidebar extends React.Component<SidebarProps, undefined> {
     super(props);
 
     this.renderFile = this.renderFile.bind(this);
-  }
-
-  getSortedLogFiles(): SortedLogFiles {
-    const { logFiles } = this.props;
-    const result: SortedLogFiles = {
-      renderer: [],
-      webapp: [],
-      browser: [],
-      webview: []
-    };
-
-    logFiles.forEach((logFile) => {
-      if (logFile.logType === 'renderer') {
-        result.renderer.push(logFile);
-      } else if (logFile.logType === 'browser') {
-        result.browser.push(logFile);
-      } else if (logFile.logType === 'webapp') {
-        result.webapp.push(logFile);
-      } else if (logFile.logType === 'webview') {
-        result.webview.push(logFile);
-      }
-    });
-
-    return result;
   }
 
   renderFile(file: ProcessedLogFile) {
@@ -63,15 +32,14 @@ export class Sidebar extends React.Component<SidebarProps, undefined> {
   }
 
   public render() {
-    const { isOpen, selectLogFile, selectedLogFileName } = this.props;
-    const sortedLogFiles = this.getSortedLogFiles();
+    const { isOpen, selectLogFile, selectedLogFileName, logFiles } = this.props;
     const className = classNames('Sidebar', { 'nav_open': isOpen });
 
     const getSelectedClassName = (logType: string) => classNames({ Selected: (selectedLogFileName === logType) });
-    const browserFiles = sortedLogFiles.browser.map(this.renderFile.bind(this));
-    const rendererFiles = sortedLogFiles.renderer.map(this.renderFile.bind(this));
-    const webappFiles = sortedLogFiles.webapp.map(this.renderFile.bind(this));
-    const webviewFiles = sortedLogFiles.webview.map(this.renderFile.bind(this));
+    const browserFiles = logFiles.browser.map(this.renderFile.bind(this));
+    const rendererFiles = logFiles.renderer.map(this.renderFile.bind(this));
+    const webappFiles = logFiles.webapp.map(this.renderFile.bind(this));
+    const webviewFiles = logFiles.webview.map(this.renderFile.bind(this));
 
     return (
       <div className={className}>
@@ -81,7 +49,7 @@ export class Sidebar extends React.Component<SidebarProps, undefined> {
               <ul className="primary_nav">
                 <li className="MenuTitle MenuTitle-all">
                   <a onClick={() => selectLogFile(null, 'all')} className={getSelectedClassName('all')}>
-                    <i className="ts_icon ts_icon_archive"></i>All Log Files
+                    <i className="ts_icon ts_icon_archive"></i>All Desktop Log Files
                   </a>
                 </li>
               </ul>
