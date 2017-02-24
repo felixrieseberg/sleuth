@@ -1,78 +1,18 @@
-import { SortedLogFiles } from './components/sidebar';
 import { UnzippedFile, UnzippedFiles } from './unzip';
+import { LogEntry, MatchResult, MergedLogFile, ProcessedLogFile, SortedUnzippedFiles } from './interfaces';
 import { ipcRenderer } from 'electron';
 
 import * as fs from 'fs-promise';
 import * as readline from 'readline';
 import * as moment from 'moment';
 
-export interface LogEntry {
-  timestamp: string;
-  message: string;
-  level: string;
-  logType: string;
-  meta?: any;
-  moment?: moment.Moment | string;
-}
-
-export interface MatchResult {
-  timestamp?: string;
-  message?: string;
-  level?: string;
-  meta?: any;
-  moment?: moment.Moment;
-  toParseHead?: string;
-}
-
-export interface MergedLogFiles {
-  all?: Array<LogEntry>;
-  browser?: Array<LogEntry>;
-  renderer?: Array<LogEntry>;
-  webapp?: Array<LogEntry>;
-  webview?: Array<LogEntry>;
-  type: 'MergedLogFiles';
-}
-
-export interface ProcessedLogFile {
-  logFile: UnzippedFile;
-  logEntries: Array<LogEntry>;
-  logType: string;
-  type: 'ProcessedLogFile';
-}
-
-export interface ProcessedLogFiles {
-  browser: Array<ProcessedLogFile>;
-  renderer: Array<ProcessedLogFile>;
-  webview: Array<ProcessedLogFile>;
-  webapp: Array<ProcessedLogFile>;
-  state: Array<UnzippedFile>;
-}
-
-export interface MergedLogFile {
-  logFiles: Array<ProcessedLogFile>;
-  logEntries: Array<LogEntry>;
-  logType: string;
-  type: 'MergedLogFile';
-}
-
-export interface CombinedLogFiles {
-  logFiles: Array<ProcessedLogFile>;
-  logEntries: Array<LogEntry>;
-  logType: string;
-  type: 'CombinedLogFiles';
-}
-
-export interface SortedUnzippedFiles {
-  browser: Array<UnzippedFile>;
-  renderer: Array<UnzippedFile>;
-  webview: Array<UnzippedFile>;
-  webapp: Array<UnzippedFile>;
-  state: Array<UnzippedFile>;
-}
-
-export interface StatusCallback { (status: any): void }
-
-export function statusCallback(status: any): void {
+/**
+ * Sends a status update via IPC. Using IPC allows us to possible use other
+ * BrowserWindows, too.
+ *
+ * @param {*} status
+ */
+export function sendProcStatus(status: any): void {
   ipcRenderer.send('processing-status', status);
 }
 
@@ -125,6 +65,12 @@ export function getTypeForFile(logFile: UnzippedFile): string {
   return logType;
 }
 
+/**
+ * Takes a bunch of unzipped log files and returns a neatly sorted object.
+ *
+ * @param {UnzippedFiles} logFiles
+ * @returns {SortedUnzippedFiles}
+ */
 export function getTypesForFiles(logFiles: UnzippedFiles): SortedUnzippedFiles {
   const isStateFile = /^slack-[\s\S]*$/;
 
@@ -175,7 +121,7 @@ export function processLogFile(logFile: UnzippedFile): Promise<ProcessedLogFile>
     const logType = getTypeForFile(logFile);
 
     console.log(`Processing file ${logFile.fileName}. Log type: ${logType}.`);
-    statusCallback(`Processing file ${logFile.fileName}...`);
+    sendProcStatus(`Processing file ${logFile.fileName}...`);
 
     readFile(logFile, logType)
       .then((logEntries) => {
@@ -242,7 +188,7 @@ export function readFile(logFile: UnzippedFile, logType: string = ''): Promise<A
       // Update Status
       readLines = readLines + 1;
       if (readLines > lastLogged + 999) {
-        statusCallback(`Processed ${readLines} log lines in ${logFile.fileName}`);
+        sendProcStatus(`Processed ${readLines} log lines in ${logFile.fileName}`);
         lastLogged = readLines;
       }
     });
@@ -254,6 +200,14 @@ export function readFile(logFile: UnzippedFile, logType: string = ''): Promise<A
   });
 }
 
+/**
+ * The heart of the operation - matches a single line against regexes to understand what's
+ * happening inside a logline.
+ *
+ * @param {string} line
+ * @param {string} logType
+ * @returns {(MatchResult | undefined)}
+ */
 export function matchLine(line: string, logType: string): MatchResult | undefined {
   // Matcher for the webapp, which is a bit dirty
   // info: 2017/2/22 16:02:37.178 didStartLoading called TSSSB.timeout_tim set for ms:60000

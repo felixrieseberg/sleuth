@@ -24,7 +24,15 @@ export class App extends React.Component<undefined, AppState> {
     ipcRenderer.on('file-dropped', (_e, url) => this.openFile(url));
   }
 
-  public openFile(url: string) {
+  /**
+   * Takes a rando string, quickly checks if it's a zip or not,
+   * and either tries to open it as a file or as a folder. If
+   * it's neither, we'll do nothing.
+   *
+   * @param {string} url
+   * @returns {void}
+   */
+  public openFile(url: string): void {
     console.log(`Received open-url for ${url}`);
 
     const isZipFile = /[\s\S]*\.zip$/.test(url);
@@ -40,7 +48,12 @@ export class App extends React.Component<undefined, AppState> {
     });
   }
 
-  public openDirectory(url: string) {
+  /**
+   * Takes a folder url as a string and opens it.
+   *
+   * @param {string} url
+   */
+  public openDirectory(url: string): void {
     console.log(`Now opening directory ${url}`);
 
     fs.readdir(url)
@@ -66,7 +79,12 @@ export class App extends React.Component<undefined, AppState> {
       });
   }
 
-  public openZip(url: string) {
+  /**
+   * Takes a zip file url as a string and opens it.
+   *
+   * @param {string} url
+   */
+  public openZip(url: string): void {
     const unzipper = new Unzipper(url);
     unzipper.open()
       .then(() => unzipper.unzip())

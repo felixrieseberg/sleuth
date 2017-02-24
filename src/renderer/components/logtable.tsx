@@ -1,8 +1,7 @@
-import { MergedLogFile } from '../processor';
 import * as React from 'react';
 import * as classNames from 'classnames';
 
-import { LogEntry, ProcessedLogFile } from '../processor';
+import { LogEntry, MergedLogFile, ProcessedLogFile } from '../interfaces';
 import { DataView } from './dataview';
 import { Column, Table, AutoSizer } from 'react-virtualized';
 

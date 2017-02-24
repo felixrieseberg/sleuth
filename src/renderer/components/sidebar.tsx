@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as classNames from 'classnames';
 
-import { ProcessedLogFile, ProcessedLogFiles } from '../processor';
+import { ProcessedLogFile, ProcessedLogFiles } from '../interfaces';
 
 export interface SidebarProps {
   logFiles: ProcessedLogFiles;
@@ -17,7 +17,13 @@ export class Sidebar extends React.Component<SidebarProps, undefined> {
     this.renderFile = this.renderFile.bind(this);
   }
 
-  renderFile(file: ProcessedLogFile) {
+  /**
+   * Renders a single file inside the sidebar.
+   *
+   * @param {ProcessedLogFile} file
+   * @returns {JSX.Element}
+   */
+  renderFile(file: ProcessedLogFile): JSX.Element {
     const { selectLogFile, selectedLogFileName } = this.props;
     const isSelected = (selectedLogFileName === file.logFile.fileName);
     const className = classNames({ Selected: isSelected });
@@ -31,7 +37,7 @@ export class Sidebar extends React.Component<SidebarProps, undefined> {
         );
   }
 
-  public render() {
+  public render(): JSX.Element | null {
     const { isOpen, selectLogFile, selectedLogFileName, logFiles } = this.props;
     const className = classNames('Sidebar', { 'nav_open': isOpen });
 

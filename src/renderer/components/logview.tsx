@@ -1,20 +1,10 @@
 import * as React from 'react';
 import * as classNames from 'classnames';
-import * as fs from 'fs-promise';
-import * as readline from 'readline';
-import * as moment from 'moment';
 
 import { ipcRenderer } from 'electron';
 import { UnzippedFile, UnzippedFiles } from '../unzip';
-import {
-  getTypesForFiles,
-  MergedLogFile,
-  MergedLogFiles,
-  mergeLogFiles,
-  ProcessedLogFile,
-  ProcessedLogFiles,
-  processLogFiles
-} from '../processor';
+import { getTypesForFiles, mergeLogFiles, processLogFiles } from '../processor';
+import { MergedLogFile, MergedLogFiles, ProcessedLogFile, ProcessedLogFiles } from '../interfaces';
 import { LogViewHeader } from './logview-header';
 import { LogTable } from './logtable';
 import { Sidebar } from './sidebar';
@@ -50,17 +40,28 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
       doneProcessing: false
     };
 
+    this.toggleSidebar = this.toggleSidebar.bind(this);
     this.selectLogFile = this.selectLogFile.bind(this);
 
     ipcRenderer.on('processing-status', (_event, loadingMessage: string) => {
-      this.setState({ loadingMessage })
+      this.setState({ loadingMessage });
     });
   }
 
+  /**
+   * Once the component has mounted, we'll start processing files.
+   */
   public componentDidMount() {
     this.processFiles();
   }
 
+  /**
+   * Take an array of processed files (for logs) or unzipped files (for state files)
+   * and add them to the state of this component.
+   *
+   * @param {(Array<ProcessedLogFile|UnzippedFile>)} files
+   * @param {string} logType
+   */
   public addFilesToState(files: Array<ProcessedLogFile|UnzippedFile>, logType: string) {
     const { processedLogFiles } = this.state;
     const newProcessedLogFiles = {...processedLogFiles};
@@ -71,6 +72,9 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
     });
   }
 
+  /**
+   * Process files - most of the work happens over in ../processor.ts.
+   */
   public async processFiles() {
     const { unzippedFiles } = this.props;
     const sortedUnzippedFiles = getTypesForFiles(unzippedFiles);
@@ -87,15 +91,25 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
       .then((newFiles: Array<ProcessedLogFile>) => this.addFilesToState(newFiles, 'webview'));
 
     const { selectedLogFile, processedLogFiles } = this.state;
-    if (!selectedLogFile) {
+    if (!selectedLogFile && processedLogFiles) {
       this.setState({ selectedLogFile: processedLogFiles.browser[0] });
     }
   }
 
-  public menuToggled() {
+  /**
+   * Toggle the sidebar.
+   */
+  public toggleSidebar() {
     this.setState({ sidebarIsOpen: !this.state.sidebarIsOpen });
   }
 
+  /**
+   * Select a log file. This is a more complex operation than one might think -
+   * mostly because we might need to create a merged file on-the-fly.
+   *
+   * @param {ProcessedLogFile} logFile
+   * @param {string} [logType]
+   */
   public selectLogFile(logFile: ProcessedLogFile, logType?: string) {
     if (!logFile && logType) {
       const { mergedLogFiles, processedLogFiles } = this.state;
@@ -103,14 +117,14 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
       if (!mergedLogFiles || !mergedLogFiles[logType]) {
         // Requested for the first time? Let's sort them real quick
         console.log(`Requested the merged log format for '${logType}', but it hasn't been created yet.`);
-        let filesToMerge;
+        let filesToMerge = [];
 
-        if (logType === 'all') {
+        if (logType === 'all' && processedLogFiles) {
           filesToMerge = Object.keys(processedLogFiles)
             .filter((k) => k !== 'state' && k !== 'webapp')
             .map((k) => processedLogFiles[k])
             .reduce((p, c) => p.concat(c), []);
-        } else {
+        } else if (processedLogFiles) {
           filesToMerge = processedLogFiles[logType];
         }
 
@@ -128,6 +142,11 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
     }
   }
 
+  /**
+   * Return the file name of the currently selected file.
+   *
+   * @returns {string}
+   */
   public getSelectedFileName(): string {
     const { selectedLogFile } = this.state;
 
@@ -140,9 +159,14 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
     }
   }
 
-  public getPercentageLoaded() {
+  /**
+   * Returns a rounded percentage number for our init process.
+   *
+   * @returns {number} Percentage loaded
+   */
+  public getPercentageLoaded(): number {
     const { unzippedFiles } = this.props;
-    const { processedLogFiles } = this.state;
+    const processedLogFiles = this.state.processedLogFiles || {};
     const alreadyLoaded = Object.keys(processedLogFiles)
       .map((k) => processedLogFiles[k])
       .reduce((p, c) => p + c.length, 0);
@@ -162,9 +186,12 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
 
     return (
       <div className={logViewClassName}>
-        <Sidebar isOpen={sidebarIsOpen} logFiles={processedLogFiles} selectLogFile={this.selectLogFile} selectedLogFileName={selectedLogFileName} />
+        <Sidebar isOpen={sidebarIsOpen || true}
+          logFiles={processedLogFiles}
+          selectLogFile={this.selectLogFile}
+          selectedLogFileName={selectedLogFileName} />
         <div id='content' className={logContentClassName}>
-          <LogViewHeader menuToggle={() => this.menuToggled()} />
+          <LogViewHeader menuToggle={this.toggleSidebar} />
           {tableOrLoading}
         </div>
       </div>

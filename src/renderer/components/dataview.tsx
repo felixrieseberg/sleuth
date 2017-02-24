@@ -2,8 +2,9 @@ import * as React from 'react';
 import * as classNames from 'classnames';
 import * as dirtyJSON from 'jsonic';
 import JSONTree from 'react-json-tree';
+import * as moment from 'moment';
 
-import { LogEntry } from '../processor';
+import { LogEntry } from '../interfaces';
 
 export interface DataViewProps {
   isVisible: boolean;
@@ -24,41 +25,70 @@ export class DataView extends React.Component<DataViewProps, DataViewState> {
     this.onDoubleClick = this.onDoubleClick.bind(this);
   }
 
+  /**
+   * Toggle the whole data view.
+   */
   public onDoubleClick() {
     this.props.toggle();
   }
 
-  public getPrettyMeta(meta: string): JSX.Element | string {
+  /**
+   * Takes a meta string (probably dirty JSON) and attempts to pretty-print it.
+   *
+   * @param {string} meta
+   * @returns {(JSX.Element | null)}
+   */
+  public renderMeta(meta: string): JSX.Element | null {
     if (!meta) {
-      return '';
+      return null;
     }
 
     try {
-      console.log(meta);
       const data = dirtyJSON(meta);
 
       if (data) {
         return <JSONTree data={data} theme={this.getTheme()} />;
       } else {
-        return meta;
+        return <code>{meta}</code>;
       }
     } catch (e) {
-      return meta;
+      return <code>{meta}</code>;
     }
   }
 
-  public render() {
+  /**
+   * Renders a single log entry, ensuring that people can scroll around and still now what log entry they're looking at.
+   *
+   * @param {LogEntry} logEntry
+   * @returns {(JSX.Element | null)}
+   */
+  public renderLogEntry(logEntry: LogEntry): JSX.Element | null {
+    const { level, logType, message, timestamp } = logEntry;
+    const datetime = logEntry.moment ? moment(logEntry.moment).format("dddd, MMMM Do YYYY, h:mm:ss a") : timestamp;
+
+    return (
+      <div className='DataView-LogEntry'>
+        <div className='DataView-MetaInfo'>
+          <div className='DataView-Moment'>{datetime}</div>
+          <div className='DataView-LogType'>{logType}</div>
+          <div className='DataView-Message'>{level}</div>
+        </div>
+        <div className='DataView-Message'>{message}</div>
+      </div>
+    )
+  }
+
+  public render(): JSX.Element | null {
     const { entry, isVisible, height, logEntry } = this.props;
     const style = { height: `${height || 300}px` };
     const meta = entry ? entry.meta : '';
     const className = classNames('DataView', { IsVisible: isVisible });
-    let prettyMeta = this.getPrettyMeta(meta);
+    const logEntryInfo = logEntry ? this.renderLogEntry(logEntry) : null;
+    const prettyMeta = this.renderMeta(meta);
 
     return (
       <div className={className} style={style} onDoubleClick={this.onDoubleClick}>
-        <div>
-          <JSONTree data={logEntry || {}} theme={this.getTheme()} />
-        </div>
+        {logEntryInfo}
         {prettyMeta}
       </div>
     );
