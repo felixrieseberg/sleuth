@@ -3,7 +3,6 @@ import * as classNames from 'classnames';
 import * as fs from 'fs-promise';
 import * as readline from 'readline';
 import * as moment from 'moment';
-import { requireTaskPool } from 'electron-remote';
 
 import { ipcRenderer } from 'electron';
 import { UnzippedFile, UnzippedFiles } from '../unzip';
@@ -13,7 +12,8 @@ import {
   MergedLogFiles,
   mergeLogFiles,
   ProcessedLogFile,
-  ProcessedLogFiles
+  ProcessedLogFiles,
+  processLogFiles
 } from '../processor';
 import { LogViewHeader } from './logview-header';
 import { LogTable } from './logtable';
@@ -72,21 +72,24 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
   }
 
   public async processFiles() {
-    const remoteProcessor = requireTaskPool(require.resolve('../processor'));
     const { unzippedFiles } = this.props;
     const sortedUnzippedFiles = getTypesForFiles(unzippedFiles);
 
     this.addFilesToState(sortedUnzippedFiles.state, 'state');
 
-    // We'll process files using electron-remote. We'll also do it step-by-step.
-    await remoteProcessor.processLogFiles(sortedUnzippedFiles.renderer)
+    await processLogFiles(sortedUnzippedFiles.renderer)
       .then((newFiles: Array<ProcessedLogFile>) => this.addFilesToState(newFiles, 'renderer'));
-    await remoteProcessor.processLogFiles(sortedUnzippedFiles.browser)
+    await processLogFiles(sortedUnzippedFiles.browser)
       .then((newFiles: Array<ProcessedLogFile>) => this.addFilesToState(newFiles, 'browser'));
-    await remoteProcessor.processLogFiles(sortedUnzippedFiles.webapp)
+    await processLogFiles(sortedUnzippedFiles.webapp)
       .then((newFiles: Array<ProcessedLogFile>) => this.addFilesToState(newFiles, 'webapp'));
-    await remoteProcessor.processLogFiles(sortedUnzippedFiles.webview)
+    await processLogFiles(sortedUnzippedFiles.webview)
       .then((newFiles: Array<ProcessedLogFile>) => this.addFilesToState(newFiles, 'webview'));
+
+    const { selectedLogFile, processedLogFiles } = this.state;
+    if (!selectedLogFile) {
+      this.setState({ selectedLogFile: processedLogFiles.browser[0] });
+    }
   }
 
   public menuToggled() {
