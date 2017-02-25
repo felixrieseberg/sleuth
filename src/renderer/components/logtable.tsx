@@ -30,7 +30,7 @@ export class LogTable extends React.Component<LogTableProps, LogTableState> {
 
     this.onRowClick = this.onRowClick.bind(this);
     this.messageCellRenderer = this.messageCellRenderer.bind(this);
-    this.prefixTypeCellRenderer = this.prefixTypeCellRenderer.bind(this);
+    this.timestampCellRenderer = this.timestampCellRenderer.bind(this);
     this.toggleDataView = this.toggleDataView.bind(this);
   }
 
@@ -55,7 +55,7 @@ export class LogTable extends React.Component<LogTableProps, LogTableState> {
    * @param {any} { cellData, columnData, dataKey, rowData, rowIndex }
    * @returns {(JSX.Element | string)}
    */
-  public messageCellRenderer({ cellData, columnData, dataKey, rowData, rowIndex }): JSX.Element | string {
+  public messageCellRenderer({ cellData, rowData }): JSX.Element | string {
     if (rowData.meta) {
       return (<span><i className='ts_icon ts_icon_all_files_alt HasData'/> {cellData}</span>);
     } else {
@@ -69,20 +69,22 @@ export class LogTable extends React.Component<LogTableProps, LogTableState> {
    * @param {any} { cellData, columnData, dataKey, rowData, rowIndex }
    * @returns {JSX.Element}
    */
-  public prefixTypeCellRenderer({ cellData, columnData, dataKey, rowData, rowIndex }): JSX.Element | String {
+  public timestampCellRenderer(data: any): JSX.Element | String {
+    const entry = data.rowData as LogEntry;
+    const timestamp = entry.moment ? entry.moment.format('HH:mm:ss (DD/MM)') : entry.timestamp;
     let prefix = <i className='Meta ts_icon ts_icon_question'/>;
 
-    if ((rowData as LogEntry).logType === 'browser') {
+    if (entry.logType === 'browser') {
       prefix = <i title='Browser Log' className='Meta Color-Browser ts_icon ts_icon_power_off'/>;
-    } else if ((rowData as LogEntry).logType === 'renderer') {
+    } else if (entry.logType === 'renderer') {
       prefix = <i title='Renderer Log' className='Meta Color-Renderer ts_icon ts_icon_laptop'/>;
-    } else if ((rowData as LogEntry).logType === 'webapp') {
+    } else if (entry.logType === 'webapp') {
       prefix = <i title='Webapp Log' className='Meta Color-Webapp ts_icon ts_icon_globe'/>;
-    } else if ((rowData as LogEntry).logType === 'webview') {
+    } else if (entry.logType === 'webview') {
       prefix = <i title='Webview Log' className='Meta Color-Webview ts_icon ts_icon_all_files_alt'/>;
     }
 
-    return (<span>{prefix}{cellData}</span>);
+    return (<span title={entry.timestamp}>{prefix}{timestamp}</span>);
   }
 
   /**
@@ -129,7 +131,7 @@ export class LogTable extends React.Component<LogTableProps, LogTableState> {
           <AutoSizer>
             {({ width, height }) => (
               <Table {...tableOptions} height={height} width={width}>
-                <Column width={190} label='Timestamp' dataKey='timestamp' cellRenderer={this.prefixTypeCellRenderer} />
+                <Column width={190} label='Timestamp' dataKey='timestamp' cellRenderer={this.timestampCellRenderer} />
                 <Column width={70} label='Level' dataKey='level' />
                 <Column width={200} label='Message' dataKey='message' flexGrow={1} cellRenderer={this.messageCellRenderer} />
               </Table>
