@@ -3,6 +3,7 @@ import { UnzippedFile } from './unzip';
 import * as moment from 'moment';
 
 export interface LogEntry {
+  index: number;
   timestamp: string;
   message: string;
   level: string;
@@ -19,6 +20,7 @@ export interface MatchResult {
   meta?: any;
   moment?: moment.Moment;
   toParseHead?: string;
+  momentValue?: number;
 }
 
 export interface MergedLogFiles {
@@ -74,3 +76,11 @@ export interface MergedFilesLoadStatus {
   webview: boolean;
   webapp: boolean;
 }
+
+export interface LevelFilter {
+  error: boolean;
+  info: boolean;
+  debug: boolean;
+  warning: boolean;
+}
+

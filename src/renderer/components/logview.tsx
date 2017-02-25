@@ -3,14 +3,8 @@ import * as classNames from 'classnames';
 
 import { ipcRenderer } from 'electron';
 import { UnzippedFile, UnzippedFiles } from '../unzip';
-import { getTypesForFiles, mergeLogFiles, processLogFile, processLogFiles } from '../processor';
-import {
-  MergedFilesLoadStatus,
-  MergedLogFile,
-  MergedLogFiles,
-  ProcessedLogFile,
-  ProcessedLogFiles
-} from '../interfaces';
+import { getTypesForFiles, mergeLogFiles, processLogFiles } from '../processor';
+import { LevelFilter, MergedFilesLoadStatus, MergedLogFile, MergedLogFiles, ProcessedLogFile, ProcessedLogFiles } from '../interfaces';
 import { LogViewHeader } from './logview-header';
 import { LogTable } from './logtable';
 import { StateTable } from './statetable';
@@ -29,6 +23,7 @@ export interface LogViewState {
   loadingMessage: string;
   loadedLogFiles: boolean;
   loadedMergeFiles: boolean;
+  filter: LevelFilter;
 }
 
 export class LogView extends React.Component<LogViewProps, Partial<LogViewState>> {
@@ -44,6 +39,12 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
         webapp: [],
         state: []
       },
+      filter: {
+        error: false,
+        info: false,
+        debug: false,
+        warning: false
+      },
       loadingMessage: '',
       loadedLogFiles: false,
       loadedMergeFiles: false
@@ -51,6 +52,7 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
 
     this.toggleSidebar = this.toggleSidebar.bind(this);
     this.selectLogFile = this.selectLogFile.bind(this);
+    this.filterToggle = this.filterToggle.bind(this);
 
     ipcRenderer.on('processing-status', (_event, loadingMessage: string) => {
       this.setState({ loadingMessage });
@@ -217,16 +219,30 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
   }
 
   /**
+   * Toggles the filter for a given level
+   *
+   * @param {string} level
+   */
+  public filterToggle(level: string) {
+    const { filter } = this.state;
+    if (filter && filter[level] !== undefined) {
+      console.log(`Toggling filter for ${level}`);
+      filter[level] = !filter[level];
+      this.setState({ filter });
+    }
+  }
+
+  /**
    * Renders either a table or a data view (for state data)
    *
    * @returns {(JSX.Element | null)}
    */
   public renderTableOrData(): JSX.Element | null {
-    const { selectedLogFile } = this.state;
+    const { selectedLogFile, filter } = this.state;
 
     if ((selectedLogFile as ProcessedLogFile).type === 'ProcessedLogFile' ||
         (selectedLogFile as MergedLogFile).type === 'MergedLogFile') {
-      return (<LogTable logFile={selectedLogFile as ProcessedLogFile} />);
+      return (<LogTable logFile={selectedLogFile as ProcessedLogFile} filter={filter as LevelFilter} />);
     } else {
       return (<StateTable file={selectedLogFile as UnzippedFile} />);
     }
@@ -250,7 +266,7 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
           selectLogFile={this.selectLogFile}
           selectedLogFileName={selectedLogFileName} />
         <div id='content' className={logContentClassName}>
-          <LogViewHeader menuToggle={this.toggleSidebar} />
+          <LogViewHeader menuToggle={this.toggleSidebar} filterToggle={this.filterToggle} />
           {tableOrLoading}
         </div>
       </div>

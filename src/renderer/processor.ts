@@ -217,6 +217,7 @@ export function readFile(logFile: UnzippedFile, logType: string = ''): Promise<A
 
         // Push the last entry
         if (currentEntry) {
+          currentEntry.index = lines.length;
           lines.push(currentEntry);
         }
 
@@ -300,8 +301,11 @@ export function matchLine(line: string, logType: string): MatchResult | undefine
     let results = desktopRegex.exec(line);
 
     if (results && results.length === 4) {
+      const mom = moment(results[1], 'MM/DD/YY, HH:mm:ss:SSS');
+
       return {
-        moment: moment(results[1], 'MM/DD/YY, HH:mm:ss:SSS'),
+        moment: mom,
+        momentValue: mom.valueOf(),
         timestamp: results[1],
         level: results[2],
         message: results[3]
@@ -316,9 +320,11 @@ export function matchLine(line: string, logType: string): MatchResult | undefine
       const endsWithObject = endsWithObjectRegex.exec(results[3]);
       const message = (endsWithObject && endsWithObject.length === 2) ? endsWithObject[1] : results[3];
       const toParseHead = (endsWithObject && endsWithObject.length === 2) ? '{' : undefined;
+      const mom = moment(results[1], 'MM/DD/YY, HH:mm:ss:SSS');
 
       return {
-        moment: moment(results[1]),
+        moment: mom,
+        momentValue: mom.valueOf(),
         timestamp: results[1],
         level: results[2],
         message,

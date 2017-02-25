@@ -61,7 +61,7 @@ export class Welcome extends React.Component<undefined, Partial<WelcomeState>> {
       suggestion = (
         <div className='Suggestions'>
           <h5>From your Downloads folder, may we suggest:</h5>
-          {suggestions.map((file) => <a className="small" href={file}>{path.basename(file)}</a>)}
+          {suggestions.map((file) => <a key={file} className="small" href={file}>{path.basename(file)}</a>)}
         </div>
       );
     }
