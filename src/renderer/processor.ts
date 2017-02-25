@@ -38,7 +38,7 @@ export function sortWithWebWorker(data: Array<any>, sortFn: string) {
  *
  * @param {ProcessedLogFiles} logFiles
  */
-export function mergeLogFiles(logFiles: Array<ProcessedLogFile>, logType: string): Promise<MergedLogFile> {
+export function mergeLogFiles(logFiles: Array<ProcessedLogFile>|Array<MergedLogFile>, logType: string): Promise<MergedLogFile> {
   return new Promise((resolve) => {
     let logEntries: Array<LogEntry> = [];
     const totalEntries = logFiles.map((l) => l.logEntries.length).reduce((t, s) => t + s);
@@ -64,15 +64,18 @@ export function mergeLogFiles(logFiles: Array<ProcessedLogFile>, logType: string
 
     // Replace moment with a string (so that we can pass it to a webWorker)
     console.time(`merging-map-moment-${logType}`);
-    logEntries.map((e) => {
-      e.momentValue = e.moment ? e.moment.valueOf() : 0;
-      e.moment = undefined;
+    logEntries = logEntries.map((e) => {
+      if (e.moment) {
+        delete e.moment;
+      }
+
+      return e;
     });
     console.timeEnd(`merging-map-moment-${logType}`);
 
     const sortFn = `function sort(a, b) {
-      if (a.moment && b.moment) {
-        return a.moment.valueOf() - b.moment.valueOf();
+      if (a.momentValue && b.momentValueOf) {
+        return a.momentValue - b.momentValueOf;
       } else {
         return 1;
       }

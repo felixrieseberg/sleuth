@@ -76,7 +76,8 @@ export class LogTable extends React.Component<LogTableProps, LogTableState> {
    */
   public timestampCellRenderer(data: any): JSX.Element | String {
     const entry = data.rowData as LogEntry;
-    const timestamp = entry.moment ? entry.moment.format('HH:mm:ss (DD/MM)') : entry.timestamp;
+    // Todo: This could be cool, but it's expensive af
+    // const timestamp = entry.moment ? entry.moment.format('HH:mm:ss (DD/MM)') : entry.timestamp;
     let prefix = <i className='Meta ts_icon ts_icon_question'/>;
 
     if (entry.logType === 'browser') {
@@ -89,7 +90,7 @@ export class LogTable extends React.Component<LogTableProps, LogTableState> {
       prefix = <i title='Webview Log' className='Meta Color-Webview ts_icon ts_icon_all_files_alt'/>;
     }
 
-    return (<span title={entry.timestamp}>{prefix}{timestamp}</span>);
+    return (<span title={entry.timestamp}>{prefix}{entry.timestamp}</span>);
   }
 
   /**

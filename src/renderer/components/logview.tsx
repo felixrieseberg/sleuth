@@ -133,10 +133,13 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
     const { processedLogFiles } = this.state;
 
     if (processedLogFiles) {
-      mergeLogFiles(processedLogFiles.browser, 'all').then((r) => this.setMergedFile(r));
-      mergeLogFiles(processedLogFiles.browser, 'browser').then((r) => this.setMergedFile(r));
-      mergeLogFiles(processedLogFiles.renderer, 'renderer').then((r) => this.setMergedFile(r));
-      mergeLogFiles(processedLogFiles.webview, 'webview').then((r) => this.setMergedFile(r));
+      await mergeLogFiles(processedLogFiles.browser, 'browser').then((r) => this.setMergedFile(r));
+      await mergeLogFiles(processedLogFiles.renderer, 'renderer').then((r) => this.setMergedFile(r));
+      await mergeLogFiles(processedLogFiles.webview, 'webview').then((r) => this.setMergedFile(r));
+
+      const merged = this.state.mergedLogFiles as MergedLogFiles;
+
+      mergeLogFiles([merged.browser, merged.renderer, merged.webview], 'all').then((r) => this.setMergedFile(r));
     }
   }
 
