@@ -17,30 +17,73 @@ export function sendProcStatus(status: any): void {
 }
 
 /**
+ * Sort an array, but do it on a different thread
+ *
+ * @export
+ * @param {Array<any>} data
+ * @param {string} sortFn
+ */
+export function sortWithWebWorker(data: Array<any>, sortFn: string) {
+  return new Promise((resolve) => {
+    const code = `onmessage = function (evt) {evt.data.sort(${sortFn}); postMessage(evt.data)}`;
+    const worker = new Worker(URL.createObjectURL(new Blob([code])));
+    worker.onmessage = (e) => resolve(e.data);
+    worker.postMessage(data);
+  });
+}
+
+/**
  * Takes a bunch of processed log files and merges all the entries into one sorted
  * array.
  *
  * @param {ProcessedLogFiles} logFiles
  */
-export function mergeLogFiles(logFiles: Array<ProcessedLogFile>, logType: string): MergedLogFile {
-  let logEntries: Array<LogEntry> = [];
-  const totalEntries = logFiles.map((l) => l.logEntries.length).reduce((t, s) => t + s);
+export function mergeLogFiles(logFiles: Array<ProcessedLogFile>, logType: string): Promise<MergedLogFile> {
+  return new Promise((resolve) => {
+    let logEntries: Array<LogEntry> = [];
+    const totalEntries = logFiles.map((l) => l.logEntries.length).reduce((t, s) => t + s);
 
-  console.log(`Merging ${logFiles.length} log files with ${totalEntries} entries`, logFiles);
+    console.log(`Merging ${logFiles.length} log files with ${totalEntries} entries`, logFiles);
+    console.time(`merging-${logType}`);
 
-  logFiles.forEach((logFile) => {
-    logEntries = logEntries.concat(logFile.logEntries);
-  });
-
-  logEntries.sort((a, b) => {
-    if (a.moment && b.moment) {
-      return (a.moment.valueOf() as number) - (b.moment.valueOf() as number);
-    } else {
-      return 1;
+    // Single file? Cool, shortcut!
+    if (logFiles.length === 1) {
+      console.timeEnd(`merging-${logType}`);
+      return resolve({
+        logEntries: logFiles[0].logEntries,
+        type: 'MergedLogFile',
+        logType,
+        logFiles
+      });
     }
-  });
 
-  return { logFiles, logEntries, logType, type: 'MergedLogFile' };
+    // Alright, let's do this
+    logFiles.forEach((logFile) => {
+      logEntries = logEntries.concat(logFile.logEntries);
+    });
+
+    // Replace moment with a string (so that we can pass it to a webWorker)
+    console.time(`merging-map-moment-${logType}`);
+    logEntries.map((e) => {
+      e.momentValue = e.moment ? e.moment.valueOf() : 0;
+      e.moment = undefined;
+    });
+    console.timeEnd(`merging-map-moment-${logType}`);
+
+    const sortFn = `function sort(a, b) {
+      if (a.moment && b.moment) {
+        return a.moment.valueOf() - b.moment.valueOf();
+      } else {
+        return 1;
+      }
+    }`;
+
+    sortWithWebWorker(logEntries, sortFn)
+      .then((sortedLogEntries) => {
+        console.timeEnd(`merging-${logType}`);
+        resolve({ logFiles, logEntries: sortedLogEntries, logType, type: 'MergedLogFile' });
+      });
+  });
 }
 
 /**

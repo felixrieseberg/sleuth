@@ -119,7 +119,7 @@ export class LogTable extends React.Component<LogTableProps, LogTableState> {
       rowCount: logEntries.length,
       onRowClick: (event: RowClickEvent) => this.onRowClick(event),
       ref: this.refHandlers.table,
-      overscanRowCount: 200
+      overscanRowCount: 500
     };
 
     return (

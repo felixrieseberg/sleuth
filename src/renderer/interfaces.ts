@@ -9,6 +9,7 @@ export interface LogEntry {
   logType: string;
   meta?: any;
   moment?: moment.Moment;
+  momentValue?: number;
 }
 
 export interface MatchResult {
@@ -21,11 +22,11 @@ export interface MatchResult {
 }
 
 export interface MergedLogFiles {
-  all?: Array<LogEntry>;
-  browser?: Array<LogEntry>;
-  renderer?: Array<LogEntry>;
-  webapp?: Array<LogEntry>;
-  webview?: Array<LogEntry>;
+  all?: MergedLogFile;
+  browser?: MergedLogFile;
+  renderer?: MergedLogFile;
+  webapp?: MergedLogFile;
+  webview?: MergedLogFile;
   type: 'MergedLogFiles';
 }
 
@@ -64,4 +65,12 @@ export interface SortedUnzippedFiles {
   webview: Array<UnzippedFile>;
   webapp: Array<UnzippedFile>;
   state: Array<UnzippedFile>;
+}
+
+export interface MergedFilesLoadStatus {
+  all: boolean;
+  browser: boolean;
+  renderer: boolean;
+  webview: boolean;
+  webapp: boolean;
 }

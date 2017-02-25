@@ -27,7 +27,7 @@ export class Welcome extends React.Component<undefined, Partial<WelcomeState>> {
     const sleuths = ['🕵', '🕵️‍♀️', '🕵🏻', '🕵🏼', '🕵🏽', '🕵🏾', '🕵🏿', '🕵🏻‍♀️', '🕵🏼‍♀️', '🕵🏽‍♀️', '🕵🏾‍♀️', '🕵🏿‍♀️'];
 
     if (process.platform === 'darwin' || (process.platform === 'win32' && os.release().startsWith('10'))) {
-      return sleuths[Math.floor(Math.random() * 12) + 1];
+      return sleuths[Math.floor(Math.random() * 11) + 1];
     } else {
       return sleuths[Math.round(Math.random())];
     }
@@ -61,7 +61,7 @@ export class Welcome extends React.Component<undefined, Partial<WelcomeState>> {
       suggestion = (
         <div className='Suggestions'>
           <h5>From your Downloads folder, may we suggest:</h5>
-          {suggestions.map((file) => <a className="small" href={file}>{path.basename(file)}</a> )}
+          {suggestions.map((file) => <a className="small" href={file}>{path.basename(file)}</a>)}
         </div>
       );
     }

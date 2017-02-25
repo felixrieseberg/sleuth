@@ -3,8 +3,14 @@ import * as classNames from 'classnames';
 
 import { ipcRenderer } from 'electron';
 import { UnzippedFile, UnzippedFiles } from '../unzip';
-import { getTypesForFiles, mergeLogFiles, processLogFiles } from '../processor';
-import { MergedLogFile, MergedLogFiles, ProcessedLogFile, ProcessedLogFiles } from '../interfaces';
+import { getTypesForFiles, mergeLogFiles, processLogFile, processLogFiles } from '../processor';
+import {
+  MergedFilesLoadStatus,
+  MergedLogFile,
+  MergedLogFiles,
+  ProcessedLogFile,
+  ProcessedLogFiles
+} from '../interfaces';
 import { LogViewHeader } from './logview-header';
 import { LogTable } from './logtable';
 import { StateTable } from './statetable';
@@ -21,7 +27,8 @@ export interface LogViewState {
   selectedLogFile?: ProcessedLogFile | MergedLogFile | UnzippedFile;
   mergedLogFiles?: MergedLogFiles;
   loadingMessage: string;
-  doneProcessing: boolean;
+  loadedLogFiles: boolean;
+  loadedMergeFiles: boolean;
 }
 
 export class LogView extends React.Component<LogViewProps, Partial<LogViewState>> {
@@ -38,7 +45,8 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
         state: []
       },
       loadingMessage: '',
-      doneProcessing: false
+      loadedLogFiles: false,
+      loadedMergeFiles: false
     };
 
     this.toggleSidebar = this.toggleSidebar.bind(this);
@@ -93,7 +101,40 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
 
     const { selectedLogFile, processedLogFiles } = this.state;
     if (!selectedLogFile && processedLogFiles) {
-      this.setState({ selectedLogFile: processedLogFiles.browser[0] });
+      this.setState({ selectedLogFile: processedLogFiles.browser[0], loadedLogFiles: true });
+    } else {
+      this.setState({ loadedLogFiles: true });
+    }
+
+    // We're done processing the files, so let's get started on the merge files.
+    this.processMergeFiles();
+  }
+
+  /**
+   * Update this component's status with a merged logfile
+   *
+   * @param {MergedLogFile} mergedFile
+   */
+  public setMergedFile(mergedFile: MergedLogFile) {
+    const { mergedLogFiles } = this.state;
+    const newMergedLogFiles = {...mergedLogFiles};
+
+    console.log(`Merged log file for ${mergedFile.logType} now created!`);
+    newMergedLogFiles[mergedFile.logType] = mergedFile;
+    this.setState({ mergedLogFiles: newMergedLogFiles });
+  };
+
+  /**
+   * Kick off merging of all the log files
+   */
+  public async processMergeFiles() {
+    const { processedLogFiles } = this.state;
+
+    if (processedLogFiles) {
+      mergeLogFiles(processedLogFiles.browser, 'all').then((r) => this.setMergedFile(r));
+      mergeLogFiles(processedLogFiles.browser, 'browser').then((r) => this.setMergedFile(r));
+      mergeLogFiles(processedLogFiles.renderer, 'renderer').then((r) => this.setMergedFile(r));
+      mergeLogFiles(processedLogFiles.webview, 'webview').then((r) => this.setMergedFile(r));
     }
   }
 
@@ -111,31 +152,11 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
    * @param {ProcessedLogFile} logFile
    * @param {string} [logType]
    */
-  public selectLogFile(logFile: ProcessedLogFile, logType?: string) {
+  public async selectLogFile(logFile: ProcessedLogFile, logType?: string) {
     if (!logFile && logType) {
-      const { mergedLogFiles, processedLogFiles } = this.state;
+      const { mergedLogFiles } = this.state;
 
-      if (!mergedLogFiles || !mergedLogFiles[logType]) {
-        // Requested for the first time? Let's sort them real quick
-        console.log(`Requested the merged log format for '${logType}', but it hasn't been created yet.`);
-        let filesToMerge = [];
-
-        if (logType === 'all' && processedLogFiles) {
-          filesToMerge = Object.keys(processedLogFiles)
-            .filter((k) => k !== 'state' && k !== 'webapp')
-            .map((k) => processedLogFiles[k])
-            .reduce((p, c) => p.concat(c), []);
-        } else if (processedLogFiles) {
-          filesToMerge = processedLogFiles[logType];
-        }
-
-        const freshlyMerged = mergeLogFiles(filesToMerge, logType);
-        const newMergedLogFiles = {...mergedLogFiles};
-
-        console.log(`Merged log file for '${logType}' now created!`);
-        newMergedLogFiles[logType] = freshlyMerged;
-        this.setState({ mergedLogFiles: newMergedLogFiles, selectedLogFile: freshlyMerged });
-      } else {
+      if (mergedLogFiles && mergedLogFiles[logType]) {
         this.setState({ selectedLogFile: mergedLogFiles[logType] });
       }
     } else {
@@ -151,12 +172,14 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
   public getSelectedFileName(): string {
     const { selectedLogFile } = this.state;
 
-    if (selectedLogFile && selectedLogFile.type === 'ProcessedLogFile') {
+    if (selectedLogFile && (selectedLogFile as ProcessedLogFile).type === 'ProcessedLogFile') {
       return (selectedLogFile as ProcessedLogFile).logFile.fileName;
-    } else if (selectedLogFile && selectedLogFile.type === 'MergedLogFile') {
+    } else if (selectedLogFile && (selectedLogFile as MergedLogFile).type === 'MergedLogFile') {
       return (selectedLogFile as MergedLogFile).logType;
     } else if (selectedLogFile) {
       return (selectedLogFile as UnzippedFile).fileName;
+    } else {
+      return '';
     }
   }
 
@@ -176,7 +199,29 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
     return Math.round(alreadyLoaded / toLoad * 100);
   }
 
-  public renderTableOrData() {
+  /**
+   * Real quick: Are we loaded yet?
+   *
+   * @returns
+   */
+  public getMergedFilesStatus(): MergedFilesLoadStatus {
+    const { mergedLogFiles } = this.state;
+
+    return {
+      all: !!(mergedLogFiles && mergedLogFiles.all && mergedLogFiles.all.logEntries),
+      browser: !!(mergedLogFiles && mergedLogFiles.browser && mergedLogFiles.browser.logEntries),
+      renderer: !!(mergedLogFiles && mergedLogFiles.renderer && mergedLogFiles.renderer.logEntries),
+      webview: !!(mergedLogFiles && mergedLogFiles.webview && mergedLogFiles.webview.logEntries),
+      webapp: !!(mergedLogFiles && mergedLogFiles.webapp && mergedLogFiles.webapp.logEntries)
+    };
+  }
+
+  /**
+   * Renders either a table or a data view (for state data)
+   *
+   * @returns {(JSX.Element | null)}
+   */
+  public renderTableOrData(): JSX.Element | null {
     const { selectedLogFile } = this.state;
 
     if ((selectedLogFile as ProcessedLogFile).type === 'ProcessedLogFile' ||
@@ -195,11 +240,13 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
     const percentageLoaded = this.getPercentageLoaded();
     const loading = <Loading percentage={percentageLoaded} message={loadingMessage} />;
     const tableOrLoading = selectedLogFile ? this.renderTableOrData() : loading;
+    const mergedFilesStatus = this.getMergedFilesStatus();
 
     return (
       <div className={logViewClassName}>
-        <Sidebar isOpen={sidebarIsOpen || true}
+        <Sidebar isOpen={!!sidebarIsOpen}
           logFiles={processedLogFiles as ProcessedLogFiles}
+          mergedFilesStatus={mergedFilesStatus}
           selectLogFile={this.selectLogFile}
           selectedLogFileName={selectedLogFileName} />
         <div id='content' className={logContentClassName}>
