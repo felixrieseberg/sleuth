@@ -3,7 +3,7 @@ import * as classNames from 'classnames';
 
 import { ipcRenderer } from 'electron';
 import { UnzippedFile, UnzippedFiles } from '../unzip';
-import { getTypesForFiles, mergeLogFiles, processLogFiles } from '../processor';
+import { getTypesForFiles, mergeLogFiles, processLogFile, processLogFiles } from '../processor';
 import { LevelFilter, MergedFilesLoadStatus, MergedLogFile, MergedLogFiles, ProcessedLogFile, ProcessedLogFiles } from '../interfaces';
 import { LogViewHeader } from './logview-header';
 import { LogTable } from './logtable';
@@ -230,8 +230,9 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
     const { filter } = this.state;
     if (filter && filter[level] !== undefined) {
       console.log(`Toggling filter for ${level}`);
-      filter[level] = !filter[level];
-      this.setState({ filter });
+      const newFilter = {...filter};
+      newFilter[level] = !newFilter[level];
+      this.setState({ filter: newFilter });
     }
   }
 

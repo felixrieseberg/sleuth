@@ -1,7 +1,5 @@
 import { UnzippedFile } from './unzip';
 
-import * as moment from 'moment';
-
 export interface LogEntry {
   index: number;
   timestamp: string;
@@ -9,8 +7,8 @@ export interface LogEntry {
   level: string;
   logType: string;
   meta?: any;
-  moment?: moment.Moment;
   momentValue?: number;
+  repeated?: Array<string>;
 }
 
 export interface MatchResult {
@@ -18,7 +16,6 @@ export interface MatchResult {
   message?: string;
   level?: string;
   meta?: any;
-  moment?: moment.Moment;
   toParseHead?: string;
   momentValue?: number;
 }

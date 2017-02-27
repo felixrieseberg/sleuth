@@ -1,7 +1,8 @@
-import { UnzippedFile } from '../unzip';
 import * as React from 'react';
 import * as classNames from 'classnames';
 
+import { UnzippedFile } from '../unzip';
+import { isEqualArrays } from '../../utils/array-is-equal';
 import { MergedFilesLoadStatus, ProcessedLogFile, ProcessedLogFiles } from '../interfaces';
 
 export interface SidebarProps {
@@ -18,6 +19,66 @@ export class Sidebar extends React.Component<SidebarProps, undefined> {
 
     this.renderFile = this.renderFile.bind(this);
     this.renderIcon = this.renderIcon.bind(this);
+  }
+
+  public shouldComponentUpdate(next: SidebarProps) {
+    const { isOpen, selectedLogFileName, mergedFilesStatus, logFiles } = this.props;
+
+    // Check the defaults first
+    if (isOpen !== next.isOpen || selectedLogFileName !== next.selectedLogFileName) {
+      return true;
+    }
+
+    // Check merge status
+    if (
+      mergedFilesStatus.all !== next.mergedFilesStatus.all ||
+      mergedFilesStatus.browser !== next.mergedFilesStatus.browser ||
+      mergedFilesStatus.renderer !== next.mergedFilesStatus.renderer ||
+      mergedFilesStatus.webapp !== next.mergedFilesStatus.webapp ||
+      mergedFilesStatus.webview !== next.mergedFilesStatus.webview
+    ) {
+      return true;
+    }
+
+    // Ugh, new files? Alright, let's check
+    const newNames = this.getLogFileNames(next.logFiles);
+    const oldNames = this.getLogFileNames(logFiles);
+
+    if (
+      (!oldNames && newNames) ||
+      (oldNames && !newNames) ||
+      !isEqualArrays(oldNames.browser, newNames.browser) ||
+      !isEqualArrays(oldNames.renderer, newNames.renderer) ||
+      !isEqualArrays(oldNames.webapp, newNames.webapp) ||
+      !isEqualArrays(oldNames.webview, newNames.webview)
+    ) {
+      return true;
+    }
+
+    return false;
+  }
+
+  public getLogFileNames(logFiles: ProcessedLogFiles) {
+    const getNames = (ob: Array<ProcessedLogFile>) => {
+      return ob.map((l) => l && l.logFile && l.logFile.fileName ? l.logFile.fileName : null)
+        .filter((e) => e);
+    };
+
+    if (!logFiles) {
+      return {
+        browser: [],
+        renderer: [],
+        webapp: [],
+        webview: []
+      };
+    }
+
+    return {
+      browser: getNames(logFiles.browser),
+      renderer: getNames(logFiles.renderer),
+      webapp: getNames(logFiles.webapp),
+      webview: getNames(logFiles.webview)
+    }
   }
 
   /**

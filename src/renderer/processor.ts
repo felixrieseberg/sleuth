@@ -62,17 +62,6 @@ export function mergeLogFiles(logFiles: Array<ProcessedLogFile>|Array<MergedLogF
       logEntries = logEntries.concat(logFile.logEntries);
     });
 
-    // Replace moment with a string (so that we can pass it to a webWorker)
-    console.time(`merging-map-moment-${logType}`);
-    logEntries = logEntries.map((e) => {
-      if (e.moment) {
-        delete e.moment;
-      }
-
-      return e;
-    });
-    console.timeEnd(`merging-map-moment-${logType}`);
-
     const sortFn = `function sort(a, b) {
       if (a.momentValue && b.momentValueOf) {
         return a.momentValue - b.momentValueOf;
@@ -169,8 +158,10 @@ export function processLogFile(logFile: UnzippedFile): Promise<ProcessedLogFile>
     console.log(`Processing file ${logFile.fileName}. Log type: ${logType}.`);
     sendProcStatus(`Processing file ${logFile.fileName}...`);
 
+    console.time(`read-file-${logFile.fileName}`);
     readFile(logFile, logType)
       .then((logEntries) => {
+        console.timeEnd(`read-file-${logFile.fileName}`);
         resolve({ logFile, logEntries, logType, type: 'ProcessedLogFile'} as ProcessedLogFile)
       });
   });
@@ -202,8 +193,9 @@ export function readFile(logFile: UnzippedFile, logType: string = ''): Promise<A
 
     let readLines = 0;
     let lastLogged = 0;
-    let currentEntry: LogEntry | null = null;
+    let current: LogEntry | null = null;
     let toParse = '';
+    let lastPushed = 0;
 
     readInterface.on('line', function onLine(line) {
       if (!line || line.length === 0) {
@@ -214,19 +206,27 @@ export function readFile(logFile: UnzippedFile, logType: string = ''): Promise<A
 
       if (matched) {
         // Is there a meta object?
-        if (currentEntry && toParse && toParse.length > 0) {
-          currentEntry.meta = toParse;
+        if (current && toParse && toParse.length > 0) {
+          current.meta = toParse;
         }
 
         // Push the last entry
-        if (currentEntry) {
-          currentEntry.index = lines.length;
-          lines.push(currentEntry);
+        if (current) {
+          // If this a repeated line, save as repeated
+          const lastIndex = lines.length - 1;
+          const previous = lines.length > 0 ? lines[lastIndex] : null;
+          if (previous && previous.message === current.message && previous.meta === current.meta) {
+            lines[lastIndex].repeated = lines[lastIndex].repeated || [];
+            lines[lastIndex].repeated!.push(current.timestamp);
+          } else {
+            current.index = lines.length;
+            lines.push(current);
+          }
         }
 
         // Create new entry
         toParse = matched.toParseHead || '';
-        currentEntry = makeLogEntry(matched, logType);
+        current = makeLogEntry(matched, logType);
       } else {
         // This is (hopefully) part of a meta object
         toParse += line;
@@ -241,7 +241,7 @@ export function readFile(logFile: UnzippedFile, logType: string = ''): Promise<A
     });
 
     readInterface.on('close', () => {
-      console.log(`Finished reading file ${logFile.fileName}.`);
+      console.log(`Finished reading file ${logFile.fileName}. ${lines.length} entries!`);
       resolve(lines);
     });
   });
@@ -304,14 +304,13 @@ export function matchLine(line: string, logType: string): MatchResult | undefine
     let results = desktopRegex.exec(line);
 
     if (results && results.length === 4) {
-      const mom = moment(results[1], 'MM/DD/YY, HH:mm:ss:SSS');
+      const momentValue = moment(results[1], 'MM/DD/YY, HH:mm:ss:SSS').valueOf();
 
       return {
-        moment: mom,
-        momentValue: mom.valueOf(),
         timestamp: results[1],
         level: results[2],
-        message: results[3]
+        message: results[3],
+        momentValue
       };
     }
 
@@ -323,15 +322,14 @@ export function matchLine(line: string, logType: string): MatchResult | undefine
       const endsWithObject = endsWithObjectRegex.exec(results[3]);
       const message = (endsWithObject && endsWithObject.length === 2) ? endsWithObject[1] : results[3];
       const toParseHead = (endsWithObject && endsWithObject.length === 2) ? '{' : undefined;
-      const mom = moment(results[1], 'MM/DD/YY, HH:mm:ss:SSS');
+      const momentValue = moment(results[1], 'MM/DD/YY, HH:mm:ss:SSS').valueOf();
 
       return {
-        moment: mom,
-        momentValue: mom.valueOf(),
         timestamp: results[1],
         level: results[2],
         message,
-        toParseHead
+        toParseHead,
+        momentValue
       };
     }
 

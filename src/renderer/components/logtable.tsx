@@ -43,6 +43,42 @@ export class LogTable extends React.Component<LogTableProps, LogTableState> {
     table: (ref: Table) => this.tableElement = ref,
   };
 
+  public shouldComponentUpdate(nextProps: LogTableProps, nextState: LogTableState) {
+    const { filter, logFile } = this.props;
+    const { selectedEntry, sortBy, sortDirection, isDataViewVisible } = this.state;
+
+    // File changed - and update is in order
+    if (nextProps.logFile !== logFile) {
+      return true;
+    }
+
+    // The data view is open and the selected entry changed
+    if (nextState.isDataViewVisible !== isDataViewVisible) {
+      return true;
+    }
+
+    // Filter changed
+    if (nextProps.filter.error !== filter.error ||
+        nextProps.filter.debug !== filter.debug ||
+        nextProps.filter.info !== filter.info ||
+        nextProps.filter.warning !== filter.warning) {
+      return true;
+    }
+
+    // The selected entry changed _and_ we have the data view open
+    if (nextState.isDataViewVisible && nextState.selectedEntry
+        && selectedEntry && nextState.selectedEntry.momentValue !== selectedEntry!.momentValue) {
+      return true;
+    }
+
+    // Sort direction changed
+    if (nextState.sortBy !== sortBy || nextState.sortDirection !== sortDirection) {
+      return true;
+    }
+
+    return false;
+  }
+
   /**
    * Handles a single click onto a row
    *
@@ -61,8 +97,10 @@ export class LogTable extends React.Component<LogTableProps, LogTableState> {
    * @returns {(JSX.Element | string)}
    */
   public messageCellRenderer({ cellData, rowData }): JSX.Element | string {
-    if (rowData.meta) {
+    if (rowData && rowData.meta) {
       return (<span><i className='ts_icon ts_icon_all_files_alt HasData'/> {cellData}</span>);
+    } else if (rowData && rowData.repeated) {
+      return String(`(Repeated ${rowData.repeated.length} times) ${cellData}`);
     } else {
       return String(cellData);
     }
@@ -155,7 +193,6 @@ export class LogTable extends React.Component<LogTableProps, LogTableState> {
     let sortedList: Array<LogEntry> = [];
 
     // Named definition here allows V8 to go craaaaaazy, speed-wise.
-    function doSortByIndex(a: LogEntry, b: LogEntry) { return a.index - b.index; };
     function doSortByTimestamp(a: LogEntry, b: LogEntry) { return a.momentValue - b.momentValue; };
     function doSortByMessage(a: LogEntry, b: LogEntry) { return a.message.localeCompare(b.message); };
     function doSortByLevel(a: LogEntry, b: LogEntry) { return a.level.localeCompare(b.level); };
@@ -165,13 +202,12 @@ export class LogTable extends React.Component<LogTableProps, LogTableState> {
     if (this.shouldFilter()) {
       sortedList = logEntries.filter(doFilter);
     } else {
-      sortedList = logEntries;
+      sortedList = logEntries || [];
     }
 
     // Sort
     if (sortBy === 'index') {
-      console.log('Sorting by index');
-      sortedList = sortedList.sort(doSortByIndex);
+      console.log('Sorting by index (aka doing nothing)');
     } else if (sortBy === 'timestamp') {
       console.log('Sorting by timestamp');
       sortedList = sortedList.sort(doSortByTimestamp);
@@ -184,7 +220,7 @@ export class LogTable extends React.Component<LogTableProps, LogTableState> {
     }
 
     if (sortDirection === 'DESC') {
-      sortedList.reverse();
+      sortedList = sortedList.concat().reverse();
     }
 
     const tableOptions = {
@@ -194,7 +230,7 @@ export class LogTable extends React.Component<LogTableProps, LogTableState> {
       rowCount: sortedList.length,
       onRowClick: (event: RowClickEvent) => this.onRowClick(event),
       ref: this.refHandlers.table,
-      overscanRowCount: 500,
+      overscanRowCount: 1000,
       sort: this.sort,
       sortBy: sortBy,
       sortDirection: sortDirection

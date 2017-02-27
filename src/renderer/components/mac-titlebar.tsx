@@ -5,6 +5,10 @@ export class MacTitlebar extends React.Component<undefined, undefined> {
     super();
   }
 
+  public shouldComponentUpdate() {
+    return false;
+  }
+
   public render(): JSX.Element | null {
     return (
       <div className="MacTitlebar" />
