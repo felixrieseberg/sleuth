@@ -14,6 +14,7 @@
 
   .Sizer {
     height: 100%;
+    padding-left: 2rem;
 
     .HasWarning {
       height: calc(~"100% - 76px");
@@ -27,19 +28,11 @@
   .Meta {
     padding-right: 5px;
   }
-
-  .ReactVirtualized__Table__row {
-    font-size: 1rem;
-  }
-
-  .ReactVirtualized__Table__headerColumn:first-of-type, .ReactVirtualized__Table__rowColumn:first-of-type {
-    margin-left: 2rem;
-  }
 }
 
-.ReactVirtualized__Table,
-.ReactVirtualized__Grid,
-.ReactVirtualized__Table__Grid {
+.fixedDataTableLayout_main {
+  border: none;
+
   &::-webkit-scrollbar {
     width: 10px;
     height: 10px;
@@ -64,6 +57,20 @@
 
   &::-webkit-scrollbar-corner {
       background-color: transparent;
+  }
+
+  .fixedDataTableRowLayout_body {
+    font-size: 1rem;
+  }
+
+  .fixedDataTableCellLayout_main {
+    border: none;
+  }
+
+  .fixedDataTableLayout_header {
+    font-weight: 700;
+    background-color: @neutral_grey;
+    border-bottom-color: @cloud_silver;
   }
 }
 
