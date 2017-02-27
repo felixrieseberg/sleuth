@@ -26,7 +26,7 @@ export class Sidebar extends React.Component<SidebarProps, undefined> {
    * @param {ProcessedLogFile} file
    * @returns {JSX.Element}
    */
-  renderLogFile(file: ProcessedLogFile): JSX.Element {
+  public renderLogFile(file: ProcessedLogFile): JSX.Element {
     const { selectLogFile, selectedLogFileName } = this.props;
     const isSelected = (selectedLogFileName === file.logFile.fileName);
     const className = classNames({ Selected: isSelected });
@@ -40,7 +40,7 @@ export class Sidebar extends React.Component<SidebarProps, undefined> {
         );
   }
 
-  renderStateFile(file: UnzippedFile): JSX.Element {
+  public renderStateFile(file: UnzippedFile): JSX.Element {
     const { selectLogFile, selectedLogFileName } = this.props;
     const isSelected = (selectedLogFileName === file.fileName);
     const className = classNames({ Selected: isSelected });
@@ -88,7 +88,6 @@ export class Sidebar extends React.Component<SidebarProps, undefined> {
   public render(): JSX.Element | null {
     const { isOpen, selectLogFile, selectedLogFileName, logFiles, mergedFilesStatus } = this.props;
     const className = classNames('Sidebar', { 'nav_open': isOpen });
-
 
     const getSelectedClassName = (logType: string) => {
       const stillLoading = logType !== 'webapp' && !mergedFilesStatus[logType];

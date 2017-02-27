@@ -10,14 +10,16 @@ export class Loading extends React.Component<LoadingProps, undefined> {
     super();
   }
 
-  public render() {
+  public render(): JSX.Element | null {
     const { percentage, message } = this.props;
 
-    if (percentage === 100) return null;
+    if (percentage === 100) {
+      return null;
+    }
 
     return (
-      <div className="Loading">
-          <progress value={percentage} max="100" />
+      <div className='Loading'>
+          <progress value={percentage!.toString()} max="100" />
           <p>{message}</p>
       </div>
     );
