@@ -21,6 +21,11 @@ export class App extends React.Component<undefined, AppState> {
       unzippedFiles: [],
     };
 
+    const isDevMode = process.execPath.match(/[\\/]electron/);
+    if (isDevMode) {
+      window.Perf = require('react-addons-perf')
+    }
+
     ipcRenderer.on('file-dropped', (_e, url) => this.openFile(url));
   }
 
