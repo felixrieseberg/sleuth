@@ -29,8 +29,6 @@ export class App extends React.Component<undefined, AppState> {
         console.log(`Could not add React Perf`, e);
       }
     }
-
-    ipcRenderer.on('file-dropped', (_e, url) => this.openFile(url));
   }
 
   /**
@@ -38,6 +36,25 @@ export class App extends React.Component<undefined, AppState> {
    */
   public componentDidMount() {
     remote.getCurrentWindow().show();
+    this.setupFileDrop();
+  }
+
+  public setupFileDrop() {
+    document.ondragover = document.ondrop = (event) => {
+      event.preventDefault();
+    };
+
+    document.body.ondrop = (event) => {
+      if (event.dataTransfer && event.dataTransfer.files.length > 0) {
+        let url = event.dataTransfer.files[0].path;
+        url = url.replace('file:///', '/');
+        this.openFile(url);
+      }
+
+      event.preventDefault();
+    };
+
+    ipcRenderer.on('file-dropped', (_e, url) => this.openFile(url));
   }
 
   /**
