@@ -19,7 +19,7 @@ export class Loading extends React.Component<LoadingProps, undefined> {
 
     return (
       <div className='Loading'>
-          <progress value={percentage!.toString()} max="100" />
+          <progress value={percentage!.toString()} max='100' />
           <p>{message}</p>
       </div>
     );

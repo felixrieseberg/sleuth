@@ -3,7 +3,7 @@ import * as classNames from 'classnames';
 
 import { ipcRenderer } from 'electron';
 import { UnzippedFile, UnzippedFiles } from '../unzip';
-import { getTypesForFiles, mergeLogFiles, processLogFile, processLogFiles } from '../processor';
+import { getTypesForFiles, mergeLogFiles, processLogFiles } from '../processor';
 import { LevelFilter, MergedFilesLoadStatus, MergedLogFile, MergedLogFiles, ProcessedLogFile, ProcessedLogFiles } from '../interfaces';
 import { LogViewHeader } from './logview-header';
 import { LogTable } from './logtable';

@@ -9,9 +9,9 @@ export class MacTitlebar extends React.Component<undefined, undefined> {
     return false;
   }
 
-  public render(): JSX.Element | null {
+  public render(): JSX.Element {
     return (
-      <div className="MacTitlebar" />
+      <div className='MacTitlebar' />
     );
   }
 }

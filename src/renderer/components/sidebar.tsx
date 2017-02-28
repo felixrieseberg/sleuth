@@ -95,7 +95,7 @@ export class Sidebar extends React.Component<SidebarProps, undefined> {
     return (
         <li key={file.logFile.fileName}>
           <a onClick={() => selectLogFile(file)} className={className}>
-              <i className='ts_icon ts_icon_file LogFile'></i>{file.logFile.fileName}
+              <i className='ts_icon ts_icon_file LogFile' />{file.logFile.fileName}
           </a>
         </li>
         );
@@ -112,7 +112,7 @@ export class Sidebar extends React.Component<SidebarProps, undefined> {
     return (
         <li key={file.fileName}>
           <a onClick={() => selectLogFile(file)} className={className}>
-              <i className='ts_icon ts_icon_file LogFile'></i>{name}
+              <i className='ts_icon ts_icon_file LogFile' />{name}
           </a>
         </li>
         );
@@ -133,22 +133,22 @@ export class Sidebar extends React.Component<SidebarProps, undefined> {
 
     if (mergedFilesStatus[logType]) {
       if (logType === 'browser') {
-        return <i className='ts_icon ts_icon_power_off'></i>;
+        return <i className='ts_icon ts_icon_power_off' />;
       } else if (logType === 'renderer') {
-        return <i className='ts_icon ts_icon_laptop'></i>;
+        return <i className='ts_icon ts_icon_laptop' />;
       } else if (logType === 'webview') {
-        return <i className='ts_icon ts_icon_all_files_alt'></i>;
+        return <i className='ts_icon ts_icon_all_files_alt' />;
       } else if (logType === 'all') {
-        return <i className='ts_icon ts_icon_archive'></i>;
+        return <i className='ts_icon ts_icon_archive' />;
       }
     }
 
-    return (<svg className="ts_icon ts_icon_spin ts_icon_spinner"><use href="./img/starburst.svg#starburst_svg"/></svg>);
+    return (<svg className='ts_icon ts_icon_spin ts_icon_spinner'><use href='./img/starburst.svg#starburst_svg'/></svg>);
   }
 
   public render(): JSX.Element {
     const { isOpen, selectLogFile, selectedLogFileName, logFiles, mergedFilesStatus } = this.props;
-    const className = classNames('Sidebar', { 'nav_open': isOpen });
+    const className = classNames('Sidebar', { nav_open: isOpen });
 
     const getSelectedClassName = (logType: string) => {
       const stillLoading = logType !== 'webapp' && !mergedFilesStatus[logType];
@@ -170,7 +170,7 @@ export class Sidebar extends React.Component<SidebarProps, undefined> {
               <ul className='primary_nav'>
                 <li className='MenuTitle MenuTitle-Webapp'>
                   <a>
-                    <i className='ts_icon ts_icon_filter'></i>State
+                    <i className='ts_icon ts_icon_filter' />State
                   </a>
                 </li>
                 {stateFiles}
@@ -209,7 +209,7 @@ export class Sidebar extends React.Component<SidebarProps, undefined> {
               <ul className='primary_nav'>
                 <li className='MenuTitle MenuTitle-Webapp'>
                   <a onClick={() => selectLogFile(null, 'webapp')} className={getSelectedClassName('webapp')}>
-                    <i className='ts_icon ts_icon_globe'></i>WebApp
+                    <i className='ts_icon ts_icon_globe' />WebApp
                   </a>
                 </li>
                 {webappFiles}

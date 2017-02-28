@@ -23,7 +23,11 @@ export class App extends React.Component<undefined, AppState> {
 
     const isDevMode = process.execPath.match(/[\\/]electron/);
     if (isDevMode) {
-      window.Perf = require('react-addons-perf')
+      try {
+        (window as any).Perf = require('react-addons-perf');
+      } catch (e) {
+        console.log(`Could not add React Perf`, e);
+      }
     }
 
     ipcRenderer.on('file-dropped', (_e, url) => this.openFile(url));
@@ -96,7 +100,7 @@ export class App extends React.Component<undefined, AppState> {
       .then((unzippedFiles: UnzippedFiles) => this.setState({unzippedFiles}));
   }
 
-  public render(): JSX.Element | null {
+  public render(): JSX.Element {
     const { unzippedFiles } = this.state;
     const className = classNames('App', { Darwin: process.platform === 'darwin' });
     const titleBar = process.platform === 'darwin' ? <MacTitlebar /> : '';

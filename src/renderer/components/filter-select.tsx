@@ -9,7 +9,7 @@ export interface FilterProps {
 }
 
 export interface FilterState {
-  filter: LevelFilter,
+  filter: LevelFilter;
   isSearchVisible: boolean;
 }
 

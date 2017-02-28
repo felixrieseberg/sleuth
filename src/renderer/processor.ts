@@ -195,7 +195,6 @@ export function readFile(logFile: UnzippedFile, logType: string = ''): Promise<A
     let lastLogged = 0;
     let current: LogEntry | null = null;
     let toParse = '';
-    let lastPushed = 0;
 
     readInterface.on('line', function onLine(line) {
       if (!line || line.length === 0) {

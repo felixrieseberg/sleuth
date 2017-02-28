@@ -1,4 +1,3 @@
-import { mergeLogFiles } from '../processor';
 import * as React from 'react';
 import * as classNames from 'classnames';
 import { Table, Column, Cell } from 'fixed-data-table';
@@ -335,7 +334,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
             <AutoSizer>{(options: any) => this.renderTable(options)}</AutoSizer>
           </div>
         </div>
-        <DataView isVisible={isDataViewVisible} entry={selectedEntry} toggle={this.toggleDataView} logEntry={selectedEntry} />
+        <DataView isVisible={isDataViewVisible!} entry={selectedEntry} toggle={this.toggleDataView} logEntry={selectedEntry} />
       </div>
     );
   }

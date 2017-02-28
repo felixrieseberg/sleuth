@@ -15,7 +15,6 @@ export interface DataViewProps {
 }
 
 export interface DataViewState {
-
 }
 
 export class DataView extends React.Component<DataViewProps, DataViewState> {
@@ -65,7 +64,7 @@ export class DataView extends React.Component<DataViewProps, DataViewState> {
   public renderLogEntry(logEntry: LogEntry): JSX.Element | null {
     const { level, logType, message, timestamp } = logEntry;
     const type = `${logType.charAt(0).toUpperCase() + logType.slice(1)} Process`;
-    const datetime = logEntry.momentValue ? moment(logEntry.momentValue).format("dddd, MMMM Do YYYY, h:mm:ss a") : timestamp;
+    const datetime = logEntry.momentValue ? moment(logEntry.momentValue).format('dddd, MMMM Do YYYY, h:mm:ss a') : timestamp;
 
     return (
       <div className='DataView-LogEntry'>
