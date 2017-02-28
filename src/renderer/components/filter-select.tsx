@@ -28,7 +28,16 @@ export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
     };
 
     this.onFilterToggle = this.onFilterToggle.bind(this);
-    this.onToggleSearch = debounce(this.onToggleSearch.bind(this), 700);
+    this.onToggleSearch = this.onToggleSearch.bind(this);
+    this.onSearchChange = debounce(this.onSearchChange.bind(this), 700);
+  }
+
+  public onSearchChange(value: string) {
+    const { onSearchChange } = this.props;
+
+    if (onSearchChange) {
+      onSearchChange(value || '');
+    }
   }
 
   public onFilterToggle(level: string) {
@@ -42,26 +51,31 @@ export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
   }
 
   public onToggleSearch() {
+    const { onSearchChange } = this.props;
+
+    if (onSearchChange) {
+      onSearchChange('');
+    }
+
     this.setState({ isSearchVisible: !this.state.isSearchVisible });
   }
 
   public render() {
-    const { onSearchChange } = this.props;
     const { isSearchVisible } = this.state;
     const { error, warning, info, debug } = this.state.filter!;
 
     if (isSearchVisible) {
       return (
         <div id='search_container'>
-            <form role='search' id='header_search_form' className='search_form no_bottom_margin'>
+            <form onSubmit={(e) => e.preventDefault()} role='search' id='header_search_form' className='search_form no_bottom_margin'>
               <div className='icon_search_wrapper'>
                 <i className='ts_icon ts_icon_search icon_search' />
               </div>
               <div className='search_input_wrapper'>
-                  <input type='text' onChange={onSearchChange} id='search_terms' className='search_input' placeholder='Search' />
+                  <input type='text' onChange={(e) => this.onSearchChange(e.target.value)} id='search_terms' className='search_input' placeholder='Search' />
               </div>
             </form>
-            <a onClick={() => this.onToggleSearch()}>
+            <a onClick={this.onToggleSearch}>
               <i className='ts_icon ts_icon_times_circle' />
             </a>
         </div>
