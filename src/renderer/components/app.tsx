@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ipcRenderer } from 'electron';
+import { ipcRenderer, remote } from 'electron';
 import * as classNames from 'classnames';
 import * as fs from 'fs-promise';
 import * as path from 'path';
@@ -31,6 +31,13 @@ export class App extends React.Component<undefined, AppState> {
     }
 
     ipcRenderer.on('file-dropped', (_e, url) => this.openFile(url));
+  }
+
+  /**
+   * Alright, time to show the window!
+   */
+  public componentDidMount() {
+    remote.getCurrentWindow().show();
   }
 
   /**

@@ -1,5 +1,6 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, shell } from 'electron';
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
+import * as defaultMenu from 'electron-default-menu';
 
 import { IpcManager } from './ipc';
 
@@ -17,6 +18,7 @@ const createWindow = async () => {
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
+    show: false,
     titleBarStyle: process.platform === 'darwin' ? 'hidden-inset' : undefined;
   });
 
@@ -38,6 +40,7 @@ const createWindow = async () => {
   });
 
   ipcManager = new IpcManager(mainWindow);
+  defaultMenu(app, shell);
 };
 
 // This method will be called when Electron has finished
