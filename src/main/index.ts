@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell } from 'electron';
+import { app, BrowserWindow, shell, Menu } from 'electron';
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
 import * as defaultMenu from 'electron-default-menu';
 
@@ -40,7 +40,8 @@ const createWindow = async () => {
   });
 
   ipcManager = new IpcManager(mainWindow);
-  defaultMenu(app, shell);
+  const menu = defaultMenu(app, shell);
+  Menu.setApplicationMenu(Menu.buildFromTemplate(menu));
 };
 
 // This method will be called when Electron has finished

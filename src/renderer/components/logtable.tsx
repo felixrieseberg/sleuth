@@ -313,7 +313,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     return (
       <Table {...tableOptions}>
         <Column header={indexHeader} cell={renderIndex} width={100}  />
-        <Column header={timestampHeader} cell={renderTimestamp} width={190}  />
+        <Column header={timestampHeader} cell={renderTimestamp} width={220}  />
         <Column header={levelHeader} cell={renderLevel} width={70}  />
         <Column header={messageHeader} flexGrow={1} cell={renderMessageCell} width={300} />
       </Table>);
