@@ -1,7 +1,7 @@
 {
   "name": "sleuth",
   "productName": "Sleuth",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Slack Log Viewer",
   "main": "src/main/index.ts",
   "scripts": {
@@ -27,9 +27,11 @@
           "rpm"
         ]
       },
-      "electronPackagerConfig": {},
+      "electronPackagerConfig": {
+        "icon": "./src/static/sleuth-icon"
+      },
       "electronWinstallerConfig": {
-        "name": "sleuth"
+        "name": "Sleuth"
       },
       "electronInstallerDebian": {},
       "electronInstallerRedhat": {},
