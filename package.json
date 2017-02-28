@@ -28,7 +28,11 @@
         ]
       },
       "electronPackagerConfig": {
-        "icon": "./src/static/sleuth-icon"
+        "icon": "./src/static/sleuth-icon",
+        "asar": true,
+        "osxSign": {
+          "identity": "LT94ZKYDCJ"
+        }
       },
       "electronWinstallerConfig": {
         "name": "Sleuth"
