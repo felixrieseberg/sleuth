@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as classNames from 'classnames';
 
-import { ipcRenderer } from 'electron';
+import { ipcRenderer, remote } from 'electron';
 import { UnzippedFile, UnzippedFiles } from '../unzip';
 import { getTypesForFiles, mergeLogFiles, processLogFiles } from '../processor';
 import { LevelFilter, MergedFilesLoadStatus, MergedLogFile, MergedLogFiles, ProcessedLogFile, ProcessedLogFiles } from '../interfaces';
@@ -90,7 +90,17 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
    */
   public async processFiles() {
     const { unzippedFiles } = this.props;
+
     const sortedUnzippedFiles = getTypesForFiles(unzippedFiles);
+
+    if (Object.keys(sortedUnzippedFiles).map((k) => sortedUnzippedFiles[k]).every((s) => s.length === 0)) {
+      const title = 'Huh, weird logs!';
+      const message = 'Sorry, Sleuth does not understand the files. It seems like there are no Slack logs here.';
+
+      remote.dialog.showMessageBox({ type: 'error', title, message }, () => {
+        remote.getCurrentWindow().reload();
+      });
+    }
 
     this.addFilesToState(sortedUnzippedFiles.state, 'state');
 

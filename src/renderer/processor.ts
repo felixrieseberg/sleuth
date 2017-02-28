@@ -41,7 +41,7 @@ export function sortWithWebWorker(data: Array<any>, sortFn: string) {
 export function mergeLogFiles(logFiles: Array<ProcessedLogFile>|Array<MergedLogFile>, logType: string): Promise<MergedLogFile> {
   return new Promise((resolve) => {
     let logEntries: Array<LogEntry> = [];
-    const totalEntries = logFiles.map((l) => l.logEntries.length).reduce((t, s) => t + s);
+    const totalEntries = logFiles.map((l) => l.logEntries.length).reduce((t, s) => t + s, 0);
 
     console.log(`Merging ${logFiles.length} log files with ${totalEntries} entries`, logFiles);
     console.time(`merging-${logType}`);
