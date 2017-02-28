@@ -11,6 +11,8 @@ let ipcManager;
 
 const isDevMode = process.execPath.match(/[\\/]electron/);
 
+if (require('electron-squirrel-startup')) return;
+
 const createWindow = async () => {
   require('electron-context-menu')();
 

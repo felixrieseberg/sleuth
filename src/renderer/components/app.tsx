@@ -29,6 +29,8 @@ export class App extends React.Component<undefined, AppState> {
         console.log(`Could not add React Perf`, e);
       }
     }
+
+    this.openFile = this.openFile.bind(this);
   }
 
   /**
@@ -128,7 +130,7 @@ export class App extends React.Component<undefined, AppState> {
     const { unzippedFiles } = this.state;
     const className = classNames('App', { Darwin: process.platform === 'darwin' });
     const titleBar = process.platform === 'darwin' ? <MacTitlebar /> : '';
-    let content: JSX.Element | null = <Welcome />;
+    let content: JSX.Element | null = <Welcome openFile={this.openFile} />;
 
     if (unzippedFiles && unzippedFiles.length > 0) {
       content = <LogView unzippedFiles={unzippedFiles} />;

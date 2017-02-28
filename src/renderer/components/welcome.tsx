@@ -10,7 +10,11 @@ export interface WelcomeState {
   suggestions: Array<string>;
 }
 
-export class Welcome extends React.Component<undefined, Partial<WelcomeState>> {
+export interface WelcomeProps {
+  openFile: Function;
+}
+
+export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>> {
   constructor() {
     super();
 
@@ -58,13 +62,14 @@ export class Welcome extends React.Component<undefined, Partial<WelcomeState>> {
 
   public render() {
     const { suggestions, sleuth } = this.state;
+    const { openFile } = this.props;
     let suggestion = null;
 
     if (suggestions && suggestions.length > 0) {
       suggestion = (
         <div className='Suggestions'>
           <h5>From your Downloads folder, may we suggest:</h5>
-          {suggestions.map((file) => <a key={file} className="small" href={file}>{path.basename(file)}</a>)}
+          {suggestions.map((file) => <a key={file} className="small" onClick={() => openFile(file)}>{path.basename(file)}</a>)}
         </div>
       );
     }

@@ -60,6 +60,7 @@
     "electron-context-menu": "0.8.0",
     "electron-default-menu": "^1.0.0",
     "electron-devtools-installer": "2.1.0",
+    "electron-squirrel-startup": "^1.0.0",
     "es6-promisify": "5.0.0",
     "fixed-data-table": "^0.6.3",
     "fs-promise": "2.0.0",
