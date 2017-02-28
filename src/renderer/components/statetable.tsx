@@ -4,7 +4,7 @@ import JSONTree from 'react-json-tree';
 import * as fs from 'fs-promise';
 
 import { UnzippedFile } from '../unzip';
-import { formatArray } from '../utils';
+import { shell } from 'electron';
 
 export interface StateTableProps {
   file: UnzippedFile;
@@ -100,7 +100,7 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
 
   public getSearchLink(text: string, query: string): JSX.Element {
     const href = `https://mc.tinyspeck.com/god/search.php?q=${encodeURIComponent(query)}`;
-    return (<a href={href}>{text}</a>);
+    return (<a onClick={() => shell.openExternal(href)}>{text}</a>);
   }
 
   public renderWindowFrameInfo(): JSX.Element | null {
