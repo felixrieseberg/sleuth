@@ -128,7 +128,7 @@ export class Sidebar extends React.Component<SidebarProps, undefined> {
     }
   }
 
-  public renderIcon(logType: string): JSX.Element {
+  public renderIcon(logType: string): JSX.Element | null {
     const { mergedFilesStatus } = this.props;
 
     if (mergedFilesStatus[logType]) {
@@ -141,12 +141,12 @@ export class Sidebar extends React.Component<SidebarProps, undefined> {
       } else if (logType === 'all') {
         return <i className='ts_icon ts_icon_archive'></i>;
       }
-    } else {
-      return (<svg className="ts_icon ts_icon_spin ts_icon_spinner"><use href="./img/starburst.svg#starburst_svg"/></svg>);
     }
+
+    return (<svg className="ts_icon ts_icon_spin ts_icon_spinner"><use href="./img/starburst.svg#starburst_svg"/></svg>);
   }
 
-  public render(): JSX.Element | null {
+  public render(): JSX.Element {
     const { isOpen, selectLogFile, selectedLogFileName, logFiles, mergedFilesStatus } = this.props;
     const className = classNames('Sidebar', { 'nav_open': isOpen });
 

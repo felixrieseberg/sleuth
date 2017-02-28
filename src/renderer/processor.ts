@@ -87,7 +87,7 @@ export function getTypeForFile(logFile: UnzippedFile): string {
   const { fileName } = logFile;
   let logType: string = '';
 
-  if (fileName.startsWith('browser.log')) {
+  if (fileName.startsWith('browser')) {
     logType = 'browser';
   } else if (fileName.startsWith('renderer-')) {
     logType = 'renderer';

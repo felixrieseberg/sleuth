@@ -6,7 +6,8 @@ import { Filter } from './filter-select';
 
 export interface LogViewHeaderProps {
   menuToggle: Function;
-  filterToggle: Function;
+  onFilterToggle: Function;
+  onSearchChange: Function;
 }
 
 export class LogViewHeader extends React.Component<LogViewHeaderProps, undefined> {
@@ -14,6 +15,15 @@ export class LogViewHeader extends React.Component<LogViewHeaderProps, undefined
     super(props);
 
     this.refresh = this.refresh.bind(this);
+    this.onSearchChange = this.onSearchChange.bind(this);
+  }
+
+  public onSearchChange(e: React.FormEvent) {
+    const { onSearchChange } = this.props;
+
+    if (onSearchChange && e && e.target) {
+      onSearchChange((e.target as any).value || '');
+    }
   }
 
   public refresh() {
@@ -21,7 +31,7 @@ export class LogViewHeader extends React.Component<LogViewHeaderProps, undefined
   }
 
   public render() {
-    const { filterToggle } = this.props;
+    const { onFilterToggle } = this.props;
     const logViewHeaderClassName = classNames('headroom', 'headroom--pinned', 'headroom--top');
 
     return (
@@ -37,7 +47,7 @@ export class LogViewHeader extends React.Component<LogViewHeaderProps, undefined
           </a>
         </h1>
         <div className='header_btns float_right'>
-          <Filter filterToggle={filterToggle} />
+          <Filter onSearchChange={this.onSearchChange} onFilterToggle={onFilterToggle} />
         </div>
       </header>
     );

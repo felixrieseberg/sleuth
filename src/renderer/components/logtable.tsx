@@ -1,3 +1,4 @@
+import { mergeLogFiles } from '../processor';
 import * as React from 'react';
 import * as classNames from 'classnames';
 import { Table, Column, Cell } from 'fixed-data-table';
@@ -22,14 +23,15 @@ export interface RowClickEvent {
 export interface LogTableProps {
   logFile: ProcessedLogFile | MergedLogFile;
   filter: LevelFilter;
+  search?: string;
 }
 
 export interface LogTableState {
-  selectedEntry?: LogEntry;
   isDataViewVisible: boolean;
   sortedList: Array<LogEntry>;
-  sortBy: string;
-  sortDirection: string;
+  selectedEntry?: LogEntry;
+  sortBy?: string;
+  sortDirection?: string;
 }
 
 export class LogTable extends React.Component<LogTableProps, Partial<LogTableState>> {
@@ -45,7 +47,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
       isDataViewVisible: false,
       sortedList: [],
       sortBy: 'index',
-      sortDirection: 'ASC'
+      sortDirection: 'ASC',
     };
 
     this.onRowClick = this.onRowClick.bind(this);
@@ -66,18 +68,19 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    */
   public shouldComponentUpdate(nextProps: LogTableProps, nextState: LogTableState): boolean {
     const { filter, logFile } = this.props;
-    const { selectedEntry, sortBy, sortDirection, isDataViewVisible } = this.state;
+    const { selectedEntry, sortBy, sortDirection, isDataViewVisible, sortedList } = this.state;
     const nextFile = nextProps.logFile;
 
-    const newEntries = (nextFile && logFile && nextFile.logEntries.length !== logFile.logEntries.length);
-    const newFile = (!nextFile && logFile || nextFile.logType !== logFile.logType);
     const newSort = (nextState.sortBy !== sortBy || nextState.sortDirection !== sortDirection);
 
     // Sort direction changed
-    if (nextState.sortBy !== sortBy || nextState.sortDirection !== sortDirection) return true;
+    if (newSort) return true;
 
     // File changed - and update is in order
-    if (newFile || newEntries || newSort) return true;
+    const newFile = ((!nextFile && logFile) || nextFile.logType !== logFile.logType);
+    const newEntries = (nextFile && logFile && nextFile.logEntries.length !== logFile.logEntries.length);
+    const newResults = ((!sortedList && nextState.sortedList) || sortedList && nextState.sortedList.length !== sortedList.length);
+    if (newFile || newEntries || newResults) return true;
 
     // The data view is open and the selected entry changed
     if (nextState.isDataViewVisible !== isDataViewVisible)  return true;
@@ -95,12 +98,14 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
   }
 
   public componentWillReceiveProps(nextProps: LogTableProps): void {
-    const { filter } = this.props;
+    const { filter, search, logFile } = this.props;
+    const filterChanged = didFilterChange(filter, nextProps.filter);
+    const searchChanged = search !== nextProps.search;
+    const fileChanged = ((!logFile && nextProps.logFile) || logFile && logFile.logEntries.length !== nextProps.logFile.logEntries.length || logFile.logType !== nextProps.logFile.logType);
 
-    // Filter changed
-    if (didFilterChange(filter, nextProps.filter)) {
-      console.log('filtering')
-      this.setState({ sortedList: this.sortFilterList(undefined, undefined, nextProps.filter) });
+    // Filter or search changed
+    if (filterChanged || searchChanged || fileChanged) {
+      this.setState({ sortedList: this.sortFilterList(undefined, undefined, nextProps.filter, nextProps.search, nextProps.logFile) });
     }
   }
 
@@ -161,17 +166,19 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
   /**
    * Sorts the list
    */
-  public sortFilterList(sortBy?: string, sortDirection?: string, filter?: LevelFilter): Array<LogEntry> {
-    const { logFile } = this.props;
+  public sortFilterList(sortBy?: string, sortDirection?: string, filter?: LevelFilter, search?: string, logFile?: ProcessedLogFile | MergedLogFile): Array<LogEntry> {
+    logFile = logFile || this.props.logFile;
     filter = filter || this.props.filter;
+    search = search !== undefined ? search : this.props.search;
     sortBy = sortBy || this.state.sortBy;
     sortDirection = sortDirection || this.state.sortDirection;
 
     const shouldFilter = this.shouldFilter(filter);
+    const searchRegex = new RegExp(search || '', 'i');
     const noSort = (!sortBy || sortBy === 'index') && (!sortDirection || sortDirection === SORT_TYPES.ASC);
 
     // Check if we can bail early and just use the naked logEntries array
-    if (noSort && !shouldFilter) return logFile.logEntries;
+    if (noSort && !shouldFilter && !search) return logFile.logEntries;
 
     let sortedList = logFile.logEntries!.concat();
 
@@ -179,12 +186,16 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     function doSortByMessage(a: LogEntry, b: LogEntry) { return a.message.localeCompare(b.message); };
     function doSortByLevel(a: LogEntry, b: LogEntry) { return a.level.localeCompare(b.level); };
     function doFilter(a: LogEntry) { return (a.level && filter![a.level]); };
-
-    console.log(filter);
+    function doSearch(a: LogEntry) { return (!search || searchRegex.test(a.message)); };
 
     // Filter
     if (shouldFilter) {
       sortedList = sortedList.filter(doFilter);
+    }
+
+    // Search
+    if (search) {
+      sortedList = sortedList.filter(doSearch);
     }
 
     // Sort

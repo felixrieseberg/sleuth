@@ -48,6 +48,7 @@
     "@types/react": "^0.14.55",
     "@types/react-dom": "^0.14.20",
     "classnames": "2.2.5",
+    "debounce": "^1.0.0",
     "debug": "2.6.1",
     "electron-compile": "6.1.2",
     "electron-context-menu": "0.8.0",

@@ -10,11 +10,11 @@ export class Loading extends React.Component<LoadingProps, undefined> {
     super();
   }
 
-  public render(): JSX.Element | null {
+  public render(): JSX.Element {
     const { percentage, message } = this.props;
 
     if (percentage === 100) {
-      return null;
+      return <div />;
     }
 
     return (

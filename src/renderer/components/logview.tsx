@@ -24,6 +24,7 @@ export interface LogViewState {
   loadedLogFiles: boolean;
   loadedMergeFiles: boolean;
   filter: LevelFilter;
+  search?: string;
 }
 
 export class LogView extends React.Component<LogViewProps, Partial<LogViewState>> {
@@ -52,7 +53,8 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
 
     this.toggleSidebar = this.toggleSidebar.bind(this);
     this.selectLogFile = this.selectLogFile.bind(this);
-    this.filterToggle = this.filterToggle.bind(this);
+    this.onFilterToggle = this.onFilterToggle.bind(this);
+    this.onSearchChange = this.onSearchChange.bind(this);
 
     ipcRenderer.on('processing-status', (_event, loadingMessage: string) => {
       this.setState({ loadingMessage });
@@ -226,13 +228,23 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
    *
    * @param {string} level
    */
-  public filterToggle(level: string) {
+  public onFilterToggle(level: string) {
     const { filter } = this.state;
     if (filter && filter[level] !== undefined) {
-      console.log(`Toggling filter for ${level}`);
       const newFilter = {...filter};
       newFilter[level] = !newFilter[level];
       this.setState({ filter: newFilter });
+    }
+  }
+
+  /**
+   * Triggered if the search input value changes.
+   *
+   * @param {string} search
+   */
+  public onSearchChange(search: string) {
+    if (search !== this.state.search) {
+      this.setState({ search });
     }
   }
 
@@ -242,11 +254,11 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
    * @returns {(JSX.Element | null)}
    */
   public renderTableOrData(): JSX.Element | null {
-    const { selectedLogFile, filter } = this.state;
+    const { selectedLogFile, filter, search } = this.state;
 
     if ((selectedLogFile as ProcessedLogFile).type === 'ProcessedLogFile' ||
         (selectedLogFile as MergedLogFile).type === 'MergedLogFile') {
-      return (<LogTable logFile={selectedLogFile as ProcessedLogFile} filter={filter as LevelFilter} />);
+      return (<LogTable logFile={selectedLogFile as ProcessedLogFile} filter={filter as LevelFilter} search={search} />);
     } else {
       return (<StateTable file={selectedLogFile as UnzippedFile} />);
     }
@@ -264,13 +276,14 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
 
     return (
       <div className={logViewClassName}>
-        <Sidebar isOpen={!!sidebarIsOpen}
+        <Sidebar
+          isOpen={!!sidebarIsOpen}
           logFiles={processedLogFiles as ProcessedLogFiles}
           mergedFilesStatus={mergedFilesStatus}
           selectLogFile={this.selectLogFile}
           selectedLogFileName={selectedLogFileName} />
         <div id='content' className={logContentClassName}>
-          <LogViewHeader menuToggle={this.toggleSidebar} filterToggle={this.filterToggle} />
+          <LogViewHeader menuToggle={this.toggleSidebar} onSearchChange={this.onSearchChange} onFilterToggle={this.onFilterToggle} />
           {tableOrLoading}
         </div>
       </div>

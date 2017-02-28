@@ -72,8 +72,7 @@ export class DataView extends React.Component<DataViewProps, DataViewState> {
         <div className='DataView-MetaInfo'>
           <div className='DataView-Moment'>{datetime}</div>
           <div className='DataView-LogType'>
-            	<i className="ts_icon ts_icon_volume_medium"></i>{level}
-              <i className="ts_icon ts_icon_volume_medium"></i>{type}
+              <i className='ts_icon ts_icon_paper_plane' />Level: {level} Type: {type}
           </div>
         </div>
         <div className='DataView-Message'>{message}</div>
@@ -81,7 +80,7 @@ export class DataView extends React.Component<DataViewProps, DataViewState> {
     )
   }
 
-  public render(): JSX.Element | null {
+  public render(): JSX.Element {
     const { entry, isVisible, height, logEntry } = this.props;
     const style = { height: `${height || 300}px` };
     const meta = entry ? entry.meta : '';

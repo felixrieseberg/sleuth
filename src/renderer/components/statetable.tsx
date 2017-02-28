@@ -180,11 +180,11 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
     return null;
   }
 
-  public render(): JSX.Element | null {
+  public render(): JSX.Element {
     const { data } = this.state;
 
     if (!data) {
-      return null;
+      return <div />;
     }
 
     const theme = this.getTheme();
