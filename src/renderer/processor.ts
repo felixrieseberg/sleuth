@@ -122,7 +122,12 @@ export function getTypesForFiles(logFiles: UnzippedFiles): SortedUnzippedFiles {
       result.state.push(logFile);
     } else {
       const logType = getTypeForFile(logFile);
-      result[logType].push(logFile);
+
+      if (result[logType]) {
+        result[logType].push(logFile);
+      } else {
+        console.log(`File ${logFile.fileName} seems weird - we don't recognize it. Throwing it away.`);
+      }
     }
   });
 
