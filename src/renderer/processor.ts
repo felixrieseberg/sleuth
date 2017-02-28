@@ -326,7 +326,7 @@ export function matchLine(line: string, logType: string): MatchResult | undefine
       const endsWithObject = endsWithObjectRegex.exec(results[3]);
       const message = (endsWithObject && endsWithObject.length === 2) ? endsWithObject[1] : results[3];
       const toParseHead = (endsWithObject && endsWithObject.length === 2) ? '{' : undefined;
-      const momentValue = moment(results[1], 'MM/DD/YY, HH:mm:ss:SSS').valueOf();
+      const momentValue = moment(results[1], 'YYYY-MM-DDTHH:mm:ss.SSSZ').valueOf();
 
       return {
         timestamp: results[1],

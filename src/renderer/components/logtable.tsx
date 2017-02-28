@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as classNames from 'classnames';
+import * as moment from 'moment';
 import { Table, Column, Cell } from 'fixed-data-table';
 import { AutoSizer } from 'react-virtualized';
 
@@ -252,7 +253,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    */
   public timestampCellRenderer(entry: LogEntry): JSX.Element | String {
     // Todo: This could be cool, but it's expensive af
-    // const timestamp = entry.moment ? entry.moment.format('HH:mm:ss (DD/MM)') : entry.timestamp;
+    const timestamp = entry.momentValue ? moment(entry.momentValue).format('HH:mm:ss (DD/MM)') : entry.timestamp;
     let prefix = <i className='Meta ts_icon ts_icon_question'/>;
 
     if (entry.logType === 'browser') {
@@ -265,7 +266,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
       prefix = <i title='Webview Log' className='Meta Color-Webview ts_icon ts_icon_all_files_alt'/>;
     }
 
-    return (<span title={entry.timestamp}>{prefix}{entry.timestamp}</span>);
+    return (<span title={entry.timestamp}>{prefix}{timestamp}</span>);
   }
 
   /**
