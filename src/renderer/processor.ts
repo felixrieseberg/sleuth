@@ -63,8 +63,8 @@ export function mergeLogFiles(logFiles: Array<ProcessedLogFile>|Array<MergedLogF
     });
 
     const sortFn = `function sort(a, b) {
-      if (a.momentValue && b.momentValueOf) {
-        return a.momentValue - b.momentValueOf;
+      if (a.momentValue && b.momentValue) {
+        return a.momentValue - b.momentValue;
       } else {
         return 1;
       }
