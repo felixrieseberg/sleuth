@@ -9,6 +9,8 @@ import { Welcome } from './welcome';
 import { LogView } from './logview';
 import { MacTitlebar } from './mac-titlebar';
 
+const debug = require('debug')('sleuth:app');
+
 export interface AppState {
   unzippedFiles: UnzippedFiles;
 }
@@ -21,12 +23,14 @@ export class App extends React.Component<undefined, AppState> {
       unzippedFiles: [],
     };
 
+    localStorage.debug = 'sleuth*';
+
     const isDevMode = process.execPath.match(/[\\/]electron/);
     if (isDevMode) {
       try {
         (window as any).Perf = require('react-addons-perf');
       } catch (e) {
-        console.log(`Could not add React Perf`, e);
+        debug(`Could not add React Perf`, e);
       }
     }
 
@@ -68,7 +72,7 @@ export class App extends React.Component<undefined, AppState> {
    * @returns {void}
    */
   public openFile(url: string): void {
-    console.log(`Received open-url for ${url}`);
+    debug(`Received open-url for ${url}`);
 
     const isZipFile = /[\s\S]*\.zip$/.test(url);
     if (isZipFile) {
@@ -89,7 +93,7 @@ export class App extends React.Component<undefined, AppState> {
    * @param {string} url
    */
   public openDirectory(url: string): void {
-    console.log(`Now opening directory ${url}`);
+    debug(`Now opening directory ${url}`);
 
     fs.readdir(url)
       .then((dir) => {
@@ -98,12 +102,12 @@ export class App extends React.Component<undefined, AppState> {
 
         dir.forEach((fileName) => {
           const fullPath = path.join(url, fileName);
-          console.log(`Checking out file ${fileName}`);
+          debug(`Checking out file ${fileName}`);
 
           const promise = fs.stat(fullPath)
             .then((stats: fs.Stats) => {
               const file: UnzippedFile = { fileName, fullPath, size: stats.size };
-              console.log('Found file, adding to result.', file);
+              debug('Found file, adding to result.', file);
               unzippedFiles.push(file);
             });
 

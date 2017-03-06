@@ -11,6 +11,8 @@ import { StateTable } from './statetable';
 import { Sidebar } from './sidebar';
 import { Loading } from './loading';
 
+const debug = require('debug')('sleuth:logview');
+
 export interface LogViewProps {
   unzippedFiles: UnzippedFiles;
 }
@@ -133,7 +135,7 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
     const { mergedLogFiles } = this.state;
     const newMergedLogFiles = {...mergedLogFiles};
 
-    console.log(`Merged log file for ${mergedFile.logType} now created!`);
+    debug(`Merged log file for ${mergedFile.logType} now created!`);
     newMergedLogFiles[mergedFile.logType] = mergedFile;
     this.setState({ mergedLogFiles: newMergedLogFiles });
   };

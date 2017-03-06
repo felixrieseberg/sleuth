@@ -6,6 +6,8 @@ import * as fs from 'fs-promise';
 import { UnzippedFile } from '../unzip';
 import { shell } from 'electron';
 
+const debug = require('debug')('sleuth:statetable');
+
 export interface StateTableProps {
   file: UnzippedFile;
 }
@@ -23,11 +25,11 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
     this.state = {};
   }
 
-  componentDidMount() {
+  public componentDidMount() {
     this.parse(this.props.file);
   }
 
-  componentWillReceiveProps(nextProps: StateTableProps) {
+  public componentWillReceiveProps(nextProps: StateTableProps) {
     const nextFile = nextProps.file;
     const currentFile = this.props.file;
 
@@ -36,7 +38,7 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
     }
   }
 
-  getFileType(): StateFileType {
+  public getFileType(): StateFileType {
     const { file } = this.props;
     const nameMatch = file.fileName.match(/slack-(\w*)/);
     const type = nameMatch && nameMatch.length > 1 ? nameMatch[1] : 'unknown';
@@ -44,12 +46,12 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
     return type as StateFileType;
   }
 
-  parse(file: UnzippedFile) {
+  public parse(file: UnzippedFile) {
     if (!file) {
       return;
     }
 
-    console.log(`Reading ${file.fullPath}`);
+    debug(`Reading ${file.fullPath}`);
 
     fs.readFile(file.fullPath, 'utf8')
       .then((rawData) => {
@@ -68,7 +70,7 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
         this.setState({ data });
       })
       .catch((error) => {
-        console.log(error);
+        debug(error);
       });
   }
 

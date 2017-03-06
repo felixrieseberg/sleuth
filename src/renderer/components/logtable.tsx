@@ -10,6 +10,8 @@ import { DataView } from './dataview';
 import { Alert } from './alert';
 import { LogTableHeaderCell } from './logtable-headercell';
 
+const debug = require('debug')('sleuth:logtable');
+
 export const SORT_TYPES = {
   ASC: 'ASC',
   DESC: 'DESC',
@@ -199,17 +201,17 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
 
     // Sort
     if (sortBy === 'index' || sortBy === 'timestamp') {
-      console.log(`Sorting by ${sortBy} (aka doing nothing)`);
+      debug(`Sorting by ${sortBy} (aka doing nothing)`);
     } else if (sortBy === 'message') {
-      console.log('Sorting by message');
+      debug('Sorting by message');
       sortedList = sortedList.sort(doSortByMessage);
     } else if (sortBy === 'level') {
-      console.log('Sorting by level');
+      debug('Sorting by level');
       sortedList = sortedList.sort(doSortByLevel);
     }
 
     if (sortDirection === SORT_TYPES.DESC) {
-      console.log('Reversing');
+      debug('Reversing');
       sortedList.reverse();
     }
 

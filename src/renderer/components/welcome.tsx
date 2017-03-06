@@ -5,6 +5,8 @@ import * as path from 'path';
 
 import { remote } from 'electron';
 
+const debug = require('debug')('sleuth:welcome');
+
 export interface WelcomeState {
   sleuth: string;
   suggestions: Array<string>;
@@ -23,7 +25,7 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
     };
   }
 
-  componentDidMount() {
+  public componentDidMount() {
     this.getItemsInDownloadFolder();
   }
 
@@ -56,7 +58,7 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
         this.setState({ suggestions });
       })
       .catch((error) => {
-        console.log(error);
+        debug(error);
       });
   }
 

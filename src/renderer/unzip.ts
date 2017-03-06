@@ -4,6 +4,8 @@ import * as path from 'path';
 import * as tmp from 'tmp';
 import * as promisify from 'es6-promisify';
 
+const debug = require('debug')('sleuth:unzip');
+
 export interface YauzlZipEntry {
   fileName: string;
   extraFields: Array<any>;
@@ -41,7 +43,7 @@ export class Unzipper {
 
   constructor(url: string) {
     this.url = url;
-    console.log(`Created new Unzipper with url ${url}`);
+    debug(`Created new Unzipper with url ${url}`);
   }
 
   public open(): Promise<any> {
@@ -67,14 +69,14 @@ export class Unzipper {
         this.zipfile.on('end', () => resolve(this.files));
         this.zipfile.readEntry();
       } else {
-        console.log('Unzipper: Tried to unzip file, but file does not exist');
+        debug('Tried to unzip file, but file does not exist');
         reject('Tried to unzip file, but file does not exist');
       }
     });
   }
 
   public handleDirectory(entry: YauzlZipEntry): Promise<void> {
-    console.log(`Unzipper: Found directory: ${entry.fileName}`);
+    debug(`Found directory: ${entry.fileName}`);
     return fs.ensureDir(path.join(this.output, entry.fileName));
   }
 
@@ -82,18 +84,18 @@ export class Unzipper {
     return new Promise((resolve, reject) => {
       const targetPath = path.join(this.output, entry.fileName);
 
-      console.log(`Unzipper: Found file: ${entry.fileName}, Size: ${entry.compressedSize}.`);
+      debug(`Found file: ${entry.fileName}, Size: ${entry.compressedSize}.`);
 
       this.zipfile.openReadStream(entry, async (error: Error, readStream: NodeJS.ReadableStream) => {
         if (error) {
-          console.log(`Unzipper: Encountered error while trying to read stream for ${entry.fileName}`);
+          debug(`Encountered error while trying to read stream for ${entry.fileName}`);
           return reject(error);
         }
 
         readStream.pipe(fs.createWriteStream(targetPath));
         readStream.once('end', () => {
           this.files.push({ fileName: entry.fileName, size: entry.uncompressedSize || 0, fullPath: targetPath });
-          console.log(`Unzipper: Successfully unzipped ${entry.fileName} to ${targetPath}`);
+          debug(`Successfully unzipped ${entry.fileName} to ${targetPath}`);
           resolve();
         });
     });
@@ -114,7 +116,7 @@ export class Unzipper {
     if (this.output) {
       return fs.remove(this.output);
     } else {
-      console.log('Unzipper: Called clean, but no temp directory created. No need to clean!');
+      debug('Called clean, but no temp directory created. No need to clean!');
       return Promise.resolve();
     }
   }
