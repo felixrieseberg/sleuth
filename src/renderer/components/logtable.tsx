@@ -239,7 +239,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    */
   public messageCellRenderer(entry: LogEntry): JSX.Element | string {
     if (entry && entry.meta) {
-      return (<span><i className='ts_icon ts_icon_all_files_alt HasData'/> {entry.message}</span>);
+      return (<span title={entry.message}><i className='ts_icon ts_icon_all_files_alt HasData'/> {entry.message}</span>);
     } else if (entry && entry.repeated) {
       return `(Repeated ${entry.repeated.length} times) ${entry.message}`;
     } else {
