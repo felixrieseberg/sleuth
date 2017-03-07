@@ -21,6 +21,8 @@ const createWindow = async () => {
     width: 1200,
     height: 800,
     show: false,
+    minHeight: 500,
+    minWidth: 1000,
     titleBarStyle: process.platform === 'darwin' ? 'hidden-inset' : undefined;
   });
 
