@@ -28,9 +28,16 @@ export function sendProcStatus(status: any): void {
 export function sortWithWebWorker(data: Array<any>, sortFn: string) {
   return new Promise((resolve) => {
     const code = `onmessage = function (evt) {evt.data.sort(${sortFn}); postMessage(evt.data)}`;
-    const worker = new Worker(URL.createObjectURL(new Blob([code])));
-    worker.onmessage = (e) => resolve(e.data);
-    worker.postMessage(data);
+
+    if (window && window.Worker && window.URL) {
+      const worker = new Worker(URL.createObjectURL(new Blob([code])));
+      worker.onmessage = (e) => resolve(e.data);
+      worker.postMessage(data);
+    } else {
+      // Lols
+      const sortedData = data.sort(new Function(`return ${sortFn}`)());
+      resolve(sortedData);
+    }
   });
 }
 
@@ -91,11 +98,11 @@ export function getTypeForFile(logFile: UnzippedFile): string {
 
   if (fileName.startsWith('browser')) {
     logType = 'browser';
-  } else if (fileName.startsWith('renderer-')) {
+  } else if (fileName.startsWith('renderer')) {
     logType = 'renderer';
-  } else if (fileName.startsWith('webapp-')) {
+  } else if (fileName.startsWith('webapp')) {
     logType = 'webapp';
-  } else if (fileName.startsWith('webview-')) {
+  } else if (fileName.startsWith('webview')) {
     logType = 'webview';
   }
 
