@@ -1,11 +1,13 @@
 import { UnzippedFile } from './unzip';
 
+export type LogType = 'browser' | 'renderer' | 'call' | 'webapp' | 'webview';
+
 export interface LogEntry {
   index: number;
   timestamp: string;
   message: string;
   level: string;
-  logType: string;
+  logType: LogType;
   meta?: any;
   momentValue?: number;
   repeated?: Array<string>;
@@ -26,13 +28,14 @@ export interface MergedLogFiles {
   renderer?: MergedLogFile;
   webapp?: MergedLogFile;
   webview?: MergedLogFile;
+  call?: MergedLogFile;
   type: 'MergedLogFiles';
 }
 
 export interface ProcessedLogFile {
   logFile: UnzippedFile;
   logEntries: Array<LogEntry>;
-  logType: string;
+  logType: LogType;
   type: 'ProcessedLogFile';
 }
 
@@ -42,19 +45,20 @@ export interface ProcessedLogFiles {
   webview: Array<ProcessedLogFile>;
   webapp: Array<ProcessedLogFile>;
   state: Array<UnzippedFile>;
+  call: Array<ProcessedLogFile>;
 }
 
 export interface MergedLogFile {
   logFiles: Array<ProcessedLogFile>;
   logEntries: Array<LogEntry>;
-  logType: string;
+  logType: LogType;
   type: 'MergedLogFile';
 }
 
 export interface CombinedLogFiles {
   logFiles: Array<ProcessedLogFile>;
   logEntries: Array<LogEntry>;
-  logType: string;
+  logType: LogType;
   type: 'CombinedLogFiles';
 }
 
@@ -64,6 +68,7 @@ export interface SortedUnzippedFiles {
   webview: Array<UnzippedFile>;
   webapp: Array<UnzippedFile>;
   state: Array<UnzippedFile>;
+  call: Array<UnzippedFile>;
 }
 
 export interface MergedFilesLoadStatus {
@@ -72,6 +77,7 @@ export interface MergedFilesLoadStatus {
   renderer: boolean;
   webview: boolean;
   webapp: boolean;
+  call: boolean;
 }
 
 export interface LevelFilter {

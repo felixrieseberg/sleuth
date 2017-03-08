@@ -40,7 +40,8 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
         renderer: [],
         webview: [],
         webapp: [],
-        state: []
+        state: [],
+        call: []
       },
       filter: {
         error: false,
@@ -114,6 +115,8 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
       .then((newFiles: Array<ProcessedLogFile>) => this.addFilesToState(newFiles, 'webapp'));
     await processLogFiles(sortedUnzippedFiles.webview)
       .then((newFiles: Array<ProcessedLogFile>) => this.addFilesToState(newFiles, 'webview'));
+    await processLogFiles(sortedUnzippedFiles.call)
+      .then((newFiles: Array<ProcessedLogFile>) => this.addFilesToState(newFiles, 'call'));
 
     const { selectedLogFile, processedLogFiles } = this.state;
     if (!selectedLogFile && processedLogFiles) {
@@ -150,6 +153,7 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
       await mergeLogFiles(processedLogFiles.browser, 'browser').then((r) => this.setMergedFile(r));
       await mergeLogFiles(processedLogFiles.renderer, 'renderer').then((r) => this.setMergedFile(r));
       await mergeLogFiles(processedLogFiles.webview, 'webview').then((r) => this.setMergedFile(r));
+      await mergeLogFiles(processedLogFiles.call, 'call').then((r) => this.setMergedFile(r));
 
       const merged = this.state.mergedLogFiles as MergedLogFiles;
 
@@ -231,7 +235,8 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
       browser: !!(mergedLogFiles && mergedLogFiles.browser && mergedLogFiles.browser.logEntries),
       renderer: !!(mergedLogFiles && mergedLogFiles.renderer && mergedLogFiles.renderer.logEntries),
       webview: !!(mergedLogFiles && mergedLogFiles.webview && mergedLogFiles.webview.logEntries),
-      webapp: !!(mergedLogFiles && mergedLogFiles.webapp && mergedLogFiles.webapp.logEntries)
+      webapp: !!(mergedLogFiles && mergedLogFiles.webapp && mergedLogFiles.webapp.logEntries),
+      call: !!(mergedLogFiles && mergedLogFiles.call && mergedLogFiles.call.logEntries),
     };
   }
 

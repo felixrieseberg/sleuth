@@ -69,7 +69,8 @@ export class Sidebar extends React.Component<SidebarProps, undefined> {
         browser: [],
         renderer: [],
         webapp: [],
-        webview: []
+        webview: [],
+        call: []
       };
     }
 
@@ -77,7 +78,8 @@ export class Sidebar extends React.Component<SidebarProps, undefined> {
       browser: getNames(logFiles.browser),
       renderer: getNames(logFiles.renderer),
       webapp: getNames(logFiles.webapp),
-      webview: getNames(logFiles.webview)
+      webview: getNames(logFiles.webview),
+      call: getNames(logFiles.call)
     }
   }
 
@@ -161,6 +163,7 @@ export class Sidebar extends React.Component<SidebarProps, undefined> {
     const rendererFiles = logFiles.renderer.map(this.renderFile.bind(this));
     const webappFiles = logFiles.webapp.map(this.renderFile.bind(this));
     const webviewFiles = logFiles.webview.map(this.renderFile.bind(this));
+    const callFiles = logFiles.call.map(this.renderFile.bind(this));
 
     return (
       <div className={className}>
@@ -205,6 +208,14 @@ export class Sidebar extends React.Component<SidebarProps, undefined> {
                   </a>
                 </li>
                 {webviewFiles}
+              </ul>
+              <ul className='primary_nav'>
+                <li className='MenuTitle MenuTitle-Call'>
+                  <a onClick={() => selectLogFile(null, 'call')} className={getSelectedClassName('call')}>
+                    <i className='ts_icon ts_icon_phone' />Call
+                  </a>
+                </li>
+                {callFiles}
               </ul>
               <ul className='primary_nav'>
                 <li className='MenuTitle MenuTitle-Webapp'>

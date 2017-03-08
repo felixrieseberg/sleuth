@@ -1,3 +1,4 @@
+import { shouldIgnoreFile } from '../utils/should-ignore-file';
 import * as yauzl from 'yauzl';
 import * as fs from 'fs-promise';
 import * as path from 'path';
@@ -85,6 +86,8 @@ export class Unzipper {
       const targetPath = path.join(this.output, entry.fileName);
 
       debug(`Found file: ${entry.fileName}, Size: ${entry.compressedSize}.`);
+
+      if (shouldIgnoreFile(entry.fileName)) return;
 
       this.zipfile.openReadStream(entry, async (error: Error, readStream: NodeJS.ReadableStream) => {
         if (error) {

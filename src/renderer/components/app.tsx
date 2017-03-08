@@ -1,3 +1,4 @@
+import { shouldIgnoreFile } from '../../utils/should-ignore-file';
 import * as React from 'react';
 import { ipcRenderer, remote } from 'electron';
 import * as classNames from 'classnames';
@@ -101,6 +102,8 @@ export class App extends React.Component<undefined, AppState> {
         const promises: Array<Promise<any>> = [];
 
         dir.forEach((fileName) => {
+          if (shouldIgnoreFile(fileName)) return;
+
           const fullPath = path.join(url, fileName);
           debug(`Checking out file ${fileName}`);
 

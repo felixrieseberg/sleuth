@@ -23,7 +23,7 @@ const createWindow = async () => {
     show: false,
     minHeight: 500,
     minWidth: 1000,
-    titleBarStyle: process.platform === 'darwin' ? 'hidden-inset' : undefined;
+    titleBarStyle: process.platform === 'darwin' ? 'hidden-inset' : undefined
   });
 
   // and load the index.html of the app.

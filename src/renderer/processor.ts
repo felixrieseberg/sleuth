@@ -1,5 +1,5 @@
 import { UnzippedFile, UnzippedFiles } from './unzip';
-import { LogEntry, MatchResult, MergedLogFile, ProcessedLogFile, SortedUnzippedFiles } from './interfaces';
+import { LogEntry, LogType, MatchResult, MergedLogFile, ProcessedLogFile, SortedUnzippedFiles } from './interfaces';
 import { ipcRenderer } from 'electron';
 
 import * as fs from 'fs-promise';
@@ -47,10 +47,10 @@ export function sortWithWebWorker(data: Array<any>, sortFn: string) {
  *
  * @param {ProcessedLogFiles} logFiles
  */
-export function mergeLogFiles(logFiles: Array<ProcessedLogFile>|Array<MergedLogFile>, logType: string): Promise<MergedLogFile> {
+export function mergeLogFiles(logFiles: Array<ProcessedLogFile>|Array<MergedLogFile>, logType: LogType): Promise<MergedLogFile> {
   return new Promise((resolve) => {
     let logEntries: Array<LogEntry> = [];
-    const totalEntries = logFiles.map((l) => l.logEntries.length).reduce((t, s) => t + s, 0);
+    const totalEntries = (logFiles as Array<ProcessedLogFile>).map((l) => l.logEntries.length).reduce((t, s) => t + s, 0);
 
     debug(`Merging ${logFiles.length} log files with ${totalEntries} entries`, logFiles);
     console.time(`merging-${logType}`);
@@ -67,7 +67,7 @@ export function mergeLogFiles(logFiles: Array<ProcessedLogFile>|Array<MergedLogF
     }
 
     // Alright, let's do this
-    logFiles.forEach((logFile) => {
+    (logFiles as Array<ProcessedLogFile>).forEach((logFile) => {
       logEntries = logEntries.concat(logFile.logEntries);
     });
 
@@ -104,6 +104,8 @@ export function getTypeForFile(logFile: UnzippedFile): string {
     logType = 'webapp';
   } else if (fileName.startsWith('webview')) {
     logType = 'webview';
+  } else if (fileName.startsWith('call')) {
+    logType = 'call';
   }
 
   return logType;
@@ -120,6 +122,7 @@ export function getTypesForFiles(logFiles: UnzippedFiles): SortedUnzippedFiles {
 
   const result = {
     browser: [] as Array<UnzippedFile>,
+    call: [] as Array<UnzippedFile>,
     renderer: [] as Array<UnzippedFile>,
     webapp: [] as Array<UnzippedFile>,
     webview: [] as Array<UnzippedFile>,
@@ -249,8 +252,15 @@ export function readFile(logFile: UnzippedFile, logType: string = ''): Promise<A
         toParse = matched.toParseHead || '';
         current = makeLogEntry(matched, logType);
       } else {
-        // This is (hopefully) part of a meta object
-        toParse += line;
+        // We couldn't match, let's treat it
+
+        if (logType === 'call' && current) {
+          // Call logs sometimes have rando newlines, for like no reason.
+          current.message += line;
+        } else {
+          // This is (hopefully) part of a meta object
+          toParse += line;
+        }
       }
 
       // Update Status
@@ -365,6 +375,32 @@ export function matchLineElectron(line: string): MatchResult | undefined {
 }
 
 /**
+ * Matches a Call line
+ *
+ * @param {string} line
+ * @returns {(MatchResult | undefined)}
+ */
+export function matchLineCall(line: string): MatchResult | undefined {
+  // Matcher for calls
+  // [YYYY/MM/DD hh:mm:ss uuu* LEVEL FILE->FUNCTION:LINE] message
+  const callRegex = /(\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2}\.\d{3})	([A-Z]{0,10}) ([\s\S]*)$/;
+  const results = callRegex.exec(line);
+
+  if (results && results.length === 4) {
+    const momentValue = moment(results[1], 'YYYY/MM/DD hh:mm:ss.SSS').valueOf();
+
+    return {
+      timestamp: results[1],
+      level: results[2].toLowerCase(),
+      message: results[3],
+      momentValue
+    };
+  }
+
+  return;
+}
+
+/**
  * The heart of the operation - matches a single line against regexes to understand what's
  * happening inside a logline.
  *
@@ -375,6 +411,8 @@ export function matchLineElectron(line: string): MatchResult | undefined {
 export function matchLine(line: string, logType: string): MatchResult | undefined {
   if (logType === 'webapp') {
     return matchLineWebApp(line);
+  } else if (logType === 'call') {
+    return matchLineCall(line);
   } else {
     return matchLineElectron(line);
   }
