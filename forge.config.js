@@ -9,15 +9,21 @@ const options = {
     asar: true,
     osxSign: {
       identity: 'LT94ZKYDCJ'
+    },
+    win32metadata: {
+      ProductName: 'Sleuth',
+      CompanyName: 'Felix Rieseberg'
     }
   },
   electronWinstallerConfig: {
-    name: 'Sleuth'
+    name: 'Sleuth',
+    packageName: 'Sleuth',
+    productName: 'Sleuth'
   },
   electronInstallerDebian: {},
   electronInstallerRedhat: {},
   windowsStoreConfig: {
-    packageName: '',
+    packageName: 'Sleuth',
     name: 'Sleuth'
   }
 };
