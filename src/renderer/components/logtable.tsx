@@ -122,7 +122,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    */
   public onRowClick(_e: Event, index: number) {
     const selectedEntry = this.state.sortedList[index] || null;
-    const isDataViewVisible = !!selectedEntry.meta;
+    const isDataViewVisible = true;
     this.setState({ selectedEntry, isDataViewVisible });
   }
 

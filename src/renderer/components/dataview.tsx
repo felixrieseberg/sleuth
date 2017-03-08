@@ -21,13 +21,13 @@ export class DataView extends React.Component<DataViewProps, DataViewState> {
   constructor(props: DataViewProps) {
     super(props);
 
-    this.onDoubleClick = this.onDoubleClick.bind(this);
+    this.toggle = this.toggle.bind(this);
   }
 
   /**
    * Toggle the whole data view.
    */
-  public onDoubleClick() {
+  public toggle() {
     this.props.toggle();
   }
 
@@ -71,7 +71,8 @@ export class DataView extends React.Component<DataViewProps, DataViewState> {
         <div className='DataView-MetaInfo'>
           <div className='DataView-Moment'>{datetime}</div>
           <div className='DataView-LogType'>
-              <i className='ts_icon ts_icon_paper_plane' />Level: {level} Type: {type}
+              Level <span className='level'>{level}</span> Type <span className='type'>{type}</span>
+              <span> <a className='close' onClick={this.toggle}>Close</a></span>
           </div>
         </div>
         <div className='DataView-Message'>{message}</div>
@@ -88,7 +89,7 @@ export class DataView extends React.Component<DataViewProps, DataViewState> {
     const prettyMeta = this.renderMeta(meta);
 
     return (
-      <div className={className} style={style} onDoubleClick={this.onDoubleClick}>
+      <div className={className} style={style} onDoubleClick={this.toggle}>
         {logEntryInfo}
         {prettyMeta}
       </div>
