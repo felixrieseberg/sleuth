@@ -175,7 +175,6 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     sortDirection = sortDirection || this.state.sortDirection;
 
     const shouldFilter = this.shouldFilter(filter);
-    const searchRegex = new RegExp(search || '', 'i');
     const noSort = (!sortBy || sortBy === 'index') && (!sortDirection || sortDirection === SORT_TYPES.ASC);
 
     // Check if we can bail early and just use the naked logEntries array
@@ -187,16 +186,30 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     function doSortByMessage(a: LogEntry, b: LogEntry) { return a.message.localeCompare(b.message); };
     function doSortByLevel(a: LogEntry, b: LogEntry) { return a.level.localeCompare(b.level); };
     function doFilter(a: LogEntry) { return (a.level && filter![a.level]); };
-    function doSearch(a: LogEntry) { return (!search || searchRegex.test(a.message)); };
 
     // Filter
     if (shouldFilter) {
       sortedList = sortedList.filter(doFilter);
     }
 
-    // Search
+    // Fancy search
     if (search) {
-      sortedList = sortedList.filter(doSearch);
+      let searchRegex = new RegExp(search || '', 'i');
+
+      function doSearch(a: LogEntry) { return (!search || searchRegex.test(a.message)); };
+      function doExclude(a: LogEntry) { return (!search || !searchRegex.test(a.message)); };
+      const searchParams = search.split(' ');
+
+      searchParams.forEach((param) => {
+        if (param.startsWith('!')) {
+          debug(`Excluding ${param.slice(1)}`);
+          searchRegex = new RegExp(param.slice(1) || '', 'i');
+          sortedList = sortedList.filter(doExclude);
+        } else {
+          debug(`Searching for ${param}`);
+          sortedList = sortedList.filter(doSearch);
+        }
+      });
     }
 
     // Sort
