@@ -74,6 +74,8 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
           {suggestions.map((file) => <a key={file} className="small" onClick={() => openFile(file)}>{path.basename(file)}</a>)}
         </div>
       );
+    } else {
+      suggestion = (<div />);
     }
 
     return (
