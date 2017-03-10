@@ -1,6 +1,34 @@
 @import "./colors.less";
 
 .Sidebar {
+  #site_nav {
+    &::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(50,50,50,.5);
+      border: 2px solid transparent;
+      border-radius: 10px;
+      background-clip: padding-box;
+
+      &:hover {
+        background-color: rgba(50,50,50,.8);
+      }
+    }
+
+    &::-webkit-scrollbar-button {
+        width: 0;
+        height: 0;
+        display: none;
+    }
+
+    &::-webkit-scrollbar-corner {
+        background-color: transparent;
+    }
+  }
+
   .MenuTitle {
     color: #fff;
     text-decoration: none;
