@@ -75,7 +75,7 @@ export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
                 <i className='ts_icon ts_icon_search icon_search' />
               </div>
               <div className='search_input_wrapper'>
-                  <input type='text' onChange={(e) => this.onSearchChange(e.target.value)} id='search_terms' className='search_input' placeholder='Search' />
+                  <input type='text' autoFocus onChange={(e) => this.onSearchChange(e.target.value)} id='search_terms' className='search_input' placeholder='Search' />
               </div>
             </form>
             <a onClick={this.onToggleSearch}>
