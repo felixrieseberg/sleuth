@@ -113,8 +113,8 @@ export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
     return (
       <ReactCSSTransitionGroup
         transitionName='filter'
-        transitionEnterTimeout={500}
-        transitionLeaveTimeout={300}>
+        transitionEnterTimeout={250}
+        transitionLeaveTimeout={250}>
         {items}
       </ReactCSSTransitionGroup>
     )
