@@ -1,7 +1,9 @@
-import { LevelFilter } from '../interfaces';
 import * as React from 'react';
 import * as classNames from 'classnames';
 import * as debounce from 'debounce';
+import * as ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+
+import { LevelFilter } from '../interfaces';
 
 export interface FilterProps {
   onFilterToggle: Function;
@@ -63,10 +65,11 @@ export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
   public render() {
     const { isSearchVisible } = this.state;
     const { error, warning, info, debug } = this.state.filter!;
+    let items;
 
     if (isSearchVisible) {
-      return (
-        <div id='search_container'>
+      items = (
+        <div key='search' id='search_container' className='SearchContainer'>
             <form onSubmit={(e) => e.preventDefault()} role='search' id='header_search_form' className='search_form no_bottom_margin'>
               <div className='icon_search_wrapper'>
                 <i className='ts_icon ts_icon_search icon_search' />
@@ -80,31 +83,40 @@ export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
             </a>
         </div>
       );
+    } else {
+      items = (
+        <div key='menu' className='FilterButtons'>
+          <a onClick={() => this.onToggleSearch()}>
+            <i className='ts_icon ts_icon_search' />
+            <span className='block label'>Search</span>
+          </a>
+          <a className={classNames({ Engaged: error })} onClick={() => this.onFilterToggle('error')}>
+            <i className='ts_icon ts_icon_poo' />
+            <span className='block label'>Filter Error</span>
+          </a>
+          <a className={classNames({ Engaged: warning })} onClick={() => this.onFilterToggle('warning')}>
+            <i className='ts_icon ts_icon_warning' />
+            <span className='block label'>Filter Warning</span>
+          </a>
+          <a className={classNames({ Engaged: info })} onClick={() => this.onFilterToggle('info')}>
+            <i className='ts_icon ts_icon_info_circle' />
+            <span className='block label'>Filter Info</span>
+          </a>
+          <a className={classNames({ Engaged: debug })} onClick={() => this.onFilterToggle('debug')}>
+            <i className='ts_icon ts_icon_filter' />
+            <span className='block label'>Filter Debug</span>
+          </a>
+        </div>
+      );
     }
 
     return (
-      <div>
-        <a onClick={() => this.onToggleSearch()}>
-          <i className='ts_icon ts_icon_search' />
-          <span className='block label'>Search</span>
-        </a>
-        <a className={classNames({ Engaged: error })} onClick={() => this.onFilterToggle('error')}>
-          <i className='ts_icon ts_icon_poo' />
-          <span className='block label'>Filter Error</span>
-        </a>
-        <a className={classNames({ Engaged: warning })} onClick={() => this.onFilterToggle('warning')}>
-          <i className='ts_icon ts_icon_warning' />
-          <span className='block label'>Filter Warning</span>
-        </a>
-        <a className={classNames({ Engaged: info })} onClick={() => this.onFilterToggle('info')}>
-          <i className='ts_icon ts_icon_info_circle' />
-          <span className='block label'>Filter Info</span>
-        </a>
-        <a className={classNames({ Engaged: debug })} onClick={() => this.onFilterToggle('debug')}>
-          <i className='ts_icon ts_icon_filter' />
-          <span className='block label'>Filter Debug</span>
-        </a>
-      </div>
-    );
+      <ReactCSSTransitionGroup
+        transitionName='filter'
+        transitionEnterTimeout={500}
+        transitionLeaveTimeout={300}>
+        {items}
+      </ReactCSSTransitionGroup>
+    )
   }
 }

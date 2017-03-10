@@ -1,5 +1,14 @@
-#search_container {
+.SearchContainer, .FilterButtons {
+  right: 0;
+  position: absolute;
+}
+
+.SearchContainer {
   margin-right: 1.5rem;
+
+  form {
+    width: 400px;
+  }
 
   .ts_icon_search {
     line-height: 17px;
@@ -13,4 +22,22 @@
   a {
     margin-top: 6px;
   }
+}
+
+.filter-enter {
+  opacity: 0.01;
+}
+
+.filter-enter.filter-enter-active {
+  opacity: 1;
+  transition: opacity 500ms ease-in;
+}
+
+.filter-leave {
+  opacity: 1;
+}
+
+.filter-leave.filter-leave-active {
+  opacity: 0.01;
+  transition: opacity 300ms ease-in;
 }
