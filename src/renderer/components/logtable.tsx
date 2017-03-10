@@ -201,7 +201,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
       const searchParams = search.split(' ');
 
       searchParams.forEach((param) => {
-        if (param.startsWith('!')) {
+        if (param.startsWith('!') && param.length > 1) {
           debug(`Excluding ${param.slice(1)}`);
           searchRegex = new RegExp(param.slice(1) || '', 'i');
           sortedList = sortedList.filter(doExclude);
