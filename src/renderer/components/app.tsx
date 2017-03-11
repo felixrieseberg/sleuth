@@ -1,3 +1,4 @@
+import { UserPreferences } from '../interfaces';
 import { shouldIgnoreFile } from '../../utils/should-ignore-file';
 import * as React from 'react';
 import { ipcRenderer, remote } from 'electron';
@@ -9,19 +10,25 @@ import { UnzippedFile, UnzippedFiles, Unzipper } from '../unzip';
 import { Welcome } from './welcome';
 import { LogView } from './logview';
 import { MacTitlebar } from './mac-titlebar';
+import { Preferences, getPreferences } from './preferences';
+import { AppMenu } from '../menu';
 
 const debug = require('debug')('sleuth:app');
 
 export interface AppState {
   unzippedFiles: UnzippedFiles;
+  userPreferences: UserPreferences;
 }
 
-export class App extends React.Component<undefined, AppState> {
+export class App extends React.Component<undefined, Partial<AppState>> {
+  private readonly menu: AppMenu = new AppMenu();
+
   constructor() {
     super();
 
     this.state = {
       unzippedFiles: [],
+      userPreferences: getPreferences()
     };
 
     localStorage.debug = 'sleuth*';
@@ -36,6 +43,11 @@ export class App extends React.Component<undefined, AppState> {
     }
 
     this.openFile = this.openFile.bind(this);
+    this.updatePreferences = this.updatePreferences.bind(this);
+  }
+
+  public updatePreferences(userPreferences: UserPreferences) {
+    this.setState({ userPreferences });
   }
 
   /**
@@ -46,11 +58,11 @@ export class App extends React.Component<undefined, AppState> {
     this.setupFileDrop();
   }
 
+  /**
+   * Whenever a file is dropped into the window, we'll try to open it
+   */
   public setupFileDrop() {
-    document.ondragover = document.ondrop = (event) => {
-      event.preventDefault();
-    };
-
+    document.ondragover = document.ondrop = (event) => event.preventDefault();
     document.body.ondrop = (event) => {
       if (event.dataTransfer && event.dataTransfer.files.length > 0) {
         let url = event.dataTransfer.files[0].path;
@@ -134,17 +146,18 @@ export class App extends React.Component<undefined, AppState> {
   }
 
   public render(): JSX.Element {
-    const { unzippedFiles } = this.state;
+    const { unzippedFiles, userPreferences } = this.state;
     const className = classNames('App', { Darwin: process.platform === 'darwin' });
     const titleBar = process.platform === 'darwin' ? <MacTitlebar /> : '';
     let content: JSX.Element | null = <Welcome openFile={this.openFile} />;
 
     if (unzippedFiles && unzippedFiles.length > 0) {
-      content = <LogView unzippedFiles={unzippedFiles} />;
+      content = <LogView unzippedFiles={unzippedFiles} userPreferences={userPreferences!} />;
     }
 
     return (
       <div className={className}>
+        <Preferences updatePreferences={this.updatePreferences} />
         {titleBar}
         {content}
       </div>

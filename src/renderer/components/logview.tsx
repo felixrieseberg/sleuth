@@ -4,7 +4,15 @@ import * as classNames from 'classnames';
 import { ipcRenderer, remote } from 'electron';
 import { UnzippedFile, UnzippedFiles } from '../unzip';
 import { getTypesForFiles, mergeLogFiles, processLogFiles } from '../processor';
-import { LevelFilter, MergedFilesLoadStatus, MergedLogFile, MergedLogFiles, ProcessedLogFile, ProcessedLogFiles } from '../interfaces';
+import {
+  LevelFilter,
+  MergedFilesLoadStatus,
+  MergedLogFile,
+  MergedLogFiles,
+  ProcessedLogFile,
+  ProcessedLogFiles,
+  UserPreferences
+} from '../interfaces';
 import { LogViewHeader } from './logview-header';
 import { LogTable } from './logtable';
 import { StateTable } from './statetable';
@@ -15,6 +23,7 @@ const debug = require('debug')('sleuth:logview');
 
 export interface LogViewProps {
   unzippedFiles: UnzippedFiles;
+  userPreferences: UserPreferences;
 }
 
 export interface LogViewState {
@@ -272,12 +281,20 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
    */
   public renderTableOrData(): JSX.Element | null {
     const { selectedLogFile, filter, search } = this.state;
+    const { userPreferences } = this.props;
+    const { dateTimeFormat } = userPreferences;
 
     if ((selectedLogFile as ProcessedLogFile).type === 'ProcessedLogFile' ||
         (selectedLogFile as MergedLogFile).type === 'MergedLogFile') {
-      return (<LogTable logFile={selectedLogFile as ProcessedLogFile} filter={filter as LevelFilter} search={search} />);
+      return (
+        <LogTable
+          dateTimeFormat={dateTimeFormat}
+          logFile={selectedLogFile as ProcessedLogFile}
+          filter={filter as LevelFilter}
+          search={search}
+        />);
     } else {
-      return (<StateTable file={selectedLogFile as UnzippedFile} />);
+      return <StateTable file={selectedLogFile as UnzippedFile} />;
     }
   }
 
@@ -298,9 +315,14 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
           logFiles={processedLogFiles as ProcessedLogFiles}
           mergedFilesStatus={mergedFilesStatus}
           selectLogFile={this.selectLogFile}
-          selectedLogFileName={selectedLogFileName} />
+          selectedLogFileName={selectedLogFileName}
+        />
         <div id='content' className={logContentClassName}>
-          <LogViewHeader menuToggle={this.toggleSidebar} onSearchChange={this.onSearchChange} onFilterToggle={this.onFilterToggle} />
+          <LogViewHeader
+            menuToggle={this.toggleSidebar}
+            onSearchChange={this.onSearchChange}
+            onFilterToggle={this.onFilterToggle}
+          />
           {tableOrLoading}
         </div>
       </div>

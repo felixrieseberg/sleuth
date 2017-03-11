@@ -1,9 +1,9 @@
 import * as React from 'react';
-import * as os from 'os';
 import * as fs from 'fs-promise';
 import * as path from 'path';
 
 import { remote } from 'electron';
+import { getSleuth } from '../sleuth';
 
 const debug = require('debug')('sleuth:welcome');
 
@@ -21,25 +21,12 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
     super();
 
     this.state = {
-      sleuth: this.getSleuth()
+      sleuth: getSleuth()
     };
   }
 
   public componentDidMount() {
     this.getItemsInDownloadFolder();
-  }
-
-  public getSleuth() {
-    let sleuths = ['🕵', '🕵️‍♀️', '🕵🏻', '🕵🏼', '🕵🏽', '🕵🏾', '🕵🏿', '🕵🏻‍♀️', '🕵🏼‍♀️', '🕵🏽‍♀️', '🕵🏾‍♀️', '🕵🏿‍♀️'];
-
-    if (process.platform === 'darwin') {
-      return sleuths[Math.floor(Math.random() * 11) + 1];
-    } else if (process.platform === 'win32' && os.release().startsWith('10')) {
-      sleuths = ['🕵', '🕵🏻', '🕵🏼', '🕵🏽', '🕵🏾', '🕵🏿'];
-      return sleuths[Math.floor(Math.random() * 5) + 1];
-    } else {
-      return sleuths[Math.round(Math.random())];
-    }
   }
 
   public getItemsInDownloadFolder(): void {

@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "experimentalDecorators": true,
     "removeComments": false,
     "preserveConstEnums": true,
     "sourceMap": true,
