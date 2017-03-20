@@ -87,6 +87,8 @@ export class App extends React.Component<undefined, Partial<AppState>> {
   public openFile(url: string): void {
     debug(`Received open-url for ${url}`);
 
+    this.setState({ unzippedFiles: [] });
+
     const isZipFile = /[\s\S]*\.zip$/.test(url);
     if (isZipFile) {
       return this.openZip(url);
