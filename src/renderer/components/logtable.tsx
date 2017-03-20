@@ -26,6 +26,7 @@ export interface LogTableProps {
   logFile: ProcessedLogFile | MergedLogFile;
   filter: LevelFilter;
   search?: string;
+  dateTimeFormat: string;
 }
 
 export interface LogTableState {
@@ -69,11 +70,14 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    * @returns {boolean}
    */
   public shouldComponentUpdate(nextProps: LogTableProps, nextState: LogTableState): boolean {
-    const { filter, logFile } = this.props;
+    const { filter, logFile, dateTimeFormat } = this.props;
     const { selectedEntry, sortBy, sortDirection, isDataViewVisible, sortedList } = this.state;
     const nextFile = nextProps.logFile;
 
     const newSort = (nextState.sortBy !== sortBy || nextState.sortDirection !== sortDirection);
+
+    // DateTimeFormat changed
+    if (dateTimeFormat !== nextProps.dateTimeFormat) return true;
 
     // Sort direction changed
     if (newSort) return true;
@@ -240,7 +244,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
   public renderWebAppWarning(): JSX.Element | null {
     const { logFile } = this.props;
 
-    const text = `The web app logs are difficult to parse for a computer - proceed with caution. Sorting is disabled.`;
+    const text = `The web app logs are difficult to parse for a computer - proceed with caution. Combined view is disabled.`;
     return logFile.logType === 'webapp' ? <Alert text={text} level='warning' /> : null;
   }
 
@@ -268,7 +272,8 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    */
   public timestampCellRenderer(entry: LogEntry): JSX.Element | String {
     // Todo: This could be cool, but it's expensive af
-    const timestamp = entry.momentValue ? moment(entry.momentValue).format('HH:mm:ss (DD/MM)') : entry.timestamp;
+    const { dateTimeFormat } = this.props;
+    const timestamp = entry.momentValue ? moment(entry.momentValue).format(dateTimeFormat) : entry.timestamp;
     let prefix = <i className='Meta ts_icon ts_icon_question'/>;
 
     if (entry.logType === 'browser') {

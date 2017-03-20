@@ -87,3 +87,7 @@ export interface LevelFilter {
   warning: boolean;
 }
 
+export interface UserPreferences {
+  dateTimeFormat: string;
+}
+

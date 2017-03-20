@@ -4,6 +4,8 @@ declare module 'yauzl';
 declare module 'es6-promisify';
 declare module 'react-json-tree';
 declare module 'react-throttle';
+declare module 'react-skylight';
+declare module 'react-keydown';
 declare module 'jsonic';
 declare module 'electron-default-menu';
 declare module 'debounce';
