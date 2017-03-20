@@ -17,11 +17,11 @@ export class IpcManager {
       e.preventDefault();
 
       if (!url.startsWith('file:///')) {
-        shell.openExternal((e as any).target.href);
+        shell.openExternal(url);
+      } else {
+        url = url.replace('file:///', '/');
+        this.mainWindow.webContents.send('file-dropped', decodeURIComponent(url));
       }
-
-      url = url.replace('file:///', '/');
-      this.mainWindow.webContents.send('file-dropped', decodeURIComponent(url));
     });
   }
 }
