@@ -13,10 +13,18 @@
   justify-content: center;
   align-items: center;
   background-color: @off_white;
-}
 
-.App p, .App ul li {
-  user-select: none;
+  a {
+    transition: color 0.2s ease;
+  }
+
+  a:hover {
+    filter: brightness(120%);
+  }
+
+  p, ul li {
+    user-select: none;
+  }
 }
 
 .Emoji {
