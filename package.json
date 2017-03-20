@@ -54,6 +54,7 @@
     "@types/debug": "0.0.29",
     "@types/electron": "^1.4.30",
     "@types/fixed-data-table": "^0.6.31",
+    "@types/fs-promise": "^1.0.1",
     "@types/jest": "^18.1.1",
     "@types/moment": "^2.13.0",
     "@types/react": "^0.14.55",
