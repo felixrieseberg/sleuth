@@ -9,7 +9,7 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "lint": "tslint src",
-    "test": "jest --config=jest.json --coverage"
+    "test": "npm run lint && jest --config=jest.json --coverage"
   },
   "keywords": [],
   "author": "Felix Rieseberg <felix@felixrieseberg.com>",

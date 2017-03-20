@@ -1,4 +1,3 @@
-import * as classnames from 'classnames';
 import * as React from 'react';
 import * as fs from 'fs-promise';
 import * as path from 'path';
