@@ -8,7 +8,7 @@ import * as path from 'path';
 
 import { UnzippedFile, UnzippedFiles, Unzipper } from '../unzip';
 import { Welcome } from './welcome';
-import { LogView } from './logview';
+import { CoreApplication } from './app-core';
 import { MacTitlebar } from './mac-titlebar';
 import { Preferences, getPreferences } from './preferences';
 import { AppMenu } from '../menu';
@@ -154,7 +154,7 @@ export class App extends React.Component<undefined, Partial<AppState>> {
     let content: JSX.Element | null = <Welcome openFile={this.openFile} />;
 
     if (unzippedFiles && unzippedFiles.length > 0) {
-      content = <LogView unzippedFiles={unzippedFiles} userPreferences={userPreferences!} />;
+      content = <CoreApplication unzippedFiles={unzippedFiles} userPreferences={userPreferences!} />;
     }
 
     return (

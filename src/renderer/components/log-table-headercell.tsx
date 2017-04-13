@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Cell } from 'fixed-data-table';
 
-import { SORT_TYPES } from './logtable';
+import { SORT_TYPES } from './log-table';
 
 export interface LogTableHeaderCellProps {
   onSortChange: Function;

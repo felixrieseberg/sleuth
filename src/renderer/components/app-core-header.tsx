@@ -4,14 +4,14 @@ import { remote } from 'electron';
 
 import { Filter } from './filter-select';
 
-export interface LogViewHeaderProps {
+export interface AppCoreHeaderProps {
   menuToggle: Function;
   onFilterToggle: Function;
   onSearchChange: Function;
 }
 
-export class LogViewHeader extends React.Component<LogViewHeaderProps, undefined> {
-  constructor(props: LogViewHeaderProps) {
+export class AppCoreHeader extends React.Component<AppCoreHeaderProps, undefined> {
+  constructor(props: AppCoreHeaderProps) {
     super(props);
 
     this.refresh = this.refresh.bind(this);

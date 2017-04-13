@@ -6,9 +6,9 @@ import { AutoSizer } from 'react-virtualized';
 
 import { LevelFilter, LogEntry, MergedLogFile, ProcessedLogFile } from '../interfaces';
 import { didFilterChange } from '../../utils/did-filter-change';
-import { DataView } from './dataview';
+import { LogLineDetails } from './log-line-details/details';
 import { Alert } from './alert';
-import { LogTableHeaderCell } from './logtable-headercell';
+import { LogTableHeaderCell } from './log-table-headercell';
 
 const debug = require('debug')('sleuth:logtable');
 
@@ -356,7 +356,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
             <AutoSizer>{(options: any) => this.renderTable(options)}</AutoSizer>
           </div>
         </div>
-        <DataView isVisible={isDataViewVisible!} entry={selectedEntry} toggle={this.toggleDataView} logEntry={selectedEntry} />
+        <LogLineDetails isVisible={isDataViewVisible!} entry={selectedEntry} toggle={this.toggleDataView} logEntry={selectedEntry} />
       </div>
     );
   }

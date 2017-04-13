@@ -13,20 +13,20 @@ import {
   ProcessedLogFiles,
   UserPreferences
 } from '../interfaces';
-import { LogViewHeader } from './logview-header';
-import { LogTable } from './logtable';
-import { StateTable } from './statetable';
+import { AppCoreHeader } from './app-core-header';
+import { LogTable } from './log-table';
+import { StateTable } from './state-table';
 import { Sidebar } from './sidebar';
 import { Loading } from './loading';
 
 const debug = require('debug')('sleuth:logview');
 
-export interface LogViewProps {
+export interface CoreAppProps {
   unzippedFiles: UnzippedFiles;
   userPreferences: UserPreferences;
 }
 
-export interface LogViewState {
+export interface CoreAppState {
   sidebarIsOpen: boolean;
   processedLogFiles: ProcessedLogFiles;
   selectedLogFile?: ProcessedLogFile | MergedLogFile | UnzippedFile;
@@ -38,8 +38,8 @@ export interface LogViewState {
   search?: string;
 }
 
-export class LogView extends React.Component<LogViewProps, Partial<LogViewState>> {
-  constructor(props: LogViewProps) {
+export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreAppState>> {
+  constructor(props: CoreAppProps) {
     super(props);
 
     this.state = {
@@ -318,7 +318,7 @@ export class LogView extends React.Component<LogViewProps, Partial<LogViewState>
           selectedLogFileName={selectedLogFileName}
         />
         <div id='content' className={logContentClassName}>
-          <LogViewHeader
+          <AppCoreHeader
             menuToggle={this.toggleSidebar}
             onSearchChange={this.onSearchChange}
             onFilterToggle={this.onFilterToggle}
