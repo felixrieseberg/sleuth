@@ -4,6 +4,7 @@ import * as moment from 'moment';
 
 import { LogEntry } from '../../interfaces';
 import { LogLineMeta } from "./meta";
+import { LogLineComments } from "./comments";
 
 export interface LogLineDetailsProps {
   isVisible: boolean;
@@ -13,10 +14,7 @@ export interface LogLineDetailsProps {
   logEntry?: LogEntry;
 }
 
-export interface LogLineDetailsState {
-}
-
-export class LogLineDetails extends React.Component<LogLineDetailsProps, LogLineDetailsState> {
+export class LogLineDetails extends React.Component<LogLineDetailsProps, undefined> {
   constructor(props: LogLineDetailsProps) {
     super(props);
 
@@ -65,6 +63,7 @@ export class LogLineDetails extends React.Component<LogLineDetailsProps, LogLine
       <div className={className} style={style} onDoubleClick={this.toggle}>
         {logEntryInfo}
         <LogLineMeta raw={entry ? entry.meta : ''} />
+        <LogLineComments line={logEntry ? logEntry.message : undefined} />
       </div>
     );
   }
