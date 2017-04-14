@@ -12,7 +12,6 @@ import { CoreApplication } from './app-core';
 import { MacTitlebar } from './mac-titlebar';
 import { Preferences, getPreferences } from './preferences';
 import { AppMenu } from '../menu';
-import { sleuthState } from '../state/sleuth';
 
 const debug = require('debug')('sleuth:app');
 
@@ -160,7 +159,7 @@ export class App extends React.Component<undefined, Partial<AppState>> {
 
     return (
       <div className={className}>
-        <Preferences updatePreferences={this.updatePreferences} state={sleuthState} />
+        <Preferences updatePreferences={this.updatePreferences} />
         {titleBar}
         {content}
       </div>

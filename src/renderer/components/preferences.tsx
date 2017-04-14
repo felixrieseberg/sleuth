@@ -1,18 +1,14 @@
-import { isSignatureDeclaration } from 'tslint/lib/rules/adjacentOverloadSignaturesRule';
-import { SleuthState } from '../state/sleuth';
+import { sleuthState } from '../state/sleuth';
 import * as React from 'react';
 import * as moment from 'moment';
 import { ipcRenderer } from 'electron';
 import { default as Skylight } from 'react-skylight';
 import { default as keydown } from 'react-keydown';
-import {observer} from 'mobx-react';
-import * as Ladda from 'react-ladda';
 
 import { UserPreferences } from '../interfaces';
 import { getSleuth } from '../sleuth';
-import { cooperAuth } from "../cooper/auth";
+import { CooperSignInOutButton } from "./cooper/sign-in-out-button";
 
-const LaddaButton = Ladda.default;
 const packageInfo = require('../../../package.json');
 const debug = require('debug')('sleuth:preferences');
 const exampleTime = 1493475035123;
@@ -53,11 +49,9 @@ export interface PreferencesState {
 }
 
 export interface PreferencesProps {
-  state: SleuthState;
   updatePreferences: (userPreferences: UserPreferences) => void;
 }
 
-@observer
 export class Preferences extends React.Component<PreferencesProps, Partial<PreferencesState>> {
   private skylightElement: any;
   private readonly refHandlers = {
@@ -79,7 +73,6 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
     this.state = { ...getPreferences() };
     this.handleDateFormatChange = this.handleDateFormatChange.bind(this);
     this.beforeClose = this.beforeClose.bind(this);
-    this.onCooperSignClick = this.onCooperSignClick.bind(this);
     ipcRenderer.on('preferences-show', () => this.show());
   }
 
@@ -115,23 +108,11 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
     return <option key={value} value={value}>{moment(exampleTime).format(value)}</option>;
   }
 
-  public onCooperSignClick(e: React.MouseEvent<HTMLButtonElement>) {
-    const isSignIn = (e.target as HTMLButtonElement).textContent === 'Sign In';
-    const method = isSignIn ? cooperAuth.signIn : cooperAuth.signOut;
-
-    this.setState({ isCooperButtonLoading: true });
-    method().then(() => this.setState({ isCooperButtonLoading: false }));
-  }
-
   public renderCooperOptions() {
-    const { isCooperSignedIn } = this.props.state;
-    const { isCooperButtonLoading } = this.state;
-    const buttonOptions = { className: 'btn', loading: isCooperButtonLoading, onClick: this.onCooperSignClick };
-
     return (
       <div>
         <label htmlFor='cooper'>Cooper Service</label>
-        <LaddaButton {...buttonOptions}>Sign {isCooperSignedIn ? 'Out' : 'In'}</LaddaButton>
+        <CooperSignInOutButton state={sleuthState} />
       </div>
     );
   }

@@ -1,3 +1,4 @@
+import { sleuthState } from '../../state/sleuth';
 import * as React from 'react';
 import * as classNames from 'classnames';
 import * as moment from 'moment';
@@ -63,7 +64,7 @@ export class LogLineDetails extends React.Component<LogLineDetailsProps, undefin
       <div className={className} style={style} onDoubleClick={this.toggle}>
         {logEntryInfo}
         <LogLineMeta raw={entry ? entry.meta : ''} />
-        <LogLineComments line={logEntry ? logEntry.message : undefined} />
+        <LogLineComments state={sleuthState} line={logEntry ? logEntry.message : undefined} />
       </div>
     );
   }
