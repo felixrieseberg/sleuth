@@ -87,7 +87,8 @@ export class LogLineComments extends React.Component<LogLineCommentsProps, LogLi
     if (!isCooperSignedIn) return this.renderSignInNeccessary();
 
     return (
-      <div>
+      <div className='Comments'>
+        <h4>Comments</h4>
         {renderedComments}
         <PostComment line={line} didPost={this.refresh} />
       </div>

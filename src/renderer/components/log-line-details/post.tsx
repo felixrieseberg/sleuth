@@ -57,9 +57,9 @@ export class PostComment extends React.Component<PostCommentProps, Partial<PostC
     const buttonOptions = { className: 'btn', loading: isPosting, onClick: this.onClick };
 
     return (
-      <form onSubmit={this.onClick}>
-        <label htmlFor='textarea'>Comment</label>
-        <textarea id='textarea' onChange={this.handleChange} placeholder='Placeholder text' />
+      <form className='PostComment' onSubmit={this.onClick}>
+        <h4>Report Your Findings</h4>
+        <textarea id='textarea' onChange={this.handleChange} placeholder='Got some interesting information about this log line to share?' />
         <LaddaButton type='submit' {...buttonOptions}>Post</LaddaButton>
       </form>
     );
