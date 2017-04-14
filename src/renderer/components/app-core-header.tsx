@@ -23,10 +23,10 @@ export class AppCoreHeader extends React.Component<AppCoreHeaderProps, undefined
 
   public render() {
     const { onFilterToggle, onSearchChange } = this.props;
-    const logViewHeaderClassName = classNames('headroom', 'headroom--pinned', 'headroom--top');
+    const appCoreHeaderClassName = classNames('headroom', 'headroom--pinned', 'headroom--top');
 
     return (
-      <header className={logViewHeaderClassName}>
+      <header className={appCoreHeaderClassName}>
         <a id='menu_toggle' onClick={() => this.props.menuToggle()}>
           <span className='menu_icon'></span>
           <span className='menu_label'>Menu</span>

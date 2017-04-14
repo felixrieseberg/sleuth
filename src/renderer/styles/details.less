@@ -1,10 +1,11 @@
 @import "../../static/plastic/plastic_colors.less";
 
-.DataView {
+.Details {
   padding: .5rem 1.5rem 1rem;
   background: white;
   border-top: 1px solid @neutral_grey;
   overflow: auto;
+  font-size: 1rem;
 
   &::-webkit-scrollbar {
     width: 10px;
@@ -44,13 +45,28 @@
   }
 }
 
-.DataView-LogEntry {
+.Details-LogEntry {
   font-size: 1rem;
 
-  .DataView-MetaInfo {
+  .MetaInfo {
     display: flex;
     font-weight: 600;
     justify-content: space-between;
-    border-bottom: 1px solid @subtle_silver;
+    padding: 0px 1px;
+  }
+
+  .Message {
+    font-size: 15px;
+    line-height: 18px;
+    margin-bottom: 0.625rem;
+    color: rgb(61, 60, 64);
+    margin-top: 10px;
+    background-color: rgba(255, 247, 235, 0.470588);
+    border-top: 1px solid rgba(0, 0, 0, 0.0901961);
+    border-right: 1px solid rgba(0, 0, 0, 0.0980392);
+    border-left: 1px solid rgba(0, 0, 0, 0.0980392);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.117647);
+    border-radius: 6px;
+    padding: 12px 25px 12px 12px;
   }
 }

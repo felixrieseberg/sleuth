@@ -19,7 +19,7 @@ import { StateTable } from './state-table';
 import { Sidebar } from './sidebar';
 import { Loading } from './loading';
 
-const debug = require('debug')('sleuth:logview');
+const debug = require('debug')('sleuth:appCore');
 
 export interface CoreAppProps {
   unzippedFiles: UnzippedFiles;
@@ -300,7 +300,7 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
 
   public render() {
     const { sidebarIsOpen, processedLogFiles, selectedLogFile, loadingMessage } = this.state;
-    const logViewClassName = classNames('LogView');
+    const appCoreClassName = classNames('AppCore');
     const logContentClassName = classNames({ SidebarIsOpen: sidebarIsOpen });
     const selectedLogFileName = this.getSelectedFileName();
     const percentageLoaded = this.getPercentageLoaded();
@@ -309,7 +309,7 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
     const mergedFilesStatus = this.getMergedFilesStatus();
 
     return (
-      <div className={logViewClassName}>
+      <div className={appCoreClassName}>
         <Sidebar
           isOpen={!!sidebarIsOpen}
           logFiles={processedLogFiles as ProcessedLogFiles}

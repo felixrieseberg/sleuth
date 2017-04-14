@@ -41,15 +41,15 @@ export class LogLineDetails extends React.Component<LogLineDetailsProps, undefin
     const datetime = logEntry.momentValue ? moment(logEntry.momentValue).format('dddd, MMMM Do YYYY, h:mm:ss a') : timestamp;
 
     return (
-      <div className='DataView-LogEntry'>
-        <div className='DataView-MetaInfo'>
-          <div className='DataView-Moment'>{datetime}</div>
-          <div className='DataView-LogType'>
+      <div className='Details-LogEntry'>
+        <div className='MetaInfo'>
+          <div className='Details-Moment'>{datetime}</div>
+          <div className='Details-LogType'>
               Level <span className='level'>{level}</span> Type <span className='type'>{type}</span>
               <span> <a className='close' onClick={this.toggle}>Close</a></span>
           </div>
         </div>
-        <div className='DataView-Message'>{message}</div>
+        <div className='Message'>{message}</div>
       </div>
     )
   }
@@ -57,7 +57,7 @@ export class LogLineDetails extends React.Component<LogLineDetailsProps, undefin
   public render(): JSX.Element {
     const { entry, isVisible, height, logEntry } = this.props;
     const style = { height: `${height || 300}px` };
-    const className = classNames('DataView', { IsVisible: isVisible });
+    const className = classNames('Details', { IsVisible: isVisible });
     const logEntryInfo = logEntry ? this.renderLogEntry(logEntry) : null;
 
     return (
