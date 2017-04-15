@@ -1,3 +1,4 @@
+import { observer } from 'mobx-react';
 import * as React from 'react';
 import * as classNames from 'classnames';
 
@@ -13,6 +14,7 @@ export interface SidebarProps {
   mergedFilesStatus: MergedFilesLoadStatus;
 }
 
+@observer
 export class Sidebar extends React.Component<SidebarProps, undefined> {
   constructor(props: SidebarProps) {
     super(props);

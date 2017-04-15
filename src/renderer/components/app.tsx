@@ -1,3 +1,4 @@
+import { sleuthState } from '../state/sleuth';
 import { UserPreferences } from '../interfaces';
 import { shouldIgnoreFile } from '../../utils/should-ignore-file';
 import * as React from 'react';
@@ -154,12 +155,12 @@ export class App extends React.Component<undefined, Partial<AppState>> {
     let content: JSX.Element | null = <Welcome openFile={this.openFile} />;
 
     if (unzippedFiles && unzippedFiles.length > 0) {
-      content = <CoreApplication unzippedFiles={unzippedFiles} userPreferences={userPreferences!} />;
+      content = <CoreApplication state={sleuthState} unzippedFiles={unzippedFiles} userPreferences={userPreferences!} />;
     }
 
     return (
       <div className={className}>
-        <Preferences updatePreferences={this.updatePreferences} />
+        <Preferences state={sleuthState} />
         {titleBar}
         {content}
       </div>

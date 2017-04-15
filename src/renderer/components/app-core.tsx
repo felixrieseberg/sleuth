@@ -1,3 +1,5 @@
+import { observer } from 'mobx-react';
+import { sleuthState, SleuthState } from '../state/sleuth';
 import * as React from 'react';
 import * as classNames from 'classnames';
 
@@ -14,14 +16,14 @@ import {
   UserPreferences
 } from '../interfaces';
 import { AppCoreHeader } from './app-core-header';
-import { LogTable } from './log-table';
-import { StateTable } from './state-table';
 import { Sidebar } from './sidebar';
 import { Loading } from './loading';
+import { LogContent } from "./log-content";
 
 const debug = require('debug')('sleuth:appCore');
 
 export interface CoreAppProps {
+  state: SleuthState;
   unzippedFiles: UnzippedFiles;
   userPreferences: UserPreferences;
 }
@@ -38,6 +40,7 @@ export interface CoreAppState {
   search?: string;
 }
 
+@observer
 export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreAppState>> {
   constructor(props: CoreAppProps) {
     super(props);
@@ -64,9 +67,9 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
     };
 
     this.toggleSidebar = this.toggleSidebar.bind(this);
-    this.selectLogFile = this.selectLogFile.bind(this);
     this.onFilterToggle = this.onFilterToggle.bind(this);
     this.onSearchChange = this.onSearchChange.bind(this);
+    this.selectLogFile = this.selectLogFile.bind(this);
 
     ipcRenderer.on('processing-status', (_event, loadingMessage: string) => {
       this.setState({ loadingMessage });
@@ -189,10 +192,10 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
       const { mergedLogFiles } = this.state;
 
       if (mergedLogFiles && mergedLogFiles[logType]) {
-        this.setState({ selectedLogFile: mergedLogFiles[logType] });
+        this.props.state.selectedLogFile = mergedLogFiles[logType];
       }
     } else {
-      this.setState({ selectedLogFile: logFile });
+      this.props.state.selectedLogFile = logFile;
     }
   }
 
@@ -202,14 +205,14 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
    * @returns {string}
    */
   public getSelectedFileName(): string {
-    const { selectedLogFile } = this.state;
+    const { selectedLogFile, selectedStateFile } = this.props.state;
 
     if (selectedLogFile && (selectedLogFile as ProcessedLogFile).type === 'ProcessedLogFile') {
       return (selectedLogFile as ProcessedLogFile).logFile.fileName;
     } else if (selectedLogFile && (selectedLogFile as MergedLogFile).type === 'MergedLogFile') {
       return (selectedLogFile as MergedLogFile).logType;
-    } else if (selectedLogFile) {
-      return (selectedLogFile as UnzippedFile).fileName;
+    } else if (selectedStateFile) {
+      return (selectedStateFile as UnzippedFile).fileName;
     } else {
       return '';
     }
@@ -274,38 +277,15 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
     }
   }
 
-  /**
-   * Renders either a table or a data view (for state data)
-   *
-   * @returns {(JSX.Element | null)}
-   */
-  public renderTableOrData(): JSX.Element | null {
-    const { selectedLogFile, filter, search } = this.state;
-    const { userPreferences } = this.props;
-    const { dateTimeFormat } = userPreferences;
-
-    if ((selectedLogFile as ProcessedLogFile).type === 'ProcessedLogFile' ||
-        (selectedLogFile as MergedLogFile).type === 'MergedLogFile') {
-      return (
-        <LogTable
-          dateTimeFormat={dateTimeFormat}
-          logFile={selectedLogFile as ProcessedLogFile}
-          filter={filter as LevelFilter}
-          search={search}
-        />);
-    } else {
-      return <StateTable file={selectedLogFile as UnzippedFile} />;
-    }
-  }
-
   public render() {
-    const { sidebarIsOpen, processedLogFiles, selectedLogFile, loadingMessage } = this.state;
+    const { selectedLogFile } = this.props.state;
+    const { sidebarIsOpen, processedLogFiles, loadingMessage } = this.state;
     const appCoreClassName = classNames('AppCore');
     const logContentClassName = classNames({ SidebarIsOpen: sidebarIsOpen });
     const selectedLogFileName = this.getSelectedFileName();
     const percentageLoaded = this.getPercentageLoaded();
     const loading = <Loading percentage={percentageLoaded} message={loadingMessage} />;
-    const tableOrLoading = selectedLogFile ? this.renderTableOrData() : loading;
+    const tableOrLoading = selectedLogFile ? <LogContent state={sleuthState} /> : loading;
     const mergedFilesStatus = this.getMergedFilesStatus();
 
     return (

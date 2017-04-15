@@ -1,3 +1,4 @@
+import { SleuthState } from '../state/sleuth';
 import * as React from 'react';
 import * as classNames from 'classnames';
 import * as moment from 'moment';
@@ -6,7 +7,6 @@ import { AutoSizer } from 'react-virtualized';
 
 import { LevelFilter, LogEntry, MergedLogFile, ProcessedLogFile } from '../interfaces';
 import { didFilterChange } from '../../utils/did-filter-change';
-import { LogLineDetails } from './log-line-details/details';
 import { Alert } from './alert';
 import { LogTableHeaderCell } from './log-table-headercell';
 
@@ -24,13 +24,13 @@ export interface RowClickEvent {
 
 export interface LogTableProps {
   logFile: ProcessedLogFile | MergedLogFile;
-  filter: LevelFilter;
+  levelFilter: LevelFilter;
   search?: string;
   dateTimeFormat: string;
+  state: SleuthState;
 }
 
 export interface LogTableState {
-  isDataViewVisible: boolean;
   sortedList: Array<LogEntry>;
   selectedEntry?: LogEntry;
   sortBy?: string;
@@ -47,7 +47,6 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     super(props);
 
     this.state = {
-      isDataViewVisible: false,
       sortedList: [],
       sortBy: 'index',
       sortDirection: 'ASC',
@@ -57,7 +56,6 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     this.renderTable = this.renderTable.bind(this);
     this.messageCellRenderer = this.messageCellRenderer.bind(this);
     this.timestampCellRenderer = this.timestampCellRenderer.bind(this);
-    this.toggleDataView = this.toggleDataView.bind(this);
     this.sortFilterList = this.sortFilterList.bind(this);
     this.onSortChange = this.onSortChange.bind(this);
   }
@@ -70,10 +68,9 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    * @returns {boolean}
    */
   public shouldComponentUpdate(nextProps: LogTableProps, nextState: LogTableState): boolean {
-    const { filter, logFile, dateTimeFormat } = this.props;
-    const { selectedEntry, sortBy, sortDirection, isDataViewVisible, sortedList } = this.state;
+    const { dateTimeFormat, levelFilter, logFile } = this.props;
+    const { sortBy, sortDirection, sortedList } = this.state;
     const nextFile = nextProps.logFile;
-
     const newSort = (nextState.sortBy !== sortBy || nextState.sortDirection !== sortDirection);
 
     // DateTimeFormat changed
@@ -83,35 +80,36 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     if (newSort) return true;
 
     // File changed - and update is in order
-    const newFile = ((!nextFile && logFile) || nextFile.logType !== logFile.logType);
-    const newEntries = (nextFile && logFile && nextFile.logEntries.length !== logFile.logEntries.length);
-    const newResults = ((!sortedList && nextState.sortedList) || sortedList && nextState.sortedList.length !== sortedList.length);
+    const newFile = ((!nextFile && logFile)
+      || nextFile && logFile && nextFile.logType !== logFile.logType);
+    const newEntries = (nextFile && logFile
+      && nextFile.logEntries.length !== logFile.logEntries.length);
+    const newResults = ((!sortedList && nextState.sortedList)
+      || sortedList && nextState.sortedList.length !== sortedList.length);
     if (newFile || newEntries || newResults) return true;
 
-    // The data view is open and the selected entry changed
-    if (nextState.isDataViewVisible !== isDataViewVisible)  return true;
-
     // Filter changed
-    if (didFilterChange(filter, nextProps.filter)) return true;
-
-    // The selected entry changed _and_ we have the data view open
-    if (nextState.isDataViewVisible && nextState.selectedEntry
-        && selectedEntry && nextState.selectedEntry.momentValue !== selectedEntry!.momentValue) {
-      return true;
-    }
+    if (didFilterChange(levelFilter, nextProps.levelFilter)) return true;
 
     return false;
   }
 
   public componentWillReceiveProps(nextProps: LogTableProps): void {
-    const { filter, search, logFile } = this.props;
-    const filterChanged = didFilterChange(filter, nextProps.filter);
+    const { levelFilter, search, logFile } = this.props;
     const searchChanged = search !== nextProps.search;
-    const fileChanged = ((!logFile && nextProps.logFile) || logFile && logFile.logEntries.length !== nextProps.logFile.logEntries.length || logFile.logType !== nextProps.logFile.logType);
+    const nextFile = nextProps.logFile;
+    const fileChanged = ((!logFile && nextFile)
+      || logFile && nextFile && logFile.logEntries.length !== nextFile.logEntries.length
+      || logFile && nextFile && logFile.logType !== nextFile.logType);
 
     // Filter or search changed
+    const nextLevelFilter = nextProps.levelFilter;
+    const filterChanged = didFilterChange(levelFilter, nextLevelFilter);
+    const nextSearch = nextProps.search;
+
     if (filterChanged || searchChanged || fileChanged) {
-      this.setState({ sortedList: this.sortFilterList(undefined, undefined, nextProps.filter, nextProps.search, nextProps.logFile) });
+      const sortedList = this.sortFilterList(undefined, undefined, nextLevelFilter, nextSearch, nextFile);
+      this.setState({ sortedList });
     }
   }
 
@@ -125,16 +123,10 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    * @param {RowClickEvent} { index }
    */
   public onRowClick(_e: Event, index: number) {
-    const selectedEntry = this.state.sortedList[index] || null;
-    const isDataViewVisible = true;
-    this.setState({ selectedEntry, isDataViewVisible });
-  }
+    const selectedEntry = this.state.sortedList![index] || null;
 
-  /**
-   * Toggles the data view
-   */
-  public toggleDataView() {
-    this.setState({ isDataViewVisible: !this.state.isDataViewVisible });
+    this.props.state.selectedEntry = selectedEntry;
+    this.props.state.isDetailsVisible = true;
   }
 
   /**
@@ -159,7 +151,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    * @returns {boolean}
    */
   public shouldFilter(filter?: LevelFilter): boolean {
-    filter = filter || this.props.filter;
+    filter = filter || this.props.levelFilter;
 
     if (!filter) return false;
     const allEnabled = Object.keys(filter).every((k) => filter![k]);
@@ -173,10 +165,12 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    */
   public sortFilterList(sortBy?: string, sortDirection?: string, filter?: LevelFilter, search?: string, logFile?: ProcessedLogFile | MergedLogFile): Array<LogEntry> {
     logFile = logFile || this.props.logFile;
-    filter = filter || this.props.filter;
+    filter = filter || this.props.levelFilter;
     search = search !== undefined ? search : this.props.search;
     sortBy = sortBy || this.state.sortBy;
     sortDirection = sortDirection || this.state.sortDirection;
+
+    if (!logFile) return [];
 
     const shouldFilter = this.shouldFilter(filter);
     const noSort = (!sortBy || sortBy === 'index') && (!sortDirection || sortDirection === SORT_TYPES.ASC);
@@ -341,22 +335,20 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
       </Table>);
   }
 
-  public render(): JSX.Element {
+  public render(): JSX.Element | null {
     const { logFile } = this.props;
-    const { isDataViewVisible, selectedEntry } = this.state;
+    const { isDataViewVisible } = this.state;
+
     const typeClassName = logFile.type === 'MergedLogFile' ? 'Merged' : 'Single';
     const className = classNames('LogTable', typeClassName, { Collapsed: isDataViewVisible });
     const warning = this.renderWebAppWarning();
 
     return (
-      <div>
-        <div className={className}>
-          {warning}
-          <div className={classNames('Sizer', { HasWarning: !!warning })}>
-            <AutoSizer>{(options: any) => this.renderTable(options)}</AutoSizer>
-          </div>
+      <div className={className}>
+        {warning}
+        <div className={classNames('Sizer', { HasWarning: !!warning })}>
+          <AutoSizer>{(options: any) => this.renderTable(options)}</AutoSizer>
         </div>
-        <LogLineDetails isVisible={isDataViewVisible!} entry={selectedEntry} toggle={this.toggleDataView} logEntry={selectedEntry} />
       </div>
     );
   }

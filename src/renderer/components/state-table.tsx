@@ -1,3 +1,4 @@
+import { SleuthState } from '../state/sleuth';
 import * as React from 'react';
 import * as dirtyJSON from 'jsonic';
 import JSONTree from 'react-json-tree';
@@ -9,7 +10,7 @@ import { shell } from 'electron';
 const debug = require('debug')('sleuth:statetable');
 
 export interface StateTableProps {
-  file: UnzippedFile;
+  state: SleuthState;
 }
 
 export interface StateTableState {
@@ -26,21 +27,28 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
   }
 
   public componentDidMount() {
-    this.parse(this.props.file);
+    const { selectedStateFile } = this.props.state;
+
+    if (selectedStateFile) {
+      this.parse(selectedStateFile);
+    }
   }
 
   public componentWillReceiveProps(nextProps: StateTableProps) {
-    const nextFile = nextProps.file;
-    const currentFile = this.props.file;
+    const nextFile = nextProps.state.selectedStateFile;
+    const currentFile = this.props.state.selectedStateFile;
 
-    if (currentFile.fullPath !== nextFile.fullPath) {
+    if (nextFile && currentFile && currentFile.fullPath !== nextFile.fullPath) {
       this.parse(nextFile);
     }
   }
 
   public getFileType(): StateFileType {
-    const { file } = this.props;
-    const nameMatch = file.fileName.match(/slack-(\w*)/);
+    const { selectedStateFile } = this.props.state;
+
+    if (!selectedStateFile) throw new Error('StateTable: No file');
+
+    const nameMatch = selectedStateFile.fileName.match(/slack-(\w*)/);
     const type = nameMatch && nameMatch.length > 1 ? nameMatch[1] : 'unknown';
 
     return type as StateFileType;

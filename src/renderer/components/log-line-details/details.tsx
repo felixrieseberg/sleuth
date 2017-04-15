@@ -1,4 +1,5 @@
-import { sleuthState } from '../../state/sleuth';
+import { observer } from 'mobx-react';
+import { sleuthState, SleuthState } from '../../state/sleuth';
 import * as React from 'react';
 import * as classNames from 'classnames';
 import * as moment from 'moment';
@@ -8,16 +9,21 @@ import { LogLineMeta } from "./meta";
 import { LogLineComments } from "./comments";
 
 export interface LogLineDetailsProps {
-  isVisible: boolean;
-  entry?: LogEntry;
-  height?: number;
-  toggle: Function;
-  logEntry?: LogEntry;
+  state: SleuthState;
 }
 
-export class LogLineDetails extends React.Component<LogLineDetailsProps, undefined> {
+export interface LogLineDetailsState {
+  height: number;
+}
+
+@observer
+export class LogLineDetails extends React.PureComponent<LogLineDetailsProps, LogLineDetailsState> {
   constructor(props: LogLineDetailsProps) {
     super(props);
+
+    this.state = {
+      height: 300
+    };
 
     this.toggle = this.toggle.bind(this);
   }
@@ -26,7 +32,7 @@ export class LogLineDetails extends React.Component<LogLineDetailsProps, undefin
    * Toggle the whole data view.
    */
   public toggle() {
-    this.props.toggle();
+    this.props.state.isDetailsVisible = !this.props.state.isDetailsVisible;
   }
 
   /**
@@ -54,17 +60,24 @@ export class LogLineDetails extends React.Component<LogLineDetailsProps, undefin
     )
   }
 
-  public render(): JSX.Element {
-    const { entry, isVisible, height, logEntry } = this.props;
-    const style = { height: `${height || 300}px` };
-    const className = classNames('Details', { IsVisible: isVisible });
-    const logEntryInfo = logEntry ? this.renderLogEntry(logEntry) : null;
+  public resizeHandler(newHeight: number) {
+    this.setState({ height: newHeight });
+  }
+
+  public render(): JSX.Element | null {
+    const { selectedEntry } = this.props.state;
+    const { isDetailsVisible } = this.props.state;
+
+    if (!isDetailsVisible) return null;
+
+    const className = classNames('Details', { IsVisible: isDetailsVisible });
+    const logEntryInfo = selectedEntry ? this.renderLogEntry(selectedEntry) : null;
 
     return (
-      <div className={className} style={style} onDoubleClick={this.toggle}>
+      <div className={className}>
         {logEntryInfo}
-        <LogLineMeta raw={entry ? entry.meta : ''} />
-        <LogLineComments state={sleuthState} line={logEntry ? logEntry.message : undefined} />
+        <LogLineMeta raw={selectedEntry ? selectedEntry.meta : ''} />
+        <LogLineComments state={sleuthState} line={selectedEntry ? selectedEntry.message : undefined} />
       </div>
     );
   }

@@ -1,4 +1,5 @@
-import { sleuthState } from '../state/sleuth';
+import { observer } from 'mobx-react';
+import { sleuthState, SleuthState } from '../state/sleuth';
 import * as React from 'react';
 import * as moment from 'moment';
 import { ipcRenderer } from 'electron';
@@ -7,7 +8,7 @@ import { default as keydown } from 'react-keydown';
 
 import { UserPreferences } from '../interfaces';
 import { getSleuth } from '../sleuth';
-import { CooperSignInOutButton } from "./cooper/sign-in-out-button";
+import { CooperSignInOutButton } from './cooper/sign-in-out-button';
 
 const packageInfo = require('../../../package.json');
 const debug = require('debug')('sleuth:preferences');
@@ -49,9 +50,10 @@ export interface PreferencesState {
 }
 
 export interface PreferencesProps {
-  updatePreferences: (userPreferences: UserPreferences) => void;
+  state: SleuthState;
 }
 
+@observer
 export class Preferences extends React.Component<PreferencesProps, Partial<PreferencesState>> {
   private skylightElement: any;
   private readonly refHandlers = {
@@ -77,9 +79,7 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
   }
 
   public beforeClose() {
-    this.props.updatePreferences({
-      dateTimeFormat: this.state.dateTimeFormat!
-    });
+    this.props.state.dateTimeFormat = this.state.dateTimeFormat;
   }
 
   public show() {
@@ -118,7 +118,7 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
   }
 
   public render(): JSX.Element {
-    const { dateTimeFormat } = this.state;
+    const { dateTimeFormat } = this.props.state;
     const dateTimePresets = this.dateTimePresets.map(this.renderDateTimeOption);
     const closeButtonStyle = { top: '10px' };
     const customDateTimePreset = this.isDateTimePreset(dateTimeFormat!) ? null :
