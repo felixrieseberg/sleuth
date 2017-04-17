@@ -13,18 +13,12 @@ export interface LogLineDetailsProps {
 }
 
 export interface LogLineDetailsState {
-  height: number;
 }
 
 @observer
 export class LogLineDetails extends React.PureComponent<LogLineDetailsProps, LogLineDetailsState> {
   constructor(props: LogLineDetailsProps) {
     super(props);
-
-    this.state = {
-      height: 300
-    };
-
     this.toggle = this.toggle.bind(this);
   }
 
@@ -60,10 +54,6 @@ export class LogLineDetails extends React.PureComponent<LogLineDetailsProps, Log
     )
   }
 
-  public resizeHandler(newHeight: number) {
-    this.setState({ height: newHeight });
-  }
-
   public render(): JSX.Element | null {
     const { selectedEntry } = this.props.state;
     const { isDetailsVisible } = this.props.state;
@@ -77,7 +67,7 @@ export class LogLineDetails extends React.PureComponent<LogLineDetailsProps, Log
       <div className={className}>
         {logEntryInfo}
         <LogLineMeta raw={selectedEntry ? selectedEntry.meta : ''} />
-        <LogLineComments state={sleuthState} line={selectedEntry ? selectedEntry.message : undefined} />
+        <LogLineComments state={sleuthState} />
       </div>
     );
   }

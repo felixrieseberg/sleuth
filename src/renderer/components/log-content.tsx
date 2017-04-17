@@ -31,6 +31,7 @@ export class LogContent extends React.Component<LogContentProps, Partial<LogCont
   }
 
   public resizeHandler(height: number) {
+    if (height < 100 || height > (window.innerHeight - 100)) return;
     this.setState({ tableHeight: height });
   }
 

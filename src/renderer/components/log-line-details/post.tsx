@@ -1,17 +1,15 @@
-import { SleuthState } from '../../state/sleuth';
+import { IEnableDisablePosition } from 'tslint/lib';
 import * as React from 'react';
-import {observer} from 'mobx-react';
 import * as Ladda from 'react-ladda';
+import { remote } from 'electron';
 import { cooperComments } from '../../cooper/comments';
-import { cooperAuth } from '../../cooper/auth';
 
 const LaddaButton = Ladda.default;
 const debug = require('debug')('sleuth:cooper');
 
 export interface PostCommentProps {
-  state: SleuthState;
   line: string;
-  didPost: () => {};
+  didPost: () => void;
 }
 
 export interface PostCommentState {
@@ -19,7 +17,6 @@ export interface PostCommentState {
   value: string;
 }
 
-@observer
 export class PostComment extends React.Component<PostCommentProps, Partial<PostCommentState>> {
   constructor() {
     super();
@@ -46,9 +43,24 @@ export class PostComment extends React.Component<PostCommentProps, Partial<PostC
     this.setState({ isPosting: true });
     cooperComments.postComment(line, value)
       .then(async (result) => {
-        this.setState({ isPosting: false });
+        debug(`Posted a comment to cooper`, result);
+
+        this.setState({ isPosting: false, value: '' });
 
         debug(await result.text());
+      })
+      .catch((error) => {
+        debug(`Tried to post commen to cooper, but failed`, error);
+
+        remote.dialog.showMessageBox({
+          title: `Posting Failed`,
+          type: 'error',
+          message: `We could not reach the log service and failed to post your comment 😢`,
+          // tslint:disable-next-line:max-line-length
+          detail: `Thank you so much for trying to post a comment... We failed to get in touch with the server. That means we're either down or you don't have a working internet connection.`
+        });
+
+        this.setState({ isPosting: false });
       });
   }
 

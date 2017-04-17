@@ -337,10 +337,9 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
 
   public render(): JSX.Element | null {
     const { logFile } = this.props;
-    const { isDataViewVisible } = this.state;
 
     const typeClassName = logFile.type === 'MergedLogFile' ? 'Merged' : 'Single';
-    const className = classNames('LogTable', typeClassName, { Collapsed: isDataViewVisible });
+    const className = classNames('LogTable', typeClassName);
     const warning = this.renderWebAppWarning();
 
     return (

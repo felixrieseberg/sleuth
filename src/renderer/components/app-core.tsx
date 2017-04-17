@@ -55,20 +55,12 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
         state: [],
         call: []
       },
-      filter: {
-        error: false,
-        info: false,
-        debug: false,
-        warning: false
-      },
       loadingMessage: '',
       loadedLogFiles: false,
       loadedMergeFiles: false
     };
 
     this.toggleSidebar = this.toggleSidebar.bind(this);
-    this.onFilterToggle = this.onFilterToggle.bind(this);
-    this.onSearchChange = this.onSearchChange.bind(this);
     this.selectLogFile = this.selectLogFile.bind(this);
 
     ipcRenderer.on('processing-status', (_event, loadingMessage: string) => {
@@ -252,31 +244,6 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
     };
   }
 
-  /**
-   * Toggles the filter for a given level
-   *
-   * @param {string} level
-   */
-  public onFilterToggle(level: string) {
-    const { filter } = this.state;
-    if (filter && filter[level] !== undefined) {
-      const newFilter = {...filter};
-      newFilter[level] = !newFilter[level];
-      this.setState({ filter: newFilter });
-    }
-  }
-
-  /**
-   * Triggered if the search input value changes.
-   *
-   * @param {string} search
-   */
-  public onSearchChange(search: string) {
-    if (search !== this.state.search) {
-      this.setState({ search });
-    }
-  }
-
   public render() {
     const { selectedLogFile } = this.props.state;
     const { sidebarIsOpen, processedLogFiles, loadingMessage } = this.state;
@@ -298,11 +265,7 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
           selectedLogFileName={selectedLogFileName}
         />
         <div id='content' className={logContentClassName}>
-          <AppCoreHeader
-            menuToggle={this.toggleSidebar}
-            onSearchChange={this.onSearchChange}
-            onFilterToggle={this.onFilterToggle}
-          />
+          <AppCoreHeader menuToggle={this.toggleSidebar} />
           {tableOrLoading}
         </div>
       </div>

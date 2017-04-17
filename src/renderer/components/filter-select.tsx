@@ -1,31 +1,24 @@
+import { SleuthState } from '../state/sleuth';
+import { observer } from 'mobx-react';
 import * as React from 'react';
 import * as classNames from 'classnames';
 import * as debounce from 'debounce';
 import * as ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
-import { LevelFilter } from '../interfaces';
-
 export interface FilterProps {
-  onFilterToggle: Function;
-  onSearchChange: React.EventHandler<React.FormEvent>;
+  state: SleuthState
 }
 
 export interface FilterState {
-  filter: LevelFilter;
   isSearchVisible: boolean;
 }
 
+@observer
 export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
   constructor(props: FilterProps) {
     super(props);
 
     this.state = {
-      filter: {
-        error: false,
-        warning: false,
-        debug: false,
-        info: false
-      },
       isSearchVisible: false
     };
 
@@ -35,36 +28,26 @@ export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
   }
 
   public onSearchChange(value: string) {
-    const { onSearchChange } = this.props;
-
-    if (onSearchChange) {
-      onSearchChange(value || '');
-    }
+    this.props.state.search = value;
   }
 
   public onFilterToggle(level: string) {
-    if (this.state.filter![level] !== undefined) {
-      const filter = {...this.state.filter};
+    if (this.props.state.levelFilter![level] !== undefined) {
+      const filter = {...this.props.state.levelFilter};
       filter[level] = !filter[level];
-      this.setState({ filter });
-    }
 
-    this.props.onFilterToggle(level);
+      this.props.state.levelFilter = filter;
+    }
   }
 
   public onToggleSearch() {
-    const { onSearchChange } = this.props;
-
-    if (onSearchChange) {
-      onSearchChange('');
-    }
-
+    this.props.state.search = '';
     this.setState({ isSearchVisible: !this.state.isSearchVisible });
   }
 
   public render() {
     const { isSearchVisible } = this.state;
-    const { error, warning, info, debug } = this.state.filter!;
+    const { error, warning, info, debug } = this.props.state.levelFilter!;
     let items;
 
     if (isSearchVisible) {

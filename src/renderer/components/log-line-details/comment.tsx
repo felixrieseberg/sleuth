@@ -8,7 +8,6 @@ export interface CommentProps {
   comment: string;
   avatar: string;
   timestamp: number;
-  id: string;
 }
 
 export interface CommentState {
@@ -21,12 +20,12 @@ export class Comment extends React.Component<CommentProps, CommentState> {
   }
 
   public render() {
-    const { name, comment, avatar, timestamp, id } = this.props;
+    const { name, comment, avatar, timestamp } = this.props;
     const time = moment(timestamp).format('MMMM Do YYYY');
     const avatarStyle = { backgroundImage: `url(${avatar})` };
 
     return (
-      <div className='Comment' key={id}>
+      <div className='Comment'>
         <div className='Avatar' style={avatarStyle} />
         <div className='Text'>
           <div>
