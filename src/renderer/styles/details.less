@@ -49,6 +49,7 @@
 .Scrubber {
   cursor: ns-resize;
   height: 10px;
+  flex-shrink: 0;
   background-color: #ececec;
   width: 100%;
   border-bottom: 1px solid #dadada;
@@ -58,6 +59,10 @@
 .Details-LogEntry {
   font-size: 1rem;
   resize: horizontal;
+
+  .Details-LogType {
+    user-select: none;
+  }
 
   .MetaInfo {
     display: flex;
