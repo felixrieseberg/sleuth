@@ -2,7 +2,7 @@ import { SleuthState } from '../state/sleuth';
 import * as React from 'react';
 import * as classNames from 'classnames';
 import * as moment from 'moment';
-import { Table, Column, Cell } from 'fixed-data-table';
+import { Table, Column, Cell } from 'fixed-data-table-2';
 import { AutoSizer } from 'react-virtualized';
 
 import { LevelFilter, LogEntry, MergedLogFile, ProcessedLogFile } from '../interfaces';
@@ -35,6 +35,7 @@ export interface LogTableState {
   selectedEntry?: LogEntry;
   sortBy?: string;
   sortDirection?: string;
+  currentIndex?: number;
 }
 
 export class LogTable extends React.Component<LogTableProps, Partial<LogTableState>> {

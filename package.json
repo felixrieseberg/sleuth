@@ -18,10 +18,6 @@
     "forge": "./forge.config.js"
   },
   "dependencies": {
-    "@types/electron": "^1.4.30",
-    "@types/fixed-data-table": "^0.6.31",
-    "@types/react": "^0.14.55",
-    "@types/react-dom": "^0.14.20",
     "classnames": "2.2.5",
     "debounce": "^1.0.0",
     "debug": "2.6.1",
@@ -31,7 +27,7 @@
     "electron-devtools-installer": "2.1.0",
     "electron-squirrel-startup": "^1.0.0",
     "es6-promisify": "5.0.0",
-    "fixed-data-table": "^0.6.3",
+    "fixed-data-table-2": "^0.7.15",
     "fs-promise": "2.0.0",
     "jsonic": "0.2.2",
     "mobx": "^3.1.9",

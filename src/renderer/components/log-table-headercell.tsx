@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Cell } from 'fixed-data-table';
+import { Cell } from 'fixed-data-table-2';
 
 import { SORT_TYPES } from './log-table';
 
@@ -36,11 +36,11 @@ export class LogTableHeaderCell extends React.Component<LogTableHeaderCellProps,
   }
 
   public render() {
-    const { sortDirection, children, sortBy, sortKey, ...props } = this.props;
+    const { sortDirection, children, sortBy, sortKey } = this.props;
     const sortIndicator = sortDirection && sortBy === sortKey ? (sortDirection === SORT_TYPES.DESC ? '↓' : '↑') : '';
 
     return (
-      <Cell {...props}>
+      <Cell>
         <a onClick={this.onSortChange}>
           {children} {sortIndicator}
         </a>
