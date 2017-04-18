@@ -36,7 +36,7 @@ export class LogContent extends React.Component<LogContentProps, Partial<LogCont
   }
 
   public render(): JSX.Element {
-    const { selectedLogFile, levelFilter, search, dateTimeFormat, isDetailsVisible, showOnlySearchResults } = this.props.state;
+    const { selectedLogFile, levelFilter, search, dateTimeFormat, isDetailsVisible, showOnlySearchResults, searchIndex } = this.props.state;
     const isLog = selectedLogFile!.type === 'ProcessedLogFile' || selectedLogFile!.type === 'MergedLogFile';
     const tableStyle = { height: isDetailsVisible ? `${this.state.tableHeight}px` : '100%' };
     const scrubber = <Scrubber elementSelector='div#LogTableContainer' onResizeHandler={this.resizeHandler} />;
@@ -52,6 +52,7 @@ export class LogContent extends React.Component<LogContentProps, Partial<LogCont
               levelFilter={levelFilter}
               search={search}
               showOnlySearchResults={showOnlySearchResults}
+              searchIndex={searchIndex}
             />
           </div>
           {isDetailsVisible ? scrubber : null}

@@ -50,9 +50,13 @@ export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
     this.props.state.showOnlySearchResults = !this.props.state.showOnlySearchResults;
   }
 
+  public onSearchIndexChange(change: number) {
+    this.props.state.searchIndex = this.props.state.searchIndex + change;
+  }
+
   public render() {
     const { isSearchVisible } = this.state;
-    const { showOnlySearchResults } = this.props.state''
+    const { showOnlySearchResults } = this.props.state;
     const { error, warning, info, debug } = this.props.state.levelFilter!;
     let items;
 
@@ -65,6 +69,16 @@ export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
               onClick={() => this.onToggleSearchResultVisibility()}>
               <i className='ts_icon ts_icon_eye' />
               <span className='block label'>Show only results</span>
+            </a>
+            <a
+              onClick={() => this.onSearchIndexChange(-1)}>
+              <i className='ts_icon ts_icon_chevron_circle_left' />
+              <span className='block label'>Prev</span>
+            </a>
+            <a
+              onClick={() => this.onSearchIndexChange(1)}>
+              <i className='ts_icon ts_icon_chevron_circle_right' />
+              <span className='block label'>Next</span>
             </a>
           </div>
           <span className='vert_divider SearchDivider' />

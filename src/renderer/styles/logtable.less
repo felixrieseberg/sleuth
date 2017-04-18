@@ -40,8 +40,14 @@
   border: none;
 
   .HighlightRow {
-    background-color: @highlight_yellow;
-    transition: background-color 0.2 ease;
+    background-color: @mention_yellow;
+    transition: background 0.5s linear;
+  }
+
+  .ActiveRow {
+    background-color: @mention_yellow;
+    transition: background 0.5s linear;
+    font-weight: 800;
   }
 
   &::-webkit-scrollbar {

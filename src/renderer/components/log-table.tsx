@@ -29,6 +29,7 @@ export interface LogTableProps {
   dateTimeFormat: string;
   state: SleuthState;
   showOnlySearchResults: boolean;
+  searchIndex: number;
 }
 
 export interface LogTableState {
@@ -37,7 +38,6 @@ export interface LogTableState {
   selectedEntry?: LogEntry;
   sortBy?: string;
   sortDirection?: string;
-  currentIndex?: number;
 }
 
 export class LogTable extends React.Component<LogTableProps, Partial<LogTableState>> {
@@ -73,7 +73,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    * @returns {boolean}
    */
   public shouldComponentUpdate(nextProps: LogTableProps, nextState: LogTableState): boolean {
-    const { dateTimeFormat, levelFilter, logFile } = this.props;
+    const { dateTimeFormat, levelFilter, logFile, searchIndex } = this.props;
     const { sortBy, sortDirection, sortedList, searchList } = this.state;
     const nextFile = nextProps.logFile;
     const newSort = (nextState.sortBy !== sortBy || nextState.sortDirection !== sortDirection);
@@ -96,8 +96,8 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     // Filter changed
     if (didFilterChange(levelFilter, nextProps.levelFilter)) return true;
 
-    // Search changedc
-    if (searchList !== nextState.searchList) return true;
+    // Search changed
+    if (searchList !== nextState.searchList || searchIndex !== nextProps.searchIndex) return true;
 
     return false;
   }
@@ -361,7 +361,8 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    * @returns {JSX.Element}
    */
   public renderTable(options: any): JSX.Element {
-    const { sortedList, sortDirection, sortBy, currentIndex } = this.state;
+    const { sortedList, sortDirection, sortBy, searchList } = this.state;
+    const { searchIndex } = this.props;
     const self = this;
     const timestampHeaderOptions = { sortKey: 'timestamp', onSortChange: this.onSortChange, sortDirection, sortBy };
     const timestampHeader = <LogTableHeaderCell {...timestampHeaderOptions}>Timestamp</LogTableHeaderCell>;
@@ -374,7 +375,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
 
     const tableOptions = {
       ...options,
-      scrollToRow: currentIndex,
+      scrollToRow: searchList![searchIndex] || 0,
       rowHeight: 30,
       rowsCount: sortedList!.length,
       onRowClick: this.onRowClick,
@@ -423,6 +424,10 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
   }
 
   private rowClassNameGetter(rowIndex: number) {
+    if (rowIndex === this.state.searchList![this.props.searchIndex]) {
+      return 'ActiveRow';
+    }
+
     if (this.state.searchList!.includes(rowIndex)) {
       return 'HighlightRow';
     }

@@ -18,7 +18,8 @@ export class SleuthState {
         info: false,
         warning: false
     };
-    @observable public search?: string;
+    @observable public searchIndex: number = 0;
+    @observable public search: string = '';
     @observable public showOnlySearchResults: boolean = false;
 
     @observable public isDetailsVisible: boolean = false;
