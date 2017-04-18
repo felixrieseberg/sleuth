@@ -1,5 +1,5 @@
 import { lineToCooperLine } from '../../cooper/line-to-cooper-line';
-import { SleuthState } from '../../state/sleuth';
+import { SleuthState, sleuthState } from '../../state/sleuth';
 import * as React from 'react';
 import { cooperComments, IAuthor, IComment, IGetCommentResponse } from '../../cooper/comments';
 import { observer } from 'mobx-react';
@@ -38,6 +38,8 @@ export class LogLineComments extends React.Component<LogLineCommentsProps, Parti
     this.renderComment = this.renderComment.bind(this);
     this.refresh = this.refresh.bind(this);
     this.updateSearch = this.updateSearch.bind(this);
+
+    this.fetchComments();
   }
 
   public refresh() {
@@ -45,7 +47,9 @@ export class LogLineComments extends React.Component<LogLineCommentsProps, Parti
   }
 
   public componentWillReceiveProps(nextProps: LogLineCommentsProps) {
-    if (nextProps.state.selectedEntry && nextProps.state.selectedEntry.message) {
+    const newSignInStatus = nextProps.state.isCooperSignedIn !== this.props.state.isCooperSignedIn;
+
+    if (nextProps.state.selectedEntry && nextProps.state.selectedEntry.message || newSignInStatus) {
       const line = lineToCooperLine(nextProps.state.selectedEntry.message);
       this.setState({ line });
       this.fetchComments(line);
@@ -85,14 +89,15 @@ export class LogLineComments extends React.Component<LogLineCommentsProps, Parti
   }
 
   public renderComment(commentObject: IComment) {
-    const { comment, authorId, timestamp } = commentObject;
+    const { comment, authorId, timestamp, id } = commentObject;
+    const { lineId } = this.state;
     const author = this.state.authors!.find((a) => a._id === authorId);
 
     if (!author) return null;
     const { name, avatar, slackUserId } = author;
-    const options = { comment, name, avatar, timestamp, slackUserId };
+    const options = { lineId, comment, name, avatar, timestamp, slackUserId, commentId: id };
 
-    return <Comment key={timestamp} {...options} />;
+    return <Comment didPost={this.refresh} state={sleuthState} key={timestamp} {...options} />;
   }
 
   public renderSignInNeccessary() {

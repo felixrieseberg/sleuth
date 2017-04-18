@@ -79,6 +79,7 @@ export class CooperAuth {
 
             if (parsedResult.result && parsedResult.result === 'You are signed in') {
               sleuthState.isCooperSignedIn = true;
+              sleuthState.slackUserId = result.slackUserId;
               resolve(true);
               signInWindow.close();
             }
@@ -111,9 +112,10 @@ export class CooperAuth {
           resolve(false);
         } else {
           const responseObject = await response.json();
-          const { result } = responseObject;
+          const { result, slackUserId } = responseObject;
           const isSignedIn = !!(result && result === 'You are signed in');
 
+          sleuthState.slackUserId = slackUserId;
           sleuthState.isCooperSignedIn = isSignedIn;
           debug(`User is signed into cooper: ${isSignedIn}`);
           resolve(isSignedIn);

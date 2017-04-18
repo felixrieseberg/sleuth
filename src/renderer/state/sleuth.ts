@@ -7,6 +7,7 @@ export const defaults = {
 };
 
 export class SleuthState {
+    @observable public slackUserId?: string;
     @observable public isCooperSignedIn = false;
     @observable public selectedEntry: LogEntry;
     @observable public selectedLogFile?: ProcessedLogFile | MergedLogFile;

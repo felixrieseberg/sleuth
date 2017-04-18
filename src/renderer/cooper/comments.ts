@@ -15,6 +15,7 @@ export interface IComment {
   comment: string;
   avatar: string;
   timestamp: number;
+  id: string;
 }
 
 export interface IAuthor {
@@ -45,6 +46,23 @@ export class CooperComments {
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
       method: 'post',
+      body
+    });
+  }
+
+  public updateComment(lineId: string, commentId: string, comment: string) {
+    const body = JSON.stringify({
+      line: { _id: lineId },
+      comment: {
+        id: commentId,
+        comment
+      }
+    });
+
+    return fetch(`${this.logUrl}/browser-renderer`, {
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      method: 'PATCH',
       body
     });
   }

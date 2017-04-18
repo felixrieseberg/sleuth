@@ -35,10 +35,11 @@ export class PostComment extends React.Component<PostCommentProps, Partial<PostC
     this.setState({ value: (e.target as HTMLTextAreaElement).value });
   }
 
-  public onClick() {
+  public onClick(e: React.FormEvent<HTMLFormElement>) {
     const { line , lineId } = this.props;
     const { value } = this.state;
 
+    e.preventDefault();
     if (!value) return;
 
     this.setState({ isPosting: true });
