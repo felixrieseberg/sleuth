@@ -16,10 +16,16 @@ export interface LogLineCommentsState {
   comments: Array<any>;
   authors: Array<IAuthor>;
   line: string;
+  lineId: string;
 }
 
 @observer
 export class LogLineComments extends React.Component<LogLineCommentsProps, Partial<LogLineCommentsState>> {
+  private lineChangeElement: HTMLInputElement;
+  private readonly refHandlers = {
+    lineChangeElement: (ref: HTMLInputElement) => this.lineChangeElement = ref,
+  };
+
   constructor(props: LogLineCommentsProps) {
     super();
 
@@ -31,6 +37,7 @@ export class LogLineComments extends React.Component<LogLineCommentsProps, Parti
 
     this.renderComment = this.renderComment.bind(this);
     this.refresh = this.refresh.bind(this);
+    this.updateSearch = this.updateSearch.bind(this);
   }
 
   public refresh() {
@@ -42,6 +49,16 @@ export class LogLineComments extends React.Component<LogLineCommentsProps, Parti
       const line = lineToCooperLine(nextProps.state.selectedEntry.message);
       this.setState({ line });
       this.fetchComments(line);
+      this.lineChangeElement.value = line;
+    }
+  }
+
+  public updateSearch() {
+    const newLine = this.lineChangeElement.value;
+
+    if (newLine) {
+      this.setState({ line: newLine });
+      this.fetchComments(newLine);
     }
   }
 
@@ -57,7 +74,8 @@ export class LogLineComments extends React.Component<LogLineCommentsProps, Parti
           if (result && result.comments) {
             this.setState({
               comments: result.comments,
-              authors: result.authors
+              authors: result.authors,
+              lineId: result._id
             });
           }
         });
@@ -83,7 +101,7 @@ export class LogLineComments extends React.Component<LogLineCommentsProps, Parti
 
   public render() {
     const { isCooperSignedIn } = this.props.state;
-    const { comments, line } = this.state;
+    const { comments, line, lineId } = this.state;
     const renderedComments = comments!.map(this.renderComment);
 
     if (!line) return null;
@@ -94,10 +112,13 @@ export class LogLineComments extends React.Component<LogLineCommentsProps, Parti
         <h4>Log Intelligence</h4>
         <div className='IntelligenceComment'>
           <label htmlFor='small_input'>To fetch comments, we generalize the log line. This one was understood as:</label>
-          <input type='text' id='small_input' value={line} className='small' />
+          <div className='InputButton'>
+            <input defaultValue={line} ref={this.refHandlers.lineChangeElement} type='text' id='small_input' className='small' />
+            <button className='btn btn_small' type='button' onClick={this.updateSearch}>Change Search</button>
+          </div>
         </div>
         {renderedComments}
-        <PostComment line={line} didPost={this.refresh} />
+        <PostComment lineId={lineId} line={line} didPost={this.refresh} />
       </div>
     );
   }

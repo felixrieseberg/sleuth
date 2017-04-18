@@ -27,16 +27,17 @@ export interface IAuthor {
 export interface IGetCommentResponse {
   comments: Array<any>;
   authors: Array<any>;
-  line: String;
+  line: string;
+  _id?: string;
 }
 
 export class CooperComments {
   public serverUrl = 'http://felix.local:8080';
   public logUrl = `${this.serverUrl}/cooper/log`;
 
-  public postComment(line: string, comment: string) {
+  public postComment(line: string, comment: string, id?: string) {
     const body = JSON.stringify({
-      line: { line },
+      line: { line, _id: id },
       comment
     });
 

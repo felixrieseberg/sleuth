@@ -4,6 +4,10 @@
     "removeComments": false,
     "preserveConstEnums": true,
     "sourceMap": true,
+    "lib": [
+      "es2016",
+      "dom"
+    ],
     "declaration": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,

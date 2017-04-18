@@ -9,6 +9,7 @@ const debug = require('debug')('sleuth:cooper');
 
 export interface PostCommentProps {
   line: string;
+  lineId?: string;
   didPost: () => void;
 }
 
@@ -35,17 +36,18 @@ export class PostComment extends React.Component<PostCommentProps, Partial<PostC
   }
 
   public onClick() {
-    const { line } = this.props;
+    const { line , lineId } = this.props;
     const { value } = this.state;
 
     if (!value) return;
 
     this.setState({ isPosting: true });
-    cooperComments.postComment(line, value)
+    cooperComments.postComment(line, value, lineId)
       .then(async (result) => {
         debug(`Posted a comment to cooper`, result);
 
         this.setState({ isPosting: false, value: '' });
+        if (this.props.didPost) this.props.didPost();
 
         debug(await result.text());
       })
@@ -65,13 +67,13 @@ export class PostComment extends React.Component<PostCommentProps, Partial<PostC
   }
 
   public render() {
-    const { isPosting } = this.state;
+    const { isPosting, value } = this.state;
     const buttonOptions = { className: 'btn', loading: isPosting, onClick: this.onClick };
 
     return (
       <form className='PostComment' onSubmit={this.onClick}>
         <h4>Report Your Findings</h4>
-        <textarea id='textarea' onChange={this.handleChange} placeholder='Got some interesting information about this log line to share?' />
+        <textarea id='textarea' onChange={this.handleChange} value={value} placeholder='Got some interesting information about this log line to share?' />
         <LaddaButton type='submit' {...buttonOptions}>Post</LaddaButton>
       </form>
     );
