@@ -28,10 +28,12 @@ export interface LogTableProps {
   search?: string;
   dateTimeFormat: string;
   state: SleuthState;
+  showOnlySearchResults: boolean;
 }
 
 export interface LogTableState {
   sortedList: Array<LogEntry>;
+  searchList: Array<number>;
   selectedEntry?: LogEntry;
   sortBy?: string;
   sortDirection?: string;
@@ -51,6 +53,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
       sortedList: [],
       sortBy: 'index',
       sortDirection: 'ASC',
+      searchList: []
     };
 
     this.onRowClick = this.onRowClick.bind(this);
@@ -59,6 +62,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     this.timestampCellRenderer = this.timestampCellRenderer.bind(this);
     this.sortFilterList = this.sortFilterList.bind(this);
     this.onSortChange = this.onSortChange.bind(this);
+    this.rowClassNameGetter = this.rowClassNameGetter.bind(this);
   }
 
   /**
@@ -70,7 +74,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    */
   public shouldComponentUpdate(nextProps: LogTableProps, nextState: LogTableState): boolean {
     const { dateTimeFormat, levelFilter, logFile } = this.props;
-    const { sortBy, sortDirection, sortedList } = this.state;
+    const { sortBy, sortDirection, sortedList, searchList } = this.state;
     const nextFile = nextProps.logFile;
     const newSort = (nextState.sortBy !== sortBy || nextState.sortDirection !== sortDirection);
 
@@ -92,12 +96,15 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     // Filter changed
     if (didFilterChange(levelFilter, nextProps.levelFilter)) return true;
 
+    // Search changedc
+    if (searchList !== nextState.searchList) return true;
+
     return false;
   }
 
   public componentWillReceiveProps(nextProps: LogTableProps): void {
-    const { levelFilter, search, logFile } = this.props;
-    const searchChanged = search !== nextProps.search;
+    const { levelFilter, search, logFile, showOnlySearchResults } = this.props;
+    const searchChanged = search !== nextProps.search || showOnlySearchResults !== nextProps.showOnlySearchResults;
     const nextFile = nextProps.logFile;
     const fileChanged = ((!logFile && nextFile)
       || logFile && nextFile && logFile.logEntries.length !== nextFile.logEntries.length
@@ -109,8 +116,16 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     const nextSearch = nextProps.search;
 
     if (filterChanged || searchChanged || fileChanged) {
-      const sortedList = this.sortFilterList(undefined, undefined, nextLevelFilter, nextSearch, nextFile);
-      this.setState({ sortedList });
+      const sortedList = this.sortFilterList(undefined, undefined, nextLevelFilter, nextSearch, nextFile, nextProps.showOnlySearchResults);
+      let searchList: Array<number> = [];
+
+      // Should we create a search list?
+      if (!nextProps.showOnlySearchResults && nextSearch) {
+        debug(`showOnlySearchResults is false, making search list`);
+        searchList = this.doSearchIndex(nextSearch, sortedList);
+      }
+
+      this.setState({ sortedList, searchList });
     }
   }
 
@@ -162,15 +177,82 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
   }
 
   /**
+   * Performs a search operation
+   *
+   * @param {string} search
+   * @param {Array<LogEntry>} list
+   * @returns Array<LogEntry>
+   */
+  public doSearchFilter(search: string, list: Array<LogEntry>): Array<LogEntry> {
+    let searchRegex = new RegExp(search || '', 'i');
+
+    function doSearch(a: LogEntry) { return (!search || searchRegex.test(a.message)); };
+    function doExclude(a: LogEntry) { return (!search || !searchRegex.test(a.message)); };
+    const searchParams = search.split(' ');
+
+    searchParams.forEach((param) => {
+      if (param.startsWith('!') && param.length > 1) {
+        debug(`Filter-Excluding ${param.slice(1)}`);
+        searchRegex = new RegExp(param.slice(1) || '', 'i');
+        list = list.filter(doExclude);
+      } else {
+        debug(`Filter-Searching for ${param}`);
+        list = list.filter(doSearch);
+      }
+    });
+
+    return list;
+  }
+
+  /**
+   * Performs a search operation
+   *
+   * @param {string} search
+   * @param {Array<LogEntry>} list
+   * @returns Array<number>
+   */
+  public doSearchIndex(search: string, list: Array<LogEntry>): Array<number> {
+    let searchRegex = new RegExp(search || '', 'i');
+    const foundIndices: Array<number> = [];
+
+    function doSearch(a: LogEntry, i: number) {
+      if (!search || searchRegex.test(a.message)) {
+        foundIndices.push(i);
+      }
+    };
+    function doExclude(a: LogEntry, i: number) {
+      if (!search || !searchRegex.test(a.message)) {
+        foundIndices.push(i);
+      }
+    };
+    const searchParams = search.split(' ');
+
+    searchParams.forEach((param) => {
+      if (param.startsWith('!') && param.length > 1) {
+        debug(`Index-Excluding ${param.slice(1)}`);
+        searchRegex = new RegExp(param.slice(1) || '', 'i');
+        list.forEach(doExclude);
+      } else {
+        debug(`Index-Searching for ${param}`);
+        list.forEach(doSearch);
+      }
+    });
+
+    return foundIndices;
+  }
+
+  /**
    * Sorts the list
    */
-  public sortFilterList(sortBy?: string, sortDirection?: string, filter?: LevelFilter, search?: string, logFile?: ProcessedLogFile | MergedLogFile): Array<LogEntry> {
+  public sortFilterList(sortBy?: string, sortDirection?: string, filter?: LevelFilter, search?: string, logFile?: ProcessedLogFile | MergedLogFile, showOnlySearchResults?: boolean): Array<LogEntry> {
     logFile = logFile || this.props.logFile;
     filter = filter || this.props.levelFilter;
     search = search !== undefined ? search : this.props.search;
     sortBy = sortBy || this.state.sortBy;
+    showOnlySearchResults = showOnlySearchResults !== undefined ? showOnlySearchResults : this.props.showOnlySearchResults;
     sortDirection = sortDirection || this.state.sortDirection;
 
+    debug(`Starting filter`);
     if (!logFile) return [];
 
     const shouldFilter = this.shouldFilter(filter);
@@ -191,24 +273,9 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
       sortedList = sortedList.filter(doFilter);
     }
 
-    // Fancy search
-    if (search) {
-      let searchRegex = new RegExp(search || '', 'i');
-
-      function doSearch(a: LogEntry) { return (!search || searchRegex.test(a.message)); };
-      function doExclude(a: LogEntry) { return (!search || !searchRegex.test(a.message)); };
-      const searchParams = search.split(' ');
-
-      searchParams.forEach((param) => {
-        if (param.startsWith('!') && param.length > 1) {
-          debug(`Excluding ${param.slice(1)}`);
-          searchRegex = new RegExp(param.slice(1) || '', 'i');
-          sortedList = sortedList.filter(doExclude);
-        } else {
-          debug(`Searching for ${param}`);
-          sortedList = sortedList.filter(doSearch);
-        }
-      });
+    // Search
+    if (search && showOnlySearchResults) {
+      sortedList = this.doSearchFilter(search, sortedList);
     }
 
     // Sort
@@ -294,7 +361,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    * @returns {JSX.Element}
    */
   public renderTable(options: any): JSX.Element {
-    const { sortedList, sortDirection, sortBy } = this.state;
+    const { sortedList, sortDirection, sortBy, currentIndex } = this.state;
     const self = this;
     const timestampHeaderOptions = { sortKey: 'timestamp', onSortChange: this.onSortChange, sortDirection, sortBy };
     const timestampHeader = <LogTableHeaderCell {...timestampHeaderOptions}>Timestamp</LogTableHeaderCell>;
@@ -307,9 +374,11 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
 
     const tableOptions = {
       ...options,
+      scrollToRow: currentIndex,
       rowHeight: 30,
       rowsCount: sortedList!.length,
       onRowClick: this.onRowClick,
+      rowClassNameGetter: this.rowClassNameGetter,
       ref: this.refHandlers.table,
       headerHeight: 30
     };
@@ -352,4 +421,12 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
       </div>
     );
   }
+
+  private rowClassNameGetter(rowIndex: number) {
+    if (this.state.searchList!.includes(rowIndex)) {
+      return 'HighlightRow';
+    }
+
+    return '';
+  };
 }

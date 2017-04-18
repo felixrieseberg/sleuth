@@ -24,6 +24,7 @@ export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
 
     this.onFilterToggle = this.onFilterToggle.bind(this);
     this.onToggleSearch = this.onToggleSearch.bind(this);
+    this.onToggleSearchResultVisibility = this.onToggleSearchResultVisibility.bind(this);
     this.onSearchChange = debounce(this.onSearchChange.bind(this), 700);
   }
 
@@ -45,25 +46,48 @@ export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
     this.setState({ isSearchVisible: !this.state.isSearchVisible });
   }
 
+  public onToggleSearchResultVisibility() {
+    this.props.state.showOnlySearchResults = !this.props.state.showOnlySearchResults;
+  }
+
   public render() {
     const { isSearchVisible } = this.state;
+    const { showOnlySearchResults } = this.props.state''
     const { error, warning, info, debug } = this.props.state.levelFilter!;
     let items;
 
     if (isSearchVisible) {
       items = (
-        <div key='search' id='search_container' className='SearchContainer'>
-            <form onSubmit={(e) => e.preventDefault()} role='search' id='header_search_form' className='search_form no_bottom_margin'>
-              <div className='icon_search_wrapper'>
-                <i className='ts_icon ts_icon_search icon_search' />
-              </div>
-              <div className='search_input_wrapper'>
-                  <input type='text' autoFocus onChange={(e) => this.onSearchChange(e.target.value)} id='search_terms' className='search_input' placeholder='Search' />
-              </div>
-            </form>
-            <a onClick={this.onToggleSearch}>
-              <i className='ts_icon ts_icon_times_circle' />
+        <div>
+          <div key='menu' className='SearchButtons'>
+            <a
+              className={classNames({ Engaged: showOnlySearchResults })}
+              onClick={() => this.onToggleSearchResultVisibility()}>
+              <i className='ts_icon ts_icon_eye' />
+              <span className='block label'>Show only results</span>
             </a>
+          </div>
+          <span className='vert_divider SearchDivider' />
+          <div key='search' id='search_container' className='SearchContainer'>
+              <form onSubmit={(e) => e.preventDefault()} role='search' id='header_search_form' className='search_form no_bottom_margin'>
+                <div className='icon_search_wrapper'>
+                  <i className='ts_icon ts_icon_search icon_search' />
+                </div>
+                <div className='search_input_wrapper'>
+                  <input
+                    type='text'
+                    autoFocus
+                    onChange={(e) => this.onSearchChange(e.target.value)}
+                    id='search_terms'
+                    className='search_input'
+                    placeholder='Search'
+                  />
+                </div>
+              </form>
+              <a onClick={this.onToggleSearch}>
+                <i className='ts_icon ts_icon_times_circle' />
+              </a>
+          </div>
         </div>
       );
     } else {
