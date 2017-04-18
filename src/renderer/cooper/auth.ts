@@ -1,3 +1,4 @@
+import { config } from '../../config';
 import { remote } from 'electron';
 import { sleuthState } from '../state/sleuth';
 
@@ -9,7 +10,7 @@ export interface SigninOptions {
 }
 
 export class CooperAuth {
-  public serverUrl = 'http://felix.local:8080';
+  public serverUrl = config.cooperUrl;
   public signInUrl = `${this.serverUrl}/cooper/signin`;
   public signinAttempt = { hasTried: false, result: false };
 
@@ -105,12 +106,13 @@ export class CooperAuth {
       fetch(this.signInUrl, { credentials: 'include' }).then(async (response) => {
         const { url } = response;
 
-        if (url.startsWith('https://slack.com/signin') && (!options || !options.silent) ) {
+        if (url.includes('slack.com') && (!options || !options.silent) ) {
           resolve(this.showSignInWindow());
         } else if (url.startsWith('https://slack.com/signin')) {
           debug(`Tried to silently sign in and couldn't`);
           resolve(false);
         } else {
+          console.log(response);
           const responseObject = await response.json();
           const { result, slackUserId } = responseObject;
           const isSignedIn = !!(result && result === 'You are signed in');

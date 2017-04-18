@@ -1,3 +1,4 @@
+import { config } from '../../config';
 import { sleuthState } from '../state/sleuth';
 import * as queryString from 'query-string';
 
@@ -33,7 +34,7 @@ export interface IGetCommentResponse {
 }
 
 export class CooperComments {
-  public serverUrl = 'http://felix.local:8080';
+  public serverUrl = config.cooperUrl;
   public logUrl = `${this.serverUrl}/cooper/log`;
 
   public postComment(line: string, comment: string, id?: string) {

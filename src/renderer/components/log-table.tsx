@@ -40,6 +40,7 @@ export interface LogTableState {
   selectedIndex?: number;
   sortBy?: string;
   sortDirection?: string;
+  ignoreSearchIndex: boolean;
 }
 
 export interface SortFilterListOptions {
@@ -64,7 +65,8 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
       sortedList: [],
       sortBy: 'index',
       sortDirection: 'ASC',
-      searchList: []
+      searchList: [],
+      ignoreSearchIndex: false
     };
 
     this.onRowClick = this.onRowClick.bind(this);
@@ -122,7 +124,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    * @param {LogTableProps} nextProps
    */
   public componentWillReceiveProps(nextProps: LogTableProps): void {
-    const { levelFilter, search, logFile, showOnlySearchResults } = this.props;
+    const { levelFilter, search, logFile, showOnlySearchResults, searchIndex } = this.props;
     const searchChanged = search !== nextProps.search || showOnlySearchResults !== nextProps.showOnlySearchResults;
     const nextFile = nextProps.logFile;
     const fileChanged = ((!logFile && nextFile)
@@ -140,7 +142,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
         filter: nextLevelFilter,
         search: nextSearch,
         logFile: nextFile
-      }
+      };
       const sortedList = this.sortFilterList(sortOptions);
       let searchList: Array<number> = [];
 
@@ -151,6 +153,10 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
       }
 
       this.setState({ sortedList, searchList });
+    }
+
+    if (searchIndex !== nextProps.searchIndex) {
+      this.setState({ ignoreSearchIndex: false })
     }
   }
 
@@ -171,7 +177,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
 
     this.props.state.selectedEntry = selectedEntry;
     this.props.state.isDetailsVisible = true;
-    this.setState({ selectedIndex: index });
+    this.setState({ selectedIndex: index, ignoreSearchIndex: true });
   }
 
   /**
@@ -387,7 +393,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    * @returns {JSX.Element}
    */
   public renderTable(options: any): JSX.Element {
-    const { sortedList, sortDirection, sortBy, searchList } = this.state;
+    const { sortedList, sortDirection, sortBy, searchList, ignoreSearchIndex } = this.state;
     const { searchIndex } = this.props;
     const self = this;
     const timestampHeaderOptions = { sortKey: 'timestamp', onSortChange: this.onSortChange, sortDirection, sortBy };
@@ -401,7 +407,6 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
 
     const tableOptions = {
       ...options,
-      scrollToRow: searchList![searchIndex] || 0,
       rowHeight: 30,
       rowsCount: sortedList!.length,
       onRowClick: this.onRowClick,
@@ -409,6 +414,8 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
       ref: this.refHandlers.table,
       headerHeight: 30
     };
+
+    if (!ignoreSearchIndex) tableOptions.scrollToRow = searchList![searchIndex] || 0;
 
     function renderIndex(props: any) {
       return <Cell {...props}>{sortedList![props.rowIndex].index}</Cell>;
@@ -458,9 +465,10 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    * @returns {string}
    */
   private rowClassNameGetter(rowIndex: number): string {
-    const { searchList, selectedIndex } = this.state;
+    const { searchList, selectedIndex, ignoreSearchIndex } = this.state;
+    const isSearchIndex = !ignoreSearchIndex && rowIndex === (searchList || [])[this.props.searchIndex];
 
-    if (searchList && rowIndex === searchList[this.props.searchIndex] || selectedIndex === rowIndex) {
+    if (isSearchIndex || selectedIndex === rowIndex) {
       return 'ActiveRow';
     }
 
