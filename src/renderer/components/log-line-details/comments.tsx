@@ -1,3 +1,4 @@
+import { CooperSignInOutButton } from '../cooper/sign-in-out-button';
 import { lineToCooperLine } from '../../cooper/line-to-cooper-line';
 import { SleuthState, sleuthState } from '../../state/sleuth';
 import * as React from 'react';
@@ -101,7 +102,13 @@ export class LogLineComments extends React.Component<LogLineCommentsProps, Parti
   }
 
   public renderSignInNeccessary() {
-    return <div>No soup for you!</div>;
+    return (
+      <div className='Comments'>
+        <h4>Log Intelligence</h4>
+        <p>Sign in to see and post information about this log line left by fellow sibs.</p>
+        <CooperSignInOutButton state={sleuthState} />
+      </div>
+    );
   }
 
   public render() {
