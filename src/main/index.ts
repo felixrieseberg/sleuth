@@ -1,5 +1,6 @@
 import { app, BrowserWindow } from 'electron';
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
+import * as windowStateKeeper from 'electron-window-state';
 
 import { IpcManager } from './ipc';
 
@@ -15,15 +16,24 @@ if (require('electron-squirrel-startup')) return;
 const createWindow = async () => {
   require('electron-context-menu')();
 
+  const mainWindowState = windowStateKeeper({
+    defaultWidth: 1200,
+    defaultHeight: 800
+  });
+
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
+    x: mainWindowState.x,
+    y: mainWindowState.y,
+    width: mainWindowState.width,
+    height: mainWindowState.height,
     show: !!isDevMode,
     minHeight: 500,
     minWidth: 1000,
     titleBarStyle: process.platform === 'darwin' ? 'hidden-inset' : undefined
   });
+
+  mainWindowState.manage(mainWindow);
 
   // and load the index.html of the app.
   mainWindow.loadURL(`file://${__dirname}/../static/index.jade`);
