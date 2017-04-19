@@ -1,7 +1,7 @@
 {
   "name": "sleuth",
   "productName": "Sleuth",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Slack Log Viewer",
   "main": "src/main/index.ts",
   "scripts": {
@@ -71,7 +71,7 @@
     "babel-preset-react": "^6.23.0",
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
-    "electron-forge": "^2.9.0",
+    "electron-forge": "^2.10.0",
     "electron-prebuilt-compile": "1.6.5",
     "jest": "^19.0.2",
     "react-addons-perf": "^15.4.2",

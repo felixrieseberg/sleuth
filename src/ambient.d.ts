@@ -9,6 +9,7 @@ declare module 'react-skylight';
 declare module 'react-ladda';
 declare module 'react-keydown';
 declare module 'jsonic';
+declare module 'electron-window-state';
 declare module 'electron-default-menu';
 declare module 'debounce';
 
