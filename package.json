@@ -40,6 +40,7 @@
     "react-json-tree": "0.10.3",
     "react-keydown": "^1.6.9",
     "react-ladda": "^5.0.6",
+    "react-markdown": "^2.5.0",
     "react-particles-js": "1.4.0",
     "react-skylight": "^0.4.1",
     "react-virtualized": "9.0.5",

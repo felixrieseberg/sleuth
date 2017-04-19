@@ -1,10 +1,10 @@
-import { checkEdit } from 'tslint/lib';
 import { cooperComments } from '../../cooper/comments';
 import { SleuthState } from '../../state/sleuth';
 import { observer } from 'mobx-react';
 import * as React from 'react';
 import * as moment from 'moment';
 import * as Ladda from 'react-ladda';
+import * as Markdown from 'react-markdown';
 
 const LaddaButton = Ladda.default;
 const debug = require('debug')('sleuth:comment');
@@ -88,8 +88,8 @@ export class Comment extends React.Component<CommentProps, Partial<CommentState>
   }
 
   public toggleEdit() {
-    const { isEditing, editValue } = this.state;
-    const newEditValue = isEditing ? this.props.comment : editValue;
+    const { isEditing } = this.state;
+    const newEditValue = this.props.comment;
 
     this.setState({ isEditing: !isEditing, editValue: newEditValue });
   }
@@ -121,7 +121,7 @@ export class Comment extends React.Component<CommentProps, Partial<CommentState>
               <span className='Name'>{name}</span>
               <span className='Timestamp'>{time}</span>
             </div>
-            <div>{comment}</div>
+            <Markdown source={comment} skipHtml={true} />
             {editBtn}
           </div>
         </div>
