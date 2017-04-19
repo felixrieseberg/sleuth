@@ -46,10 +46,14 @@ export class CooperAuth {
       const signInWindow = new BrowserWindow({
         height: 700,
         width: 800,
+        webPreferences: { nodeIntegration: false }
       });
 
       const { webContents } = signInWindow;
-      const detectSlackRegex = /https:\/\/\w*.slack.com\/messages$/i;
+      const detectSlackRegex = [
+        /https:\/\/\w*.slack.com\/messages$/i,
+        /https:\/\/slack.com\/checkcookie\?redir/i
+      ];
 
       signInWindow.on('close', () => {
         debug(`Signin window closed`);
@@ -57,12 +61,16 @@ export class CooperAuth {
       });
 
       webContents.on('will-navigate', (e, navigatedUrl) => {
-        if (detectSlackRegex.test(navigatedUrl)) {
-          // We ended up on slack.com/messages. Hopefully the cookie
-          // is set, but let's restart;
-          e.preventDefault();
-          setTimeout(() => signInWindow.loadURL(this.signInUrl));
-        }
+        debug(`Sign in window navigation attempt:`, navigatedUrl);
+
+        detectSlackRegex.forEach((rgx => {
+          if (rgx.test(navigatedUrl)) {
+            // We ended up on slack.com/messages. Hopefully the cookie
+            // is set, but let's restart;
+            e.preventDefault();
+            setTimeout(() => signInWindow.loadURL(this.signInUrl), 400);
+          }
+        }));
       });
 
       webContents.on('did-finish-load', () => {
@@ -80,7 +88,8 @@ export class CooperAuth {
 
             if (parsedResult.result && parsedResult.result === 'You are signed in') {
               sleuthState.isCooperSignedIn = true;
-              sleuthState.slackUserId = result.slackUserId;
+              sleuthState.slackUserId = parsedResult.slackUserId;
+
               resolve(true);
               signInWindow.close();
             }
@@ -112,15 +121,15 @@ export class CooperAuth {
           debug(`Tried to silently sign in and couldn't`);
           resolve(false);
         } else {
-          console.log(response);
           const responseObject = await response.json();
           const { result, slackUserId } = responseObject;
           const isSignedIn = !!(result && result === 'You are signed in');
 
           sleuthState.slackUserId = slackUserId;
           sleuthState.isCooperSignedIn = isSignedIn;
-          debug(`User is signed into cooper: ${isSignedIn}`);
           resolve(isSignedIn);
+
+        debug(`User is signed into cooper: ${isSignedIn}`, responseObject);
         }
       })
       .catch((error) => {

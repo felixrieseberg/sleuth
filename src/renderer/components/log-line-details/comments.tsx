@@ -28,7 +28,7 @@ export class LogLineComments extends React.Component<LogLineCommentsProps, Parti
   };
 
   constructor(props: LogLineCommentsProps) {
-    super();
+    super(props);
 
     this.state = {
       comments: [],
@@ -40,7 +40,7 @@ export class LogLineComments extends React.Component<LogLineCommentsProps, Parti
     this.refresh = this.refresh.bind(this);
     this.updateSearch = this.updateSearch.bind(this);
 
-    this.fetchComments();
+    this.fetchComments(this.state.line, props.state.isCooperSignedIn);
   }
 
   public refresh() {
@@ -54,12 +54,15 @@ export class LogLineComments extends React.Component<LogLineCommentsProps, Parti
       const line = lineToCooperLine(nextProps.state.selectedEntry.message);
       this.setState({ line });
       this.fetchComments(line);
-      this.lineChangeElement.value = line;
+
+      if (this.lineChangeElement) {
+        this.lineChangeElement.value = line;
+      }
     }
   }
 
   public updateSearch() {
-    const newLine = this.lineChangeElement.value;
+    const newLine = this.lineChangeElement ? this.lineChangeElement.value : null;
 
     if (newLine) {
       this.setState({ line: newLine });
@@ -67,10 +70,11 @@ export class LogLineComments extends React.Component<LogLineCommentsProps, Parti
     }
   }
 
-  public async fetchComments(line?: string) {
+  public async fetchComments(line?: string, isSignedIn?: boolean) {
     line = line || this.state.line;
+    isSignedIn = isSignedIn || this.props.state.isCooperSignedIn;
 
-    if (line) {
+    if (line && isSignedIn) {
       debug(`Fetching comments for line ${line}`);
 
       cooperComments.getComments(line)

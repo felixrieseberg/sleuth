@@ -5,8 +5,8 @@ import * as classNames from 'classnames';
 import * as moment from 'moment';
 
 import { LogEntry } from '../../interfaces';
-import { LogLineMeta } from "./meta";
-import { LogLineComments } from "./comments";
+import { LogLineMeta } from './meta';
+import { LogLineComments } from './comments';
 
 export interface LogLineDetailsProps {
   state: SleuthState;
