@@ -1,3 +1,4 @@
+import * as path from 'path';
 import { config } from '../../config';
 import { remote } from 'electron';
 import { sleuthState } from '../state/sleuth';
@@ -13,6 +14,7 @@ export class CooperAuth {
   public serverUrl = config.cooperUrl;
   public signInUrl = `${this.serverUrl}/cooper/signin`;
   public signinAttempt = { hasTried: false, result: false };
+  private signInWindow: Electron.BrowserWindow;
 
   constructor() {
     this.signIn = this.signIn.bind(this);
@@ -43,19 +45,24 @@ export class CooperAuth {
 
   public showSignInWindow() {
     return new Promise((resolve) => {
-      const signInWindow = new BrowserWindow({
+      this.signInWindow = new BrowserWindow({
         height: 700,
         width: 800,
-        webPreferences: { nodeIntegration: false }
+        webPreferences: {
+          preload: path.join(__dirname, 'auth-preload.js'),
+          nodeIntegration: false
+        }
       });
 
-      const { webContents } = signInWindow;
+      this.maybeShowDevTools();
+
+      const { webContents } = this.signInWindow;
       const detectSlackRegex = [
         /https:\/\/\w*.slack.com\/messages$/i,
         /https:\/\/slack.com\/checkcookie\?redir/i
       ];
 
-      signInWindow.on('close', () => {
+      this.signInWindow.on('close', () => {
         debug(`Signin window closed`);
         resolve(false);
       });
@@ -68,43 +75,29 @@ export class CooperAuth {
             // We ended up on slack.com/messages. Hopefully the cookie
             // is set, but let's restart;
             e.preventDefault();
-            setTimeout(() => signInWindow.loadURL(this.signInUrl), 400);
+            setTimeout(() => this.signInWindow.loadURL(this.signInUrl), 400);
           }
         }));
       });
 
-      webContents.on('did-finish-load', () => {
-        if (!signInWindow.isVisible()) signInWindow.show();
+      webContents.on('did-finish-load', async () => {
+        const url = webContents.getURL();
 
-        if (!webContents.getURL().startsWith(`${this.serverUrl}/cooper/signin/callback?access_token=`)) {
-          debug(`Sign in window loaded a page, but not the right one`);
-          return;
+        if (url.startsWith('https://slack.com/signin?redir')) {
+          await this.tryToEnterTeamName();
+          this.signInWindow.show();
+        } else {
+          this.signInWindow.show();
         }
 
-        signInWindow.hide();
-        webContents.executeJavaScript(('document.body.textContent'), false, (result) => {
-          try {
-            const parsedResult = JSON.parse(result);
-
-            if (parsedResult.result && parsedResult.result === 'You are signed in') {
-              sleuthState.isCooperSignedIn = true;
-              sleuthState.slackUserId = parsedResult.slackUserId;
-
-              resolve(true);
-              signInWindow.close();
-            }
-          } catch (error) {
-            debug(`Tried to log in - and apparently ended up on Cooper's signin page, but something went wrong`);
-            debug(error);
-
-            signInWindow.close();
-            sleuthState.isCooperSignedIn = false;
-            resolve(false);
-          }
-        });
+        if (!url.startsWith(`${this.serverUrl}/cooper/signin/callback?access_token=`)) {
+          debug(`Sign in window loaded a page, but not the right one`, webContents.getURL());
+        } else {
+          this.getSignInResults();
+        }
       });
 
-      signInWindow.loadURL(this.signInUrl);
+      this.signInWindow.loadURL(this.signInUrl);
     });
   }
 
@@ -135,6 +128,50 @@ export class CooperAuth {
       .catch((error) => {
         resolve(false);
         debug(`Tried sign into Cooper, but failed`, error);
+      });
+    });
+  }
+
+  public tryToEnterTeamName() {
+    return new Promise((resolve, reject) => {
+      if (!this.signInWindow) return reject('Tried to get results, but could not find window');
+
+      this.signInWindow.webContents.executeJavaScript(`tryToEnterTeamDomain()`, false, () => {
+        resolve();
+      });
+    });
+  }
+
+  public maybeShowDevTools() {
+    if (this.signInWindow && config.isDevMode) {
+      //this.signInWindow.webContents.toggleDevTools();
+    }
+  }
+
+  public getSignInResults() {
+    return new Promise((resolve, reject) => {
+      if (!this.signInWindow) return reject('Tried to get results, but could not find window');
+
+      this.signInWindow.hide();
+      this.signInWindow.webContents.executeJavaScript(('document.body.textContent'), false, (result) => {
+        try {
+          const parsedResult = JSON.parse(result);
+
+          if (parsedResult.result && parsedResult.result === 'You are signed in') {
+            sleuthState.isCooperSignedIn = true;
+            sleuthState.slackUserId = parsedResult.slackUserId;
+
+            resolve(true);
+            this.signInWindow.close();
+          }
+        } catch (error) {
+          debug(`Tried to log in - and apparently ended up on Cooper's signin page, but something went wrong`);
+          debug(error);
+
+          this.signInWindow.close();
+          sleuthState.isCooperSignedIn = false;
+          resolve(false);
+        }
       });
     });
   }

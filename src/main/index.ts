@@ -1,3 +1,4 @@
+import { config } from '../config';
 import { app, BrowserWindow } from 'electron';
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
 import * as windowStateKeeper from 'electron-window-state';
@@ -6,10 +7,8 @@ import { IpcManager } from './ipc';
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow;
+let mainWindow: Electron.BrowserWindow | null;
 let ipcManager;
-
-const isDevMode = process.execPath.match(/[\\/]electron/);
 
 if (require('electron-squirrel-startup')) return;
 
@@ -27,7 +26,7 @@ const createWindow = async () => {
     y: mainWindowState.y,
     width: mainWindowState.width,
     height: mainWindowState.height,
-    show: !!isDevMode,
+    show: !!config.isDevMode,
     minHeight: 500,
     minWidth: 1000,
     titleBarStyle: process.platform === 'darwin' ? 'hidden-inset' : undefined
@@ -39,7 +38,7 @@ const createWindow = async () => {
   mainWindow.loadURL(`file://${__dirname}/../static/index.jade`);
 
   // Open the DevTools.
-  if (isDevMode) {
+  if (config.isDevMode) {
     await installExtension(REACT_DEVELOPER_TOOLS);
     mainWindow.webContents.openDevTools();
   }
