@@ -1,6 +1,17 @@
+import { config } from '../../config';
+
+const debug = require('debug')('sleuth:cooper');
+
 export interface Replacer {
   name: string;
   rgx: RegExp;
+  replacer: string;
+}
+
+export interface ExtraReplacer {
+  name: string;
+  rgx: string;
+  flags: Array<string>;
   replacer: string;
 }
 
@@ -19,11 +30,6 @@ const filters: Array<Replacer> = [
     name: 'channel-id',
     rgx: /( |^)("{0,1}(C|D)[A-Z0-9]{8}"{0,1})( |$)/g,
     replacer: ' {Channel} '
-  },
-  {
-    name: 'url',
-    rgx: /( |^)("{0,1}https:\/\/\w{0,30}\.slack\.com[\S]{0,40}"{0,1})( |$)/g,
-    replacer: ' {URL} '
   },
   {
     name: 'was-active',
@@ -47,21 +53,51 @@ const filters: Array<Replacer> = [
   }
 ];
 
-/**
- * This method takes an input log line and transforms it into
- * something more generic - removing team ids and other
- * user-specific information.
- *
- * @export
- * @param {string} input
- * @returns {string}
- */
-export function lineToCooperLine(input: string): string {
-  let output = input;
+export class LineToCooperLine {
+  private filters: Array<Replacer> = [];
 
-  filters.forEach(({ rgx, replacer }) => {
-    output = output.replace(rgx, replacer);
-  });
+  constructor() {
+    this.filters = filters;
 
-  return output.trim();
+    fetch(`${config.cooperUrl}/cooper/filters`)
+      .then((response) => response.json())
+      .then((response: any) => {
+        const extraFilters = response as Array<ExtraReplacer>;
+
+        if (extraFilters && extraFilters.length > 0) {
+          extraFilters.forEach(({ flags, name, replacer, rgx }) => {
+            this.filters.push({
+              name,
+              rgx: new RegExp(rgx, flags.join('')),
+              replacer
+            });
+          });
+        }
+      })
+      .catch((error) => {
+        debug(`Tried to get additional filters, but failed`, error);
+      });
+  }
+
+  /**
+   * This method takes an input log line and transforms it into
+   * something more generic - removing team ids and other
+   * user-specific information.
+   *
+   * @export
+   * @param {string} input
+   * @returns {string}
+   */
+  public convert(input: string): string {
+    let output = input;
+
+    filters.forEach(({ rgx, replacer }) => {
+      output = output.replace(rgx, replacer);
+    });
+
+    return output.trim();
+  }
+
 }
+
+export const lineToCooperLine = new LineToCooperLine();

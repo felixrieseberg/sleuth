@@ -33,7 +33,7 @@ export class LogLineComments extends React.Component<LogLineCommentsProps, Parti
     this.state = {
       comments: [],
       authors: [],
-      line: props.state.selectedEntry ? lineToCooperLine(props.state.selectedEntry.message) : ''
+      line: props.state.selectedEntry ? lineToCooperLine.convert(props.state.selectedEntry.message) : ''
     };
 
     this.renderComment = this.renderComment.bind(this);
@@ -51,7 +51,7 @@ export class LogLineComments extends React.Component<LogLineCommentsProps, Parti
     const newSignInStatus = nextProps.state.isCooperSignedIn !== this.props.state.isCooperSignedIn;
 
     if (nextProps.state.selectedEntry && nextProps.state.selectedEntry.message || newSignInStatus) {
-      const line = lineToCooperLine(nextProps.state.selectedEntry.message);
+      const line = lineToCooperLine.convert(nextProps.state.selectedEntry.message);
       this.setState({ line });
       this.fetchComments(line);
 

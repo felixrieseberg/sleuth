@@ -58,7 +58,7 @@ export class Comment extends React.Component<CommentProps, Partial<CommentState>
     const { editValue } = this.state;
 
     e.preventDefault();
-    if (!lineId || !editValue) return;
+    if (!lineId || editValue === undefined) return;
 
     cooperComments.updateComment(lineId, commentId, editValue)
       .then(async (result) => {
