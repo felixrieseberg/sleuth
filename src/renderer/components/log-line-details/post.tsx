@@ -1,4 +1,5 @@
-import { IEnableDisablePosition } from 'tslint/lib';
+import { SleuthState } from '../../state/sleuth';
+import { observer } from 'mobx-react';
 import * as React from 'react';
 import * as Ladda from 'react-ladda';
 import { remote } from 'electron';
@@ -8,6 +9,7 @@ const LaddaButton = Ladda.default;
 const debug = require('debug')('sleuth:cooper');
 
 export interface PostCommentProps {
+  state: SleuthState;
   line: string;
   lineId?: string;
   didPost: () => void;
@@ -18,6 +20,7 @@ export interface PostCommentState {
   value: string;
 }
 
+@observer
 export class PostComment extends React.Component<PostCommentProps, Partial<PostCommentState>> {
   constructor() {
     super();
@@ -38,12 +41,13 @@ export class PostComment extends React.Component<PostCommentProps, Partial<PostC
   public onClick(e: React.FormEvent<HTMLFormElement>) {
     const { line , lineId } = this.props;
     const { value } = this.state;
+    const log = this.props.state.selectedEntry.logType;
 
     e.preventDefault();
     if (!value) return;
 
     this.setState({ isPosting: true });
-    cooperComments.postComment(line, value, lineId)
+    cooperComments.postComment(line, value, log, lineId)
       .then(async (result) => {
         debug(`Posted a comment to cooper`, result);
 

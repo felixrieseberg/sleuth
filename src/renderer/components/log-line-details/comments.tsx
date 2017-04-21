@@ -40,7 +40,7 @@ export class LogLineComments extends React.Component<LogLineCommentsProps, Parti
     this.refresh = this.refresh.bind(this);
     this.updateSearch = this.updateSearch.bind(this);
 
-    this.fetchComments(this.state.line, props.state.isCooperSignedIn);
+    this.fetchComments(this.state.line, props.state.isCooperSignedIn, props.state.selectedEntry.logType);
   }
 
   public refresh() {
@@ -53,7 +53,7 @@ export class LogLineComments extends React.Component<LogLineCommentsProps, Parti
     if (nextProps.state.selectedEntry && nextProps.state.selectedEntry.message || newSignInStatus) {
       const line = lineToCooperLine.convert(nextProps.state.selectedEntry.message);
       this.setState({ line });
-      this.fetchComments(line);
+      this.fetchComments(line, nextProps.state.isCooperSignedIn, nextProps.state.selectedEntry.logType);
 
       if (this.lineChangeElement) {
         this.lineChangeElement.value = line;
@@ -70,14 +70,15 @@ export class LogLineComments extends React.Component<LogLineCommentsProps, Parti
     }
   }
 
-  public async fetchComments(line?: string, isSignedIn?: boolean) {
+  public async fetchComments(line?: string, isSignedIn?: boolean, log?: string) {
+    log = log || this.props.state.selectedEntry.logType;
     line = line || this.state.line;
     isSignedIn = isSignedIn || this.props.state.isCooperSignedIn;
 
     if (line && isSignedIn) {
       debug(`Fetching comments for line ${line}`);
 
-      cooperComments.getComments(line)
+      cooperComments.getComments(line, log)
         .then((result: IGetCommentResponse) => {
           debug(result);
           if (result && result.comments) {
@@ -134,7 +135,7 @@ export class LogLineComments extends React.Component<LogLineCommentsProps, Parti
           </div>
         </div>
         {renderedComments}
-        <PostComment lineId={lineId} line={line} didPost={this.refresh} />
+        <PostComment lineId={lineId} line={line} didPost={this.refresh} state={sleuthState} />
       </div>
     );
   }

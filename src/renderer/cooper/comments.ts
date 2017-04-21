@@ -37,13 +37,17 @@ export class CooperComments {
   public serverUrl = config.cooperUrl;
   public logUrl = `${this.serverUrl}/cooper/log`;
 
-  public postComment(line: string, comment: string, id?: string) {
+  public postComment(line: string, comment: string, log: string, id?: string) {
     const body = JSON.stringify({
       line: { line, _id: id },
       comment
     });
 
-    return fetch(`${this.logUrl}/browser-renderer`, {
+    log = log === 'browser' || log === 'renderer' ? 'browser-renderer' : log;
+
+    debug(`Posting comment for log ${log}, line ${line}`);
+
+    return fetch(`${this.logUrl}/${log}`, {
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
       method: 'post',
@@ -51,7 +55,7 @@ export class CooperComments {
     });
   }
 
-  public updateComment(lineId: string, commentId: string, comment: string) {
+  public updateComment(lineId: string, commentId: string, comment: string, log: string) {
     const body = JSON.stringify({
       line: { _id: lineId },
       comment: {
@@ -60,7 +64,11 @@ export class CooperComments {
       }
     });
 
-    return fetch(`${this.logUrl}/browser-renderer`, {
+    log = log === 'browser' || log === 'renderer' ? 'browser-renderer' : log;
+
+    debug(`Updating comment for log ${log}, line ${lineId}, comment ${commentId}`);
+
+    return fetch(`${this.logUrl}/${log}`, {
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
       method: 'PATCH',
@@ -68,10 +76,14 @@ export class CooperComments {
     });
   }
 
-  public getComments(line: string): Promise<IGetCommentResponse> {
+  public getComments(line: string, log: string): Promise<IGetCommentResponse> {
     const qs = queryString.stringify({line});
 
-    return fetch(`${this.logUrl}/browser-renderer?${qs}`, { credentials: 'include' })
+    log = log === 'browser' || log === 'renderer' ? 'browser-renderer' : log;
+
+    debug(`Grabbing comments for log ${log}, line ${line}`);
+
+    return fetch(`${this.logUrl}/${log}?${qs}`, { credentials: 'include' })
       .then((response) => response.json() as Promise<IGetCommentResponse>)
       .catch((error) => {
         debug(`Tried to fetch comments for line ${line} but failed`);

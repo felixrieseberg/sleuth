@@ -56,11 +56,12 @@ export class Comment extends React.Component<CommentProps, Partial<CommentState>
   public submitEdit(e: React.FormEvent<HTMLFormElement>) {
     const { commentId, lineId } = this.props;
     const { editValue } = this.state;
+    const log = this.props.state.selectedEntry.logType;
 
     e.preventDefault();
     if (!lineId || editValue === undefined) return;
 
-    cooperComments.updateComment(lineId, commentId, editValue)
+    cooperComments.updateComment(lineId, commentId, log, editValue)
       .then(async (result) => {
         debug(`Posted a comment to cooper`, result);
 
