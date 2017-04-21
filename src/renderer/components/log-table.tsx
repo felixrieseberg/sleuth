@@ -1,4 +1,4 @@
-import { SleuthState } from '../state/sleuth';
+import { SleuthState, sleuthState } from '../state/sleuth';
 import * as React from 'react';
 import * as classNames from 'classnames';
 import * as moment from 'moment';
@@ -338,8 +338,8 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
   public renderWebAppWarning(): JSX.Element | null {
     const { logFile } = this.props;
 
-    const text = `The web app logs are difficult to parse for a computer - proceed with caution. Combined view is disabled.`;
-    return logFile.logType === 'webapp' ? <Alert text={text} level='warning' /> : null;
+    const text = `The web app logs are difficult to parse for a computer - proceed with caution. Combined view is disabled. Click to dismiss.`;
+    return logFile.logType === 'webapp' ? <Alert state={sleuthState} text={text} level='warning' /> : null;
   }
 
   /**

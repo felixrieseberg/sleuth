@@ -10,8 +10,7 @@ export class SleuthState {
     @observable public slackUserId?: string;
     @observable public isCooperSignedIn = false;
     @observable public selectedEntry: LogEntry;
-    @observable public selectedLogFile?: ProcessedLogFile | MergedLogFile;
-    @observable public selectedStateFile?: UnzippedFile;
+    @observable public selectedLogFile?: ProcessedLogFile | MergedLogFile | UnzippedFile;
 
     @observable public levelFilter: LevelFilter = {
         debug: false,
@@ -25,6 +24,8 @@ export class SleuthState {
 
     @observable public isDetailsVisible: boolean = false;
     @observable public dateTimeFormat: string = localStorage.getItem('dateTimeFormat') || defaults.dateTimeFormat;
+
+    @observable public webAppLogsWarningDismissed: boolean = false;
 }
 
 export const sleuthState = new SleuthState();

@@ -1,3 +1,4 @@
+import { MergedLogFile, ProcessedLogFile } from '../interfaces';
 import { SleuthState } from '../state/sleuth';
 import * as React from 'react';
 import * as dirtyJSON from 'jsonic';
@@ -26,29 +27,33 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
     this.state = {};
   }
 
-  public componentDidMount() {
-    const { selectedStateFile } = this.props.state;
+  public isStateFile(file?: ProcessedLogFile | MergedLogFile | UnzippedFile): file is UnzippedFile {
+    const _file = file as UnzippedFile;
+    return !!_file.fullPath;
+  }
 
-    if (selectedStateFile) {
-      this.parse(selectedStateFile);
+  public componentDidMount() {
+    const { selectedLogFile } = this.props.state;
+
+    if (this.isStateFile(selectedLogFile)) {
+      this.parse(selectedLogFile);
     }
   }
 
   public componentWillReceiveProps(nextProps: StateTableProps) {
-    const nextFile = nextProps.state.selectedStateFile;
-    const currentFile = this.props.state.selectedStateFile;
+    const nextFile = nextProps.state.selectedLogFile;
 
-    if (nextFile && currentFile && currentFile.fullPath !== nextFile.fullPath) {
+    if (this.isStateFile(nextFile)) {
       this.parse(nextFile);
     }
   }
 
   public getFileType(): StateFileType {
-    const { selectedStateFile } = this.props.state;
+    const { selectedLogFile } = this.props.state;
 
-    if (!selectedStateFile) throw new Error('StateTable: No file');
+    if (!this.isStateFile(selectedLogFile)) throw new Error('StateTable: No file');
 
-    const nameMatch = selectedStateFile.fileName.match(/slack-(\w*)/);
+    const nameMatch = selectedLogFile.fileName.match(/slack-(\w*)/);
     const type = nameMatch && nameMatch.length > 1 ? nameMatch[1] : 'unknown';
 
     return type as StateFileType;
