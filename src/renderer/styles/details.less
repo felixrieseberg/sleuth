@@ -1,7 +1,6 @@
 @import "../../static/plastic/plastic_colors.less";
 
 .Details {
-  padding: .5rem 1.5rem 1rem;
   background: white;
   border-top: 1px solid @neutral_grey;
   overflow: auto;
@@ -34,6 +33,28 @@
     font-size: 1rem;
   }
 
+  .Background {
+    width: 100%;
+    padding-top: 34.613%;
+    position: relative;
+
+    div {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: url(../../static/bg.png);
+      background-position: top;
+      background-size: cover;
+      background-repeat: no-repeat;
+    }
+  }
+
+  .LogLineMeta {
+    padding: .5rem 1.5rem 1rem;
+  }
+
   .close {
     padding-left: 10px;
   }
@@ -60,6 +81,7 @@
 
 .Details-LogEntry {
   font-size: 1rem;
+  margin: .5rem 1.5rem 1rem;
   resize: horizontal;
 
   .Details-LogType {

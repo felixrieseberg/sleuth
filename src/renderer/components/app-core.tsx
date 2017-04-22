@@ -1,3 +1,4 @@
+import { isMergedLogFile, isProcessedLogFile, isUnzippedFile } from '../../utils/is-logfile';
 import { observer } from 'mobx-react';
 import { sleuthState, SleuthState } from '../state/sleuth';
 import * as React from 'react';
@@ -12,20 +13,18 @@ import {
   MergedLogFile,
   MergedLogFiles,
   ProcessedLogFile,
-  ProcessedLogFiles,
-  UserPreferences
+  ProcessedLogFiles
 } from '../interfaces';
 import { AppCoreHeader } from './app-core-header';
 import { Sidebar } from './sidebar';
 import { Loading } from './loading';
-import { LogContent } from "./log-content";
+import { LogContent } from './log-content';
 
 const debug = require('debug')('sleuth:appCore');
 
 export interface CoreAppProps {
   state: SleuthState;
   unzippedFiles: UnzippedFiles;
-  userPreferences: UserPreferences;
 }
 
 export interface CoreAppState {
@@ -197,14 +196,14 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
    * @returns {string}
    */
   public getSelectedFileName(): string {
-    const { selectedLogFile, selectedStateFile } = this.props.state;
+    const { selectedLogFile } = this.props.state;
 
-    if (selectedLogFile && (selectedLogFile as ProcessedLogFile).type === 'ProcessedLogFile') {
-      return (selectedLogFile as ProcessedLogFile).logFile.fileName;
-    } else if (selectedLogFile && (selectedLogFile as MergedLogFile).type === 'MergedLogFile') {
-      return (selectedLogFile as MergedLogFile).logType;
-    } else if (selectedStateFile) {
-      return (selectedStateFile as UnzippedFile).fileName;
+    if (isProcessedLogFile(selectedLogFile)) {
+      return selectedLogFile.logFile.fileName;
+    } else if (isMergedLogFile(selectedLogFile)) {
+      return selectedLogFile.logType;
+    } else if (isUnzippedFile(selectedLogFile)) {
+      return selectedLogFile.fileName;
     } else {
       return '';
     }
@@ -265,7 +264,7 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
           selectedLogFileName={selectedLogFileName}
         />
         <div id='content' className={logContentClassName}>
-          <AppCoreHeader menuToggle={this.toggleSidebar} />
+          <AppCoreHeader state={sleuthState} menuToggle={this.toggleSidebar} />
           {tableOrLoading}
         </div>
       </div>

@@ -47,7 +47,7 @@ export function sortWithWebWorker(data: Array<any>, sortFn: string) {
  *
  * @param {ProcessedLogFiles} logFiles
  */
-export function mergeLogFiles(logFiles: Array<ProcessedLogFile>|Array<MergedLogFile>, logType: LogType): Promise<MergedLogFile> {
+export function mergeLogFiles(logFiles: Array<ProcessedLogFile>|Array<MergedLogFile>, logType: LogType | 'all'): Promise<MergedLogFile> {
   return new Promise((resolve) => {
     let logEntries: Array<LogEntry> = [];
     const totalEntries = (logFiles as Array<ProcessedLogFile>).map((l) => l.logEntries.length).reduce((t, s) => t + s, 0);

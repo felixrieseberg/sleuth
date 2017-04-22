@@ -2,12 +2,12 @@ import * as React from 'react';
 import * as dirtyJSON from 'jsonic';
 import JSONTree from 'react-json-tree';
 
-export interface LogLineMetaProps {
+export interface LogLineDataProps {
   raw: string;
 }
 
-export class LogLineMeta extends React.Component<LogLineMetaProps, undefined> {
-  constructor(props: LogLineMetaProps) {
+export class LogLineData extends React.Component<LogLineDataProps, undefined> {
+  constructor(props: LogLineDataProps) {
     super(props);
   }
 
@@ -18,20 +18,23 @@ export class LogLineMeta extends React.Component<LogLineMetaProps, undefined> {
    */
   public render(): JSX.Element | null {
     const { raw } = this.props;
+    let data = null;
 
     if (!raw) return null;
 
     try {
-      const data = dirtyJSON(raw);
+      const parsedJSON = dirtyJSON(raw);
 
-      if (data) {
-        return <JSONTree data={data} theme={this.getTheme()} />;
+      if (parsedJSON) {
+        data = <JSONTree data={data} theme={this.getTheme()} />;
       } else {
-        return <code>{raw}</code>;
+        data = <code>{raw}</code>;
       }
     } catch (e) {
-      return <code>{raw}</code>;
+      data = <code>{raw}</code>;
     }
+
+    return (<div className='LogLineData'>{data}</div>);
   }
 
   /**

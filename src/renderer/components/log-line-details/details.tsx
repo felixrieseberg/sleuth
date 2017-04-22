@@ -5,7 +5,7 @@ import * as classNames from 'classnames';
 import * as moment from 'moment';
 
 import { LogEntry } from '../../interfaces';
-import { LogLineMeta } from './meta';
+import { LogLineData } from './data';
 import { LogLineComments } from './comments';
 
 export interface LogLineDetailsProps {
@@ -66,8 +66,9 @@ export class LogLineDetails extends React.PureComponent<LogLineDetailsProps, Log
     return (
       <div className={className}>
         {logEntryInfo}
-        <LogLineMeta raw={selectedEntry ? selectedEntry.meta : ''} />
+        <LogLineData raw={selectedEntry ? selectedEntry.meta : ''} />
         <LogLineComments state={sleuthState} />
+        <div className='Background'><div /></div>
       </div>
     );
   }

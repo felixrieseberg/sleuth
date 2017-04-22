@@ -1,4 +1,4 @@
-import { sleuthState } from '../state/sleuth';
+import { resetState, sleuthState } from '../state/sleuth';
 import { UserPreferences } from '../interfaces';
 import { shouldIgnoreFile } from '../../utils/should-ignore-file';
 import * as React from 'react';
@@ -11,7 +11,7 @@ import { UnzippedFile, UnzippedFiles, Unzipper } from '../unzip';
 import { Welcome } from './welcome';
 import { CoreApplication } from './app-core';
 import { MacTitlebar } from './mac-titlebar';
-import { Preferences, getPreferences } from './preferences';
+import { Preferences } from './preferences';
 import { AppMenu } from '../menu';
 
 const debug = require('debug')('sleuth:app');
@@ -28,8 +28,7 @@ export class App extends React.Component<undefined, Partial<AppState>> {
     super();
 
     this.state = {
-      unzippedFiles: [],
-      userPreferences: getPreferences()
+      unzippedFiles: []
     };
 
     localStorage.debug = 'sleuth*';
@@ -44,11 +43,23 @@ export class App extends React.Component<undefined, Partial<AppState>> {
     }
 
     this.openFile = this.openFile.bind(this);
-    this.updatePreferences = this.updatePreferences.bind(this);
   }
 
-  public updatePreferences(userPreferences: UserPreferences) {
-    this.setState({ userPreferences });
+  /**
+   * Should this component update?
+   *
+   * @param {undefined} _nextProps
+   * @param {AppState} nextState
+   */
+  public shouldComponentUpdate(_nextProps: undefined, nextState: AppState) {
+    const currentFiles = this.state.unzippedFiles || [];
+    const nextFiles = nextState.unzippedFiles || [];
+
+    if (currentFiles.length === 0 && nextFiles.length === 0) {
+      return false;
+    }
+
+    return true;
   }
 
   /**
@@ -87,8 +98,7 @@ export class App extends React.Component<undefined, Partial<AppState>> {
    */
   public openFile(url: string): void {
     debug(`Received open-url for ${url}`);
-
-    this.setState({ unzippedFiles: [] });
+    this.reset();
 
     const isZipFile = /[\s\S]*\.zip$/.test(url);
     if (isZipFile) {
@@ -110,6 +120,7 @@ export class App extends React.Component<undefined, Partial<AppState>> {
    */
   public openDirectory(url: string): void {
     debug(`Now opening directory ${url}`);
+    this.reset();
 
     fs.readdir(url)
       .then((dir) => {
@@ -148,14 +159,29 @@ export class App extends React.Component<undefined, Partial<AppState>> {
       .then((unzippedFiles: UnzippedFiles) => this.setState({unzippedFiles}));
   }
 
+  public reset() {
+    this.setState({ unzippedFiles: [] });
+
+    if (sleuthState.opened > 0) {
+      resetState();
+    }
+
+    sleuthState.opened = sleuthState.opened + 1;
+  }
+
+  /**
+   * Let's render this!
+   *
+   * @returns {JSX.Element}
+   */
   public render(): JSX.Element {
-    const { unzippedFiles, userPreferences } = this.state;
+    const { unzippedFiles } = this.state;
     const className = classNames('App', { Darwin: process.platform === 'darwin' });
     const titleBar = process.platform === 'darwin' ? <MacTitlebar /> : '';
     let content: JSX.Element | null = <Welcome openFile={this.openFile} />;
 
     if (unzippedFiles && unzippedFiles.length > 0) {
-      content = <CoreApplication state={sleuthState} unzippedFiles={unzippedFiles} userPreferences={userPreferences!} />;
+      content = <CoreApplication state={sleuthState} unzippedFiles={unzippedFiles} />;
     }
 
     return (

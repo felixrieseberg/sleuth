@@ -2,6 +2,8 @@ import { UnzippedFile } from './unzip';
 
 export type LogType = 'browser' | 'renderer' | 'call' | 'webapp' | 'webview';
 
+export type LogFile = UnzippedFile | MergedLogFile | ProcessedLogFile;
+
 export interface LogEntry {
   index: number;
   timestamp: string;
@@ -23,12 +25,12 @@ export interface MatchResult {
 }
 
 export interface MergedLogFiles {
-  all?: MergedLogFile;
-  browser?: MergedLogFile;
-  renderer?: MergedLogFile;
-  webapp?: MergedLogFile;
-  webview?: MergedLogFile;
-  call?: MergedLogFile;
+  all: MergedLogFile;
+  browser: MergedLogFile;
+  renderer: MergedLogFile;
+  webapp: MergedLogFile;
+  webview: MergedLogFile;
+  call: MergedLogFile;
   type: 'MergedLogFiles';
 }
 

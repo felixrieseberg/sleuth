@@ -1,3 +1,4 @@
+import { isLogFile } from '../../utils/is-logfile';
 import { ProcessedLogFile } from '../interfaces';
 import { StateTable } from './state-table';
 import { SleuthState, sleuthState } from '../state/sleuth';
@@ -31,13 +32,18 @@ export class LogContent extends React.Component<LogContentProps, Partial<LogCont
   }
 
   public resizeHandler(height: number) {
+    //const details = document.querySelector('div.Details');
+    //const dHeight = details ? details.clientHeight : 100;
+
     if (height < 100 || height > (window.innerHeight - 100)) return;
     this.setState({ tableHeight: height });
   }
 
-  public render(): JSX.Element {
+  public render(): JSX.Element | null {
     const { selectedLogFile, levelFilter, search, dateTimeFormat, isDetailsVisible, showOnlySearchResults, searchIndex } = this.props.state;
-    const isLog = selectedLogFile!.type === 'ProcessedLogFile' || selectedLogFile!.type === 'MergedLogFile';
+
+    if (!selectedLogFile) return null;
+    const isLog = isLogFile(selectedLogFile);
     const tableStyle = { height: isDetailsVisible ? `${this.state.tableHeight}px` : '100%' };
     const scrubber = <Scrubber elementSelector='div#LogTableContainer' onResizeHandler={this.resizeHandler} />;
 
