@@ -128,7 +128,8 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
 
     const { selectedLogFile, processedLogFiles } = this.state;
     if (!selectedLogFile && processedLogFiles) {
-      this.setState({ selectedLogFile: getFirstLogFile(processedLogFiles), loadedLogFiles: true });
+      this.props.state.selectedLogFile = getFirstLogFile(processedLogFiles);
+      this.setState({ loadedLogFiles: true });
     } else {
       this.setState({ loadedLogFiles: true });
     }
