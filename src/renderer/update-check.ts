@@ -1,17 +1,24 @@
 import * as semver from 'semver';
 
-const debug = require('debug')('sleuth:unzip');
+const debug = require('debug')('sleuth:update-check');
 
 const packageInfo = require('../../package.json');
 const { version } = packageInfo;
 const platformModifier = process.platform === 'win32' ? 'windows': 'mac';
-
-export const checkUpdateUrl = `https://downloads.slack-edge.com/sleuth_${platformModifier}/latest-version.json`;
-
-export const downloadUpdateUrl = `https://downloads.slack-edge.com/sleuth_${platformModifier}/latest.zip`;
+const fetch = window.fetch || require('node-fetch');
 
 export interface LatestInfo {
   latest: string;
+};
+
+export interface UpdateUrls {
+  checkUpdate: string;
+  downloadUpdate: string;
+}
+
+export const defaultUrls: UpdateUrls = {
+  checkUpdate: `https://downloads.slack-edge.com/sleuth_${platformModifier}/latest-version.json`,
+  downloadUpdate: `https://downloads.slack-edge.com/sleuth_${platformModifier}/latest.zip`
 };
 
 /**
@@ -20,17 +27,17 @@ export interface LatestInfo {
  * @export
  * @returns {(Promise<boolean | string>)}
  */
-export function getUpdateAvailable(): Promise<{}> {
+export function getUpdateAvailable(urls: UpdateUrls = defaultUrls, v: string = version): Promise<{}> {
   return new Promise((resolve) => {
-    fetch(checkUpdateUrl)
+    fetch(urls.checkUpdate)
       .then((result) => result.json())
       .then((result: any) => {
         if (result && result.latest) {
-          resolve(semver.gt(result.latest, version) ? result.latest : false);
+          resolve(semver.gt(result.latest, v) ? result.latest : false);
         }
 
         resolve(false);
       })
-      .catch((err) => debug('Couuld not check for update', err));
+      .catch((err) => debug('Could not check for update', err));
   });
 }

@@ -5,7 +5,7 @@ import * as ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 import { remote } from 'electron';
 import { getSleuth } from '../sleuth';
-import { getUpdateAvailable, downloadUpdateUrl } from '../update-check';
+import { getUpdateAvailable, defaultUrls } from '../update-check';
 
 const debug = require('debug')('sleuth:welcome');
 
@@ -67,7 +67,7 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
           transitionEnterTimeout={250}
           transitionLeaveTimeout={250}>
           <p className='UpdateAvailable'>
-            <a href={downloadUpdateUrl}>By the way, a new version is available!</a>
+            <a href={defaultUrls.downloadUpdate}>By the way, a new version is available!</a>
           </p>
         </ReactCSSTransitionGroup>
       );

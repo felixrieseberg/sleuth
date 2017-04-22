@@ -5,7 +5,7 @@ import * as React from 'react';
 export interface AlertProps {
   text: string;
   level?: 'error' | 'generic' | 'warning' | 'success' | 'info';
-  state: SleuthState;
+  state?: SleuthState;
 }
 
 @observer
@@ -32,11 +32,13 @@ export class Alert extends React.PureComponent<AlertProps, undefined> {
   }
 
   public onclick() {
-    this.props.state.webAppLogsWarningDismissed = true;
+    if (this.props.state) {
+      this.props.state.webAppLogsWarningDismissed = true;
+    }
   }
 
   public render(): JSX.Element | null {
-    if (this.props.state.webAppLogsWarningDismissed) return null;
+    if (this.props.state && this.props.state.webAppLogsWarningDismissed) return null;
 
     const { level, text } = this.props;
     const levelClassName = level === 'generic' ? '' : level;

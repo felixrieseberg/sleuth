@@ -1,0 +1,61 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`alert-default 1`] = `
+<div
+  className="alert alert_undefined"
+  onClick={[Function]}
+>
+  <i
+    className="ts_icon ts_icon_slack_pillow"
+  />
+  Hello
+</div>
+`;
+
+exports[`alert-error 1`] = `
+<div
+  className="alert alert_error"
+  onClick={[Function]}
+>
+  <i
+    className="ts_icon ts_icon_warning"
+  />
+  Hello
+</div>
+`;
+
+exports[`alert-info 1`] = `
+<div
+  className="alert alert_info"
+  onClick={[Function]}
+>
+  <i
+    className="ts_icon ts_icon_info_circle"
+  />
+  Hello
+</div>
+`;
+
+exports[`alert-success 1`] = `
+<div
+  className="alert alert_success"
+  onClick={[Function]}
+>
+  <i
+    className="ts_icon ts_icon_check_circle_o"
+  />
+  Hello
+</div>
+`;
+
+exports[`alert-warning 1`] = `
+<div
+  className="alert alert_warning"
+  onClick={[Function]}
+>
+  <i
+    className="ts_icon ts_icon_warning"
+  />
+  Hello
+</div>
+`;

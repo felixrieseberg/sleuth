@@ -1,3 +1,4 @@
+import { getFirstLogFile } from '../../utils/get-first-logfile';
 import { isMergedLogFile, isProcessedLogFile, isUnzippedFile } from '../../utils/is-logfile';
 import { observer } from 'mobx-react';
 import { sleuthState, SleuthState } from '../state/sleuth';
@@ -74,6 +75,10 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
     this.processFiles();
   }
 
+  public componentWillUnmount() {
+    ipcRenderer.removeAllListeners('processing-status');
+  }
+
   /**
    * Take an array of processed files (for logs) or unzipped files (for state files)
    * and add them to the state of this component.
@@ -123,7 +128,7 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
 
     const { selectedLogFile, processedLogFiles } = this.state;
     if (!selectedLogFile && processedLogFiles) {
-      this.setState({ selectedLogFile: processedLogFiles.browser[0], loadedLogFiles: true });
+      this.setState({ selectedLogFile: getFirstLogFile(processedLogFiles), loadedLogFiles: true });
     } else {
       this.setState({ loadedLogFiles: true });
     }

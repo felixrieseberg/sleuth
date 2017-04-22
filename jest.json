@@ -18,7 +18,8 @@
     "/src/main/"
   ],
   "coverageReporters": [
-    "json"
+    "json",
+    "html"
   ],
   "collectCoverageFrom": [
     "src/**/*.{ts, tsx}",

@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Welcome welcome renders correctly 1`] = `
+<div
+  className="Welcome"
+>
+  <i />
+  <div>
+    <h1
+      className="Emoji"
+    >
+      🕵🏿
+    </h1>
+    <h2>
+      Hey there!
+    </h2>
+    <h4>
+      Just drop a logs file or folder here.
+    </h4>
+  </div>
+  <div />
+</div>
+`;
