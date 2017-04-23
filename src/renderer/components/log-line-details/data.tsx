@@ -26,7 +26,7 @@ export class LogLineData extends React.Component<LogLineDataProps, undefined> {
       const parsedJSON = dirtyJSON(raw);
 
       if (parsedJSON) {
-        data = <JSONTree data={data} theme={this.getTheme()} />;
+        data = <JSONTree data={parsedJSON} theme={this.getTheme()} />;
       } else {
         data = <code>{raw}</code>;
       }
