@@ -64,7 +64,7 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
     'hh:mm:ss A (DD/MM)',
     'HH:mm:ss.SSS (DD/MM)',
     'hh:mm:ss.SSS A (DD/MM)',
-    'hh:mm A, MMM Mo',
+    'hh:mm A, MMM Do',
     'dddd, MMMM Do YYYY, h:mm:ss a',
     'ddd, hA'
   ];
