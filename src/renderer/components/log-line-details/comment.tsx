@@ -5,8 +5,11 @@ import * as React from 'react';
 import * as moment from 'moment';
 import * as Ladda from 'react-ladda';
 import * as Markdown from 'markdown-it';
+import * as highlight from 'markdown-it-highlightjs';
 
-const markdown = new Markdown({ linkify: true });
+const markdown = new Markdown({ linkify: true })
+  .use(highlight);
+
 const LaddaButton = Ladda.default;
 const debug = require('debug')('sleuth:comment');
 

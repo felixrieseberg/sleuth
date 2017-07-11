@@ -14,6 +14,7 @@ declare module 'electron-devtools-installer';
 declare module 'electron-window-state';
 declare module 'electron-default-menu';
 declare module 'debounce';
+declare module 'markdown-it-highlightjs';
 
 //https://github.com/Microsoft/TypeScript/wiki/What's-new-in-TypeScript#wildcard-character-in-module-name
 declare module '*/package.json';
