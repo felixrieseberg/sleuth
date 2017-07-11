@@ -18,13 +18,18 @@ export interface ExtraReplacer {
 const filters: Array<Replacer> = [
   {
     name: 'team-id',
-    rgx: /( |^)("{0,1}T[A-Z0-9]{8}"{0,1})( |$)/g,
+    rgx: /( |^|')("{0,1}T[A-Z0-9]{8}"{0,1})( |'|$)/g,
     replacer: ' {Team ID} '
   },
   {
     name: 'user-id',
     rgx: /( |^)("{0,1}U[A-Z0-9]{8}"{0,1})( |$)/g,
     replacer: ' {User} '
+  },
+  {
+    name: 'ms',
+    rgx: /( |^)(\d{1,20}ms)( |$)/g,
+    replacer: ' {time period} '
   },
   {
     name: 'channel-id',
@@ -50,7 +55,7 @@ const filters: Array<Replacer> = [
     name: 'double-space',
     rgx: /  /g,
     replacer: ' '
-  }
+  },
 ];
 
 export class LineToCooperLine {
