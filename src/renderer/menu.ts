@@ -57,6 +57,12 @@ export class AppMenu {
     const devEnvLogsExist = !!fs.statSyncNoException(devEnvLogs);
     const devModeLogsExist = !!fs.statSyncNoException(devModeLogs);
 
+    const handleFilePaths = (filePaths: Array<string>) => {
+      if (filePaths && filePaths.length > 0) {
+        this.webContents.send('file-dropped', filePaths[0]);
+      }
+    };
+
     const openItem = {
       label: 'Open...',
       acccelerator: 'CmdOrCtrl+O',
@@ -65,15 +71,31 @@ export class AppMenu {
           defaultPath: app.getPath('downloads'),
           filters: [ { name: 'zip', extensions: [ 'zip' ] } ],
           properties: [ 'openFile', 'openDirectory', 'showHiddenFiles' ],
-        }, (filePaths) => {
-          if (filePaths && filePaths.length > 0) {
-            this.webContents.send('file-dropped', filePaths[0]);
-          }
-        });
+        }, handleFilePaths);
       }
     };
 
     const openItems: Array<Electron.MenuItemOptions> = [ openItem ];
+
+    // Windows and Linux don't understand combo dialogs
+    if (process.platform !== 'darwin') {
+      openItem.label = 'Open Folder...';
+
+      // Make a new one
+      const openFile = {
+        label: 'Open File...',
+        acccelerator: 'CmdOrCtrl+Shift+O',
+        click: () => {
+          dialog.showOpenDialog({
+            defaultPath: app.getPath('downloads'),
+            filters: [ { name: 'zip', extensions: [ 'zip' ] } ],
+            properties: [ 'openFile', 'showHiddenFiles' ],
+          }, handleFilePaths);
+        }
+      };
+
+      openItems.push(openFile);
+    }
 
     if (productionLogsExist || devEnvLogsExist || devModeLogsExist) openItems.push({ type: 'separator' });
     if (productionLogsExist) openItems.push(this.getOpenItem());
