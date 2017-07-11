@@ -4,8 +4,9 @@ import { observer } from 'mobx-react';
 import * as React from 'react';
 import * as moment from 'moment';
 import * as Ladda from 'react-ladda';
-import * as Markdown from 'react-markdown';
+import * as Markdown from 'markdown-it';
 
+const markdown = new Markdown({ linkify: true });
 const LaddaButton = Ladda.default;
 const debug = require('debug')('sleuth:comment');
 
@@ -54,6 +55,8 @@ export class Comment extends React.Component<CommentProps, Partial<CommentState>
   }
 
   public submitEdit(e: React.FormEvent<HTMLFormElement>) {
+    if (!this.props.state.selectedEntry) return;
+
     const { commentId, lineId } = this.props;
     const { editValue } = this.state;
     const log = this.props.state.selectedEntry.logType;
@@ -106,6 +109,12 @@ export class Comment extends React.Component<CommentProps, Partial<CommentState>
     }
   }
 
+  public renderMarkdown(text: string) {
+    return {
+      __html : markdown.render(text);
+    }
+  }
+
   public render(): JSX.Element {
     const { name, comment, avatar, timestamp } = this.props;
     const { isEditing } = this.state;
@@ -122,7 +131,7 @@ export class Comment extends React.Component<CommentProps, Partial<CommentState>
               <span className='Name'>{name}</span>
               <span className='Timestamp'>{time}</span>
             </div>
-            <Markdown source={comment} skipHtml={true} />
+            <div dangerouslySetInnerHTML={this.renderMarkdown(comment)} />
             {editBtn}
           </div>
         </div>
