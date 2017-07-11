@@ -32,6 +32,11 @@ const filters: Array<Replacer> = [
     replacer: ' {time period} '
   },
   {
+    name: 'id',
+    rgx: /( |^)id (\d{1,5})( |$)/g,
+    replacer: ' {id} '
+  },
+  {
     name: 'channel-id',
     rgx: /( |^)("{0,1}(C|D)[A-Z0-9]{8}"{0,1})( |$)/g,
     replacer: ' {Channel} '
