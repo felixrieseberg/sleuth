@@ -5,10 +5,12 @@ import * as React from 'react';
 import * as moment from 'moment';
 import * as Ladda from 'react-ladda';
 import * as Markdown from 'markdown-it';
+import * as emoji from 'markdown-it-emoji';
 import * as highlight from 'markdown-it-highlightjs';
 
 const markdown = new Markdown({ linkify: true })
-  .use(highlight);
+  .use(highlight)
+  .use(emoji);
 
 const LaddaButton = Ladda.default;
 const debug = require('debug')('sleuth:comment');
