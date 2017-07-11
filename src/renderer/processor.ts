@@ -5,6 +5,7 @@ import { ipcRenderer } from 'electron';
 import * as fs from 'fs-promise';
 import * as readline from 'readline';
 import * as moment from 'moment';
+import * as path from 'path';
 
 const debug = require('debug')('sleuth:processor');
 
@@ -29,7 +30,7 @@ export function sortWithWebWorker(data: Array<any>, sortFn: string) {
   return new Promise((resolve) => {
     const code = `onmessage = function (evt) {evt.data.sort(${sortFn}); postMessage(evt.data)}`;
 
-    if (window && window.Worker && window.URL) {
+    if (window && (window as any).Worker && window.URL) {
       const worker = new Worker(URL.createObjectURL(new Blob([code])));
       worker.onmessage = (e) => resolve(e.data);
       worker.postMessage(data);
@@ -93,7 +94,7 @@ export function mergeLogFiles(logFiles: Array<ProcessedLogFile>|Array<MergedLogF
  * @returns {string}
  */
 export function getTypeForFile(logFile: UnzippedFile): string {
-  const { fileName } = logFile;
+  const fileName = path.basename(logFile.fileName);
   let logType: string = '';
 
   if (fileName.startsWith('browser')) {
