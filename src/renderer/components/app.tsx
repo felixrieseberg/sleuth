@@ -4,7 +4,7 @@ import { shouldIgnoreFile } from '../../utils/should-ignore-file';
 import * as React from 'react';
 import { ipcRenderer, remote } from 'electron';
 import * as classNames from 'classnames';
-import * as fs from 'fs-promise';
+import * as fs from 'fs-extra';
 import * as path from 'path';
 
 import { UnzippedFile, UnzippedFiles, Unzipper } from '../unzip';

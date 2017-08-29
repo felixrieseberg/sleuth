@@ -1,4 +1,4 @@
-declare module 'fs-promise' {
+declare module 'fs-extra' {
   function statSyncNoException(path: string | Buffer): any;
 }
 

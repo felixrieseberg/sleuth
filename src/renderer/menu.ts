@@ -1,7 +1,7 @@
 import * as defaultMenu from 'electron-default-menu';
 import { remote } from 'electron';
 
-import * as fs from 'fs-promise';
+import * as fs from 'fs-extra';
 import * as path from 'path';
 
 const { Menu, shell, app, dialog } = remote;

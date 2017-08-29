@@ -3,7 +3,7 @@ import { SleuthState } from '../state/sleuth';
 import * as React from 'react';
 import * as dirtyJSON from 'jsonic';
 import JSONTree from 'react-json-tree';
-import * as fs from 'fs-promise';
+import * as fs from 'fs-extra';
 
 import { UnzippedFile } from '../unzip';
 import { shell } from 'electron';

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as fs from 'fs-promise';
+import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 

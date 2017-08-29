@@ -1,6 +1,6 @@
 import { shouldIgnoreFile } from '../utils/should-ignore-file';
 import * as yauzl from 'yauzl';
-import * as fs from 'fs-promise';
+import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as tmp from 'tmp';
 import * as promisify from 'es6-promisify';
