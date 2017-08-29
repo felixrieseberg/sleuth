@@ -8,7 +8,7 @@ import { IpcManager } from './ipc';
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow: Electron.BrowserWindow | null;
-let ipcManager;
+let ipcManager: IpcManager;
 
 if (require('electron-squirrel-startup')) return;
 
@@ -53,6 +53,17 @@ const createWindow = async () => {
 
   ipcManager = new IpcManager(mainWindow);
 };
+
+// Whenever the app has finished launching
+app.on('will-finish-launching', () => {
+  app.on('open-file', (event, path) => {
+    event.preventDefault();
+
+    if (ipcManager) {
+      ipcManager.openFile(path);
+    }
+  });
+});
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

@@ -6,21 +6,24 @@ export class IpcManager {
     this.setupProcessingStatus();
   }
 
-  setupProcessingStatus() {
+  public openFile(path: string) {
+    this.mainWindow.webContents.send('file-dropped', path);
+  }
+
+  private setupProcessingStatus() {
     ipcMain.on('processing-status', (_event, status: any) => {
       this.mainWindow.webContents.send('processing-status', status);
     });
   }
 
-  setupFileDrop() {
+  private setupFileDrop() {
     this.mainWindow.webContents.on('will-navigate', (e, url) => {
       e.preventDefault();
 
       if (!url.startsWith('file:///')) {
         shell.openExternal(url);
       } else {
-        url = url.replace('file:///', '/');
-        this.mainWindow.webContents.send('file-dropped', decodeURIComponent(url));
+        this.openFile(decodeURIComponent(url.replace('file:///', '/')))
       }
     });
   }

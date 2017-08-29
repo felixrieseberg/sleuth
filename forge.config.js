@@ -10,6 +10,7 @@ const options = {
     osxSign: {
       identity: 'LT94ZKYDCJ'
     },
+    extendInfo: './src/static/extend.plist',
     win32metadata: {
       ProductName: 'Sleuth',
       CompanyName: 'Felix Rieseberg'
