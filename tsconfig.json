@@ -22,7 +22,16 @@
     "moduleResolution": "node",
     "pretty": true,
     "target": "es2016",
-    "jsx": "react"
+    "jsx": "react",
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "electron": [
+        "node_modules/electron-prebuilt-compile/node_modules/electron"
+      ]
+    }
   },
   "formatCodeOptions": {
     "indentSize": 2,
