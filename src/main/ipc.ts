@@ -11,7 +11,7 @@ export class IpcManager {
   }
 
   private setupProcessingStatus() {
-    ipcMain.on('processing-status', (_event, status: any) => {
+    ipcMain.on('processing-status', (_event: any, status: any) => {
       this.mainWindow.webContents.send('processing-status', status);
     });
   }

@@ -21,7 +21,7 @@ export interface CommentProps {
   commentId: string;
   avatar: string;
   timestamp: number;
-  state: SleuthState
+  state: SleuthState;
   slackUserId?: string;
   lineId?: string;
   didPost: () => void;
@@ -80,7 +80,7 @@ export class Comment extends React.Component<CommentProps, Partial<CommentState>
       });
   }
 
-  public handleChange(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+  public handleChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
     this.setState({ editValue: (e.target as HTMLTextAreaElement).value });
   }
 
@@ -90,7 +90,11 @@ export class Comment extends React.Component<CommentProps, Partial<CommentState>
 
     return (
       <form className='EditComment' onSubmit={this.submitEdit}>
-        <textarea id='textarea' onChange={this.handleChange} value={editValue} />
+        <textarea
+          id='textarea'
+          onChange={this.handleChange}
+          value={editValue}
+        />
         <LaddaButton type='submit' {...buttonOptions}>Edit</LaddaButton>
       </form>
     );
@@ -116,8 +120,8 @@ export class Comment extends React.Component<CommentProps, Partial<CommentState>
 
   public renderMarkdown(text: string) {
     return {
-      __html : markdown.render(text);
-    }
+      __html : markdown.render(text)
+    };
   }
 
   public render(): JSX.Element {

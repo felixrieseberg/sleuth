@@ -34,17 +34,19 @@ export class PostComment extends React.Component<PostCommentProps, Partial<PostC
     this.onClick = this.onClick.bind(this);
   }
 
-  public handleChange(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+  public handleChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
     this.setState({ value: (e.target as HTMLTextAreaElement).value });
   }
 
   public onClick(e: React.FormEvent<HTMLFormElement>) {
     const { line , lineId } = this.props;
     const { value } = this.state;
-    const log = this.props.state.selectedEntry.logType;
+    const { selectedEntry } = this.props.state;
 
     e.preventDefault();
-    if (!value) return;
+    if (!value || !selectedEntry) return;
+
+    const log = selectedEntry.logType;
 
     this.setState({ isPosting: true });
     cooperComments.postComment(line, value, log, lineId)
@@ -78,9 +80,14 @@ export class PostComment extends React.Component<PostCommentProps, Partial<PostC
     return (
       <form className='PostComment' onSubmit={this.onClick}>
         <h4>Report Your Findings</h4>
-        <textarea id='textarea' onChange={this.handleChange} value={value} placeholder='Got some interesting information about this log line to share?' />
+        <textarea
+          id='textarea'
+          onChange={this.handleChange}
+          value={value}
+          placeholder='Got some interesting information about this log line to share?'
+        />
         <LaddaButton type='submit' {...buttonOptions}>Post</LaddaButton>
       </form>
     );
   }
-};
+}

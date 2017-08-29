@@ -1,5 +1,4 @@
 import { config } from '../../config';
-import { sleuthState } from '../state/sleuth';
 import * as queryString from 'query-string';
 
 const debug = require('debug')('sleuth:cooper');
@@ -76,7 +75,7 @@ export class CooperComments {
     });
   }
 
-  public getComments(line: string, log: string): Promise<IGetCommentResponse> {
+  public getComments(line: string, log: string): Promise<void | IGetCommentResponse> {
     const qs = queryString.stringify({line});
 
     log = log === 'browser' || log === 'renderer' ? 'browser-renderer' : log;

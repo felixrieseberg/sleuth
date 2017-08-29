@@ -20,12 +20,14 @@
     "no-var-requires": false,
     "no-empty": true,
     "no-empty-interface": false,
-    "no-unused-expression": true,
+    "no-unused-expression": false,
+    "no-unused-expression-chai": true,
     "no-reference": true,
     "no-use-before-declare": true,
     "interface-name": [
       false
     ],
+    "jsx-no-lambda": false,
     "object-literal-sort-keys": false,
     "object-literal-key-quotes": [true, "as-needed"],
     "only-arrow-functions": [false],

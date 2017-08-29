@@ -16,7 +16,7 @@ export class SleuthState {
     debug: false,
     error: false,
     info: false,
-    warning: false
+    warn: false
   };
   @observable public searchIndex: number = 0;
   @observable public search: string = '';
@@ -39,7 +39,7 @@ export function resetState() {
   sleuthState.levelFilter.debug = false;
   sleuthState.levelFilter.error = false;
   sleuthState.levelFilter.info = false;
-  sleuthState.levelFilter.warning = false;
+  sleuthState.levelFilter.warn = false;
   sleuthState.searchIndex = 0;
   sleuthState.showOnlySearchResults = false;
   sleuthState.isDetailsVisible = false;

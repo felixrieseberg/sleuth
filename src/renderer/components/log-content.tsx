@@ -9,8 +9,6 @@ import * as React from 'react';
 import { LogLineDetails } from './log-line-details/details';
 import { Scrubber } from './scrubber';
 
-const debug = require('debug')('sleuth:log-contents');
-
 export interface LogContentProps {
   state: SleuthState;
 }

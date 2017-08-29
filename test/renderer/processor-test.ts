@@ -11,7 +11,6 @@ import {
   processLogFile,
   readFile
 } from '../../src/renderer/processor';
-import * as processor from '../../src/renderer/processor';
 import { mockBrowserFile1, mockBrowserFile2 } from '../__mocks__/processed-log-file';
 
 import * as dirtyJSON from 'jsonic';
@@ -102,7 +101,7 @@ describe('readFile', () => {
     return readFile(file, 'browser').then((result) => {
       expect(result).to.exist;
       expect(result.length).to.be.equal(12);
-      expect(result[0).to.exist;
+      expect(result[0]).to.exist;
       expect(result[0].timestamp).to.be.equal('02/22/17, 16:02:32:675');
       expect(result[0].level).to.be.equal('info');
       expect(result[0].momentValue).to.be.equal(1487808152675);
@@ -145,7 +144,7 @@ describe('makeLogEntry', () => {
       meta: '{}',
       toParseHead: '{',
       momentValue: 1
-    }
+    };
 
     const result = makeLogEntry(options, 'browser');
     expect(result).to.exist;
@@ -218,7 +217,7 @@ describe('getTypesForFiles', () => {
       fileName: 'webapp.log',
       fullPath: '_',
       size: 0
-    }, , {
+    }, {
       fileName: 'webview-2.log',
       fullPath: '_',
       size: 0

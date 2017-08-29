@@ -7,12 +7,14 @@ import { remote } from 'electron';
 import { Filter } from './filter-select';
 
 export interface AppCoreHeaderProps {
-  menuToggle: Function;
-  state: SleuthState
+  menuToggle: () => void;
+  state: SleuthState;
 }
 
+export interface AppCoreHeaderState {}
+
 @observer
-export class AppCoreHeader extends React.Component<AppCoreHeaderProps, undefined> {
+export class AppCoreHeader extends React.Component<AppCoreHeaderProps, AppCoreHeaderState> {
   constructor(props: AppCoreHeaderProps) {
     super(props);
 

@@ -6,7 +6,9 @@ export interface LogLineDataProps {
   raw: string;
 }
 
-export class LogLineData extends React.Component<LogLineDataProps, undefined> {
+export interface LogLineDataState {}
+
+export class LogLineData extends React.Component<LogLineDataProps, LogLineDataState> {
   constructor(props: LogLineDataProps) {
     super(props);
   }
@@ -25,6 +27,7 @@ export class LogLineData extends React.Component<LogLineDataProps, undefined> {
     try {
       const parsedJSON = dirtyJSON(raw);
 
+      // tslint:disable-next-line:prefer-conditional-expression
       if (parsedJSON) {
         data = <JSONTree data={parsedJSON} theme={this.getTheme()} />;
       } else {

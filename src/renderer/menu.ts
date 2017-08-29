@@ -22,7 +22,7 @@ export class AppMenu {
    * @param {('' | 'DevEnv' | 'DevMode')} [type='']
    * @returns {Electron.MenuItemOptions}
    */
-  public getOpenItem(type: '' | 'DevEnv' | 'DevMode' = ''): Electron.MenuItemOptions {
+  public getOpenItem(type: '' | 'DevEnv' | 'DevMode' = ''): Electron.MenuItemConstructorOptions {
     const appData = app.getPath('appData');
     const logsPath = path.join(appData, `Slack${type}`, 'logs');
 
@@ -47,7 +47,7 @@ export class AppMenu {
    *
    * @returns {Array<Electron.MenuItemOptions>}
    */
-  public getOpenItems(): Array<Electron.MenuItemOptions> {
+  public getOpenItems(): Array<Electron.MenuItemConstructorOptions> {
     const appData = app.getPath('appData');
     const productionLogs = path.join(appData, `Slack`, 'logs');
     const devEnvLogs = path.join(appData, `SlackDevEnv`, 'logs');
@@ -75,7 +75,7 @@ export class AppMenu {
       }
     };
 
-    const openItems: Array<Electron.MenuItemOptions> = [ openItem ];
+    const openItems: Array<Electron.MenuItemConstructorOptions> = [ openItem ];
 
     // Windows and Linux don't understand combo dialogs
     if (process.platform !== 'darwin') {

@@ -4,7 +4,7 @@ import { Cell } from 'fixed-data-table-2';
 import { SORT_TYPES } from './log-table';
 
 export interface LogTableHeaderCellProps {
-  onSortChange: Function;
+  onSortChange: (sortBy: string, sortDirection: string) => void;
   sortKey: string;
   sortDirection?: string;
   sortBy?: string;
@@ -24,7 +24,7 @@ export class LogTableHeaderCell extends React.Component<LogTableHeaderCellProps,
     return sortDirection === SORT_TYPES.DESC ? SORT_TYPES.ASC : SORT_TYPES.DESC;
   }
 
-  public onSortChange(e: React.MouseEvent) {
+  public onSortChange(e: React.MouseEvent<any>) {
     e.preventDefault();
 
     if (this.props.onSortChange) {

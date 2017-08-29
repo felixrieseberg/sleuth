@@ -3,7 +3,6 @@ import * as React from 'react';
 import * as classNames from 'classnames';
 import * as moment from 'moment';
 import { Table, Column, Cell } from 'fixed-data-table-2';
-import * as FDT from '@types/fixed-data-table';
 import { AutoSizer } from 'react-virtualized';
 
 import { LevelFilter, LogEntry, MergedLogFile, ProcessedLogFile } from '../interfaces';
@@ -53,9 +52,9 @@ export interface SortFilterListOptions {
 }
 
 export class LogTable extends React.Component<LogTableProps, Partial<LogTableState>> {
-  private tableElement: FDT.Table;
+  private tableElement: any;
   private readonly refHandlers = {
-    table: (ref: FDT.Table) => this.tableElement = ref,
+    table: (ref: any) => this.tableElement = ref,
   };
 
   constructor(props: LogTableProps) {
@@ -156,7 +155,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     }
 
     if (searchIndex !== nextProps.searchIndex) {
-      this.setState({ ignoreSearchIndex: false })
+      this.setState({ ignoreSearchIndex: false });
     }
   }
 
@@ -221,8 +220,8 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
   public doSearchFilter(search: string, list: Array<LogEntry>): Array<LogEntry> {
     let searchRegex = new RegExp(search || '', 'i');
 
-    function doSearch(a: LogEntry) { return (!search || searchRegex.test(a.message)); };
-    function doExclude(a: LogEntry) { return (!search || !searchRegex.test(a.message)); };
+    function doSearch(a: LogEntry) { return (!search || searchRegex.test(a.message)); }
+    function doExclude(a: LogEntry) { return (!search || !searchRegex.test(a.message)); }
     const searchParams = search.split(' ');
 
     searchParams.forEach((param) => {
@@ -252,11 +251,12 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
 
     function doSearch(a: LogEntry, i: number) {
       if (!search || searchRegex.test(a.message)) foundIndices.push(i);
-    };
+    }
 
     function doExclude(a: LogEntry, i: number) {
       if (!search || !searchRegex.test(a.message)) foundIndices.push(i);
-    };
+    }
+
     const searchParams = search.split(' ');
 
     searchParams.forEach((param) => {
@@ -296,9 +296,9 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     let sortedList = logFile.logEntries!.concat();
 
     // Named definition here allows V8 to go craaaaaazy, speed-wise.
-    function doSortByMessage(a: LogEntry, b: LogEntry) { return a.message.localeCompare(b.message); };
-    function doSortByLevel(a: LogEntry, b: LogEntry) { return a.level.localeCompare(b.level); };
-    function doFilter(a: LogEntry) { return (a.level && filter![a.level]); };
+    function doSortByMessage(a: LogEntry, b: LogEntry) { return a.message.localeCompare(b.message); }
+    function doSortByLevel(a: LogEntry, b: LogEntry) { return a.level.localeCompare(b.level); }
+    function doFilter(a: LogEntry) { return (a.level && filter![a.level]); }
 
     // Filter
     if (shouldFilter) {
@@ -364,7 +364,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    * @param {any} { cellData, columnData, dataKey, rowData, rowIndex }
    * @returns {JSX.Element}
    */
-  public timestampCellRenderer(entry: LogEntry): JSX.Element | String {
+  public timestampCellRenderer(entry: LogEntry): JSX.Element | string {
     // Todo: This could be cool, but it's expensive af
     const { dateTimeFormat } = this.props;
     const timestamp = entry.momentValue ? moment(entry.momentValue).format(dateTimeFormat) : entry.timestamp;
@@ -395,6 +395,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
   public renderTable(options: any): JSX.Element {
     const { sortedList, sortDirection, sortBy, searchList, ignoreSearchIndex } = this.state;
     const { searchIndex } = this.props;
+    // tslint:disable-next-line:no-this-assignment
     const self = this;
     const timestampHeaderOptions = { sortKey: 'timestamp', onSortChange: this.onSortChange, sortDirection, sortBy };
     const timestampHeader = <LogTableHeaderCell {...timestampHeaderOptions}>Timestamp</LogTableHeaderCell>;
@@ -477,5 +478,5 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     }
 
     return '';
-  };
+  }
 }

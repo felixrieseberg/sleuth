@@ -6,7 +6,7 @@ import * as debounce from 'debounce';
 import * as ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 export interface FilterProps {
-  state: SleuthState
+  state: SleuthState;
 }
 
 export interface FilterState {
@@ -57,7 +57,7 @@ export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
   public render() {
     const { isSearchVisible } = this.state;
     const { showOnlySearchResults } = this.props.state;
-    const { error, warning, info, debug } = this.props.state.levelFilter!;
+    const { error, warn, info, debug } = this.props.state.levelFilter!;
     let items;
 
     if (isSearchVisible) {
@@ -66,17 +66,20 @@ export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
           <div key='menu' className='SearchButtons'>
             <a
               className={classNames({ Engaged: showOnlySearchResults })}
-              onClick={() => this.onToggleSearchResultVisibility()}>
+              onClick={() => this.onToggleSearchResultVisibility()}
+            >
               <i className='ts_icon ts_icon_eye' />
               <span className='block label'>Show only results</span>
             </a>
             <a
-              onClick={() => this.onSearchIndexChange(-1)}>
+              onClick={() => this.onSearchIndexChange(-1)}
+            >
               <i className='ts_icon ts_icon_chevron_circle_left' />
               <span className='block label'>Prev</span>
             </a>
             <a
-              onClick={() => this.onSearchIndexChange(1)}>
+              onClick={() => this.onSearchIndexChange(1)}
+            >
               <i className='ts_icon ts_icon_chevron_circle_right' />
               <span className='block label'>Next</span>
             </a>
@@ -90,8 +93,8 @@ export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
                 <div className='search_input_wrapper'>
                   <input
                     type='text'
-                    autoFocus
-                    onChange={(e) => this.onSearchChange(e.target.value)}
+                    autoFocus={true}
+                    onChange={(e) => this.onSearchChange((e.target as any).value)}
                     id='search_terms'
                     className='search_input'
                     placeholder='Search'
@@ -115,7 +118,7 @@ export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
             <i className='ts_icon ts_icon_poo' />
             <span className='block label'>Filter Error</span>
           </a>
-          <a className={classNames({ Engaged: warning })} onClick={() => this.onFilterToggle('warning')}>
+          <a className={classNames({ Engaged: warn })} onClick={() => this.onFilterToggle('warning')}>
             <i className='ts_icon ts_icon_warning' />
             <span className='block label'>Filter Warning</span>
           </a>
@@ -135,9 +138,10 @@ export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
       <ReactCSSTransitionGroup
         transitionName='filter'
         transitionEnterTimeout={250}
-        transitionLeaveTimeout={250}>
+        transitionLeaveTimeout={250}
+      >
         {items}
       </ReactCSSTransitionGroup>
-    )
+    );
   }
 }

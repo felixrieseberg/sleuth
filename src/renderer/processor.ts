@@ -9,6 +9,9 @@ import * as path from 'path';
 
 const debug = require('debug')('sleuth:processor');
 
+// It's okay in this file
+// tslint:disable:no-console
+
 /**
  * Sends a status update via IPC. Using IPC allows us to possible use other
  * BrowserWindows, too.
@@ -26,7 +29,7 @@ export function sendProcStatus(status: any): void {
  * @param {Array<any>} data
  * @param {string} sortFn
  */
-export function sortWithWebWorker(data: Array<any>, sortFn: string) {
+export function sortWithWebWorker(data: Array<any>, sortFn: string): Promise<Array<LogEntry>> {
   return new Promise((resolve) => {
     const code = `onmessage = function (evt) {evt.data.sort(${sortFn}); postMessage(evt.data)}`;
 
@@ -59,12 +62,15 @@ export function mergeLogFiles(logFiles: Array<ProcessedLogFile>|Array<MergedLogF
     // Single file? Cool, shortcut!
     if (logFiles.length === 1) {
       console.timeEnd(`merging-${logType}`);
-      return resolve({
+
+      const singleResult: MergedLogFile = {
+        logFiles: logFiles as Array<ProcessedLogFile>,
         logEntries: logFiles[0].logEntries,
         type: 'MergedLogFile',
-        logType,
-        logFiles
-      });
+        logType
+      };
+
+      return resolve(singleResult);
     }
 
     // Alright, let's do this
@@ -83,7 +89,15 @@ export function mergeLogFiles(logFiles: Array<ProcessedLogFile>|Array<MergedLogF
     sortWithWebWorker(logEntries, sortFn)
       .then((sortedLogEntries) => {
         console.timeEnd(`merging-${logType}`);
-        resolve({ logFiles, logEntries: sortedLogEntries, logType, type: 'MergedLogFile' });
+
+        const multiResult: MergedLogFile = {
+          logFiles: logFiles as Array<ProcessedLogFile>,
+          logEntries: sortedLogEntries,
+          logType,
+          type: 'MergedLogFile'
+        };
+
+        resolve(multiResult);
       });
   });
 }
@@ -154,7 +168,7 @@ export function getTypesForFiles(logFiles: UnzippedFiles): SortedUnzippedFiles {
  * @returns {Promise<ProcessedLogFiles>}
  */
 export function processLogFiles(logFiles: UnzippedFiles): Promise<Array<ProcessedLogFile>> {
-  let promises: Array<any> = [];
+  const promises: Array<any> = [];
 
   logFiles.forEach((logFile) => {
     promises.push(processLogFile(logFile));
@@ -180,7 +194,9 @@ export function processLogFile(logFile: UnzippedFile): Promise<ProcessedLogFile>
     readFile(logFile, logType)
       .then((logEntries) => {
         console.timeEnd(`read-file-${logFile.fileName}`);
-        resolve({ logFile, logEntries, logType, type: 'ProcessedLogFile'} as ProcessedLogFile)
+
+        const result = { logFile, logEntries, logType, type: 'ProcessedLogFile'};
+        resolve(result as ProcessedLogFile);
       });
   });
 }
@@ -198,7 +214,8 @@ export function makeLogEntry(options: MatchResult, logType: string): LogEntry {
   options.timestamp = options.timestamp || '';
   options.level = options.level || '';
 
-  return {...options, logType } as LogEntry;
+  const logEntry = {...options, logType };
+  return logEntry as LogEntry;
 }
 
 /**
@@ -222,7 +239,7 @@ export function readFile(logFile: UnzippedFile, logType: string = ''): Promise<A
     let current: LogEntry | null = null;
     let toParse = '';
 
-    readInterface.on('line', function onLine(line) {
+    readInterface.on('line', function onLine(line: any) {
       if (!line || line.length === 0) {
         return;
       }
@@ -418,3 +435,5 @@ export function matchLine(line: string, logType: string): MatchResult | undefine
     return matchLineElectron(line);
   }
 }
+
+// tslint:enable:no-console

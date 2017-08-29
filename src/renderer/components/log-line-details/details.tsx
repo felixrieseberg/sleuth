@@ -12,8 +12,7 @@ export interface LogLineDetailsProps {
   state: SleuthState;
 }
 
-export interface LogLineDetailsState {
-}
+export interface LogLineDetailsState {}
 
 @observer
 export class LogLineDetails extends React.PureComponent<LogLineDetailsProps, LogLineDetailsState> {
@@ -51,7 +50,7 @@ export class LogLineDetails extends React.PureComponent<LogLineDetailsProps, Log
         </div>
         <div className='Message'>{message}</div>
       </div>
-    )
+    );
   }
 
   public render(): JSX.Element | null {

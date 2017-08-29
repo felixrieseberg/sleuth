@@ -8,8 +8,10 @@ export interface AlertProps {
   state?: SleuthState;
 }
 
+export interface AlertState {}
+
 @observer
-export class Alert extends React.PureComponent<AlertProps, undefined> {
+export class Alert extends React.PureComponent<AlertProps, AlertState> {
   constructor(props: AlertProps) {
     super(props);
 

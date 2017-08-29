@@ -1,6 +1,6 @@
 import { UnzippedFile } from './unzip';
 
-export type LogType = 'browser' | 'renderer' | 'call' | 'webapp' | 'webview';
+export type LogType = 'browser' | 'renderer' | 'call' | 'webapp' | 'webview' | 'all';
 
 export type LogFile = UnzippedFile | MergedLogFile | ProcessedLogFile;
 
@@ -86,7 +86,7 @@ export interface LevelFilter {
   error: boolean;
   info: boolean;
   debug: boolean;
-  warning: boolean;
+  warn: boolean;
 }
 
 export interface UserPreferences {

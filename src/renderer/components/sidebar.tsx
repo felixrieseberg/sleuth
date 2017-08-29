@@ -10,12 +10,14 @@ export interface SidebarProps {
   logFiles: ProcessedLogFiles;
   isOpen: boolean;
   selectedLogFileName: string;
-  selectLogFile: Function;
+  selectLogFile: (logFile: ProcessedLogFile | UnzippedFile | null, logType?: string) => Promise<void>;
   mergedFilesStatus: MergedFilesLoadStatus;
 }
 
+export interface SidebarState {}
+
 @observer
-export class Sidebar extends React.Component<SidebarProps, undefined> {
+export class Sidebar extends React.Component<SidebarProps, SidebarState> {
   constructor(props: SidebarProps) {
     super(props);
 
@@ -147,7 +149,7 @@ export class Sidebar extends React.Component<SidebarProps, undefined> {
       }
     }
 
-    return (<svg className='ts_icon ts_icon_spin ts_icon_spinner'><use href='./img/starburst.svg#starburst_svg'/></svg>);
+    return (<svg className='ts_icon ts_icon_spin ts_icon_spinner'><use xlinkHref='./img/starburst.svg#starburst_svg'/></svg>);
   }
 
   public render(): JSX.Element {

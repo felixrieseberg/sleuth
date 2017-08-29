@@ -79,7 +79,7 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
   }
 
   public beforeClose() {
-    this.props.state.dateTimeFormat = this.state.dateTimeFormat;
+    this.props.state.dateTimeFormat = this.state.dateTimeFormat!;
   }
 
   public show() {

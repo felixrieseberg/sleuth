@@ -6,14 +6,14 @@ describe('didFilterChange', () => {
     const a = {
       debug: true,
       error: true,
-      warning: true,
+      warn: true,
       info: true
     };
 
     const b = {
       debug: true,
       error: true,
-      warning: true,
+      warn: true,
       info: false
     };
 
@@ -24,14 +24,14 @@ describe('didFilterChange', () => {
     const a = {
       debug: true,
       error: true,
-      warning: true,
+      warn: true,
       info: true
     };
 
     const b = {
       debug: true,
       error: true,
-      warning: true,
+      warn: true,
       info: true
     };
 

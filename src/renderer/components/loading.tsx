@@ -5,7 +5,9 @@ export interface LoadingProps {
   message?: string;
 }
 
-export class Loading extends React.Component<LoadingProps, undefined> {
+export interface LoadingState {}
+
+export class Loading extends React.Component<LoadingProps, LoadingState> {
   constructor() {
     super();
   }

@@ -43,7 +43,7 @@ export class CooperAuth {
       .catch((error) => debug(error));
   }
 
-  public showSignInWindow() {
+  public showSignInWindow(): Promise<boolean> {
     return new Promise((resolve) => {
       this.signInWindow = new BrowserWindow({
         height: 700,
@@ -70,14 +70,14 @@ export class CooperAuth {
       webContents.on('will-navigate', (e, navigatedUrl) => {
         debug(`Sign in window navigation attempt:`, navigatedUrl);
 
-        detectSlackRegex.forEach((rgx => {
+        detectSlackRegex.forEach((rgx) => {
           if (rgx.test(navigatedUrl)) {
             // We ended up on slack.com/messages. Hopefully the cookie
             // is set, but let's restart;
             e.preventDefault();
             setTimeout(() => this.signInWindow.loadURL(this.signInUrl), 400);
           }
-        }));
+        });
       });
 
       webContents.on('did-finish-load', async () => {
@@ -101,7 +101,7 @@ export class CooperAuth {
     });
   }
 
-  public signIn(options?: SigninOptions) {
+  public signIn(options?: SigninOptions): Promise<boolean> {
     return new Promise((resolve) => {
       debug(`Trying to sign into Cooper`);
 

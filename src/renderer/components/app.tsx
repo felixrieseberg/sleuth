@@ -22,7 +22,7 @@ export interface AppState {
 }
 
 export class App extends React.Component<undefined, Partial<AppState>> {
-  private readonly menu: AppMenu = new AppMenu();
+  public readonly menu: AppMenu = new AppMenu();
 
   constructor() {
     super();
@@ -85,7 +85,7 @@ export class App extends React.Component<undefined, Partial<AppState>> {
       event.preventDefault();
     };
 
-    ipcRenderer.on('file-dropped', (_e, url) => this.openFile(url));
+    ipcRenderer.on('file-dropped', (_event: any, url: string) => this.openFile(url));
   }
 
   /**

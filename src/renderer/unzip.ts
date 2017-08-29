@@ -61,7 +61,7 @@ export class Unzipper {
     });
   }
 
-  public unzip() {
+  public unzip(): Promise<Array<UnzippedFile>> {
     return new Promise(async (resolve, reject) => {
       if (this.zipfile) {
         tmp.setGracefulCleanup();

@@ -1,6 +1,9 @@
 import * as React from 'react';
 
-export class MacTitlebar extends React.Component<undefined, undefined> {
+export interface MacTitlebarProps {}
+export interface MacTitlebarState {}
+
+export class MacTitlebar extends React.Component<MacTitlebarProps, MacTitlebarState> {
   constructor() {
     super();
   }

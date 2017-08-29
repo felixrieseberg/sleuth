@@ -63,7 +63,7 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
     this.toggleSidebar = this.toggleSidebar.bind(this);
     this.selectLogFile = this.selectLogFile.bind(this);
 
-    ipcRenderer.on('processing-status', (_event, loadingMessage: string) => {
+    ipcRenderer.on('processing-status', (_event: any, loadingMessage: string) => {
       this.setState({ loadingMessage });
     });
   }
@@ -88,7 +88,7 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
    */
   public addFilesToState(files: Array<ProcessedLogFile|UnzippedFile>, logType: string) {
     const { processedLogFiles } = this.state;
-    const newProcessedLogFiles = {...processedLogFiles};
+    const newProcessedLogFiles: ProcessedLogFiles = { ...processedLogFiles as ProcessedLogFiles };
     newProcessedLogFiles[logType] = newProcessedLogFiles[logType].concat(files);
 
     this.setState({
@@ -145,12 +145,12 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
    */
   public setMergedFile(mergedFile: MergedLogFile) {
     const { mergedLogFiles } = this.state;
-    const newMergedLogFiles = {...mergedLogFiles};
+    const newMergedLogFiles = { ...mergedLogFiles as MergedLogFiles };
 
     debug(`Merged log file for ${mergedFile.logType} now created!`);
     newMergedLogFiles[mergedFile.logType] = mergedFile;
     this.setState({ mergedLogFiles: newMergedLogFiles });
-  };
+  }
 
   /**
    * Kick off merging of all the log files
@@ -184,14 +184,14 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
    * @param {ProcessedLogFile} logFile
    * @param {string} [logType]
    */
-  public async selectLogFile(logFile: ProcessedLogFile, logType?: string) {
+  public async selectLogFile(logFile: ProcessedLogFile | UnzippedFile | null, logType?: string): Promise<void> {
     if (!logFile && logType) {
       const { mergedLogFiles } = this.state;
 
       if (mergedLogFiles && mergedLogFiles[logType]) {
         this.props.state.selectedLogFile = mergedLogFiles[logType];
       }
-    } else {
+    } else if (logFile) {
       this.props.state.selectedLogFile = logFile;
     }
   }

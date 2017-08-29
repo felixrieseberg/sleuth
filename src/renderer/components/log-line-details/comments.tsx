@@ -40,7 +40,9 @@ export class LogLineComments extends React.Component<LogLineCommentsProps, Parti
     this.refresh = this.refresh.bind(this);
     this.updateSearch = this.updateSearch.bind(this);
 
-    this.fetchComments(this.state.line, props.state.isCooperSignedIn, props.state.selectedEntry.logType);
+    if (props.state.selectedEntry) {
+      this.fetchComments(this.state.line, props.state.isCooperSignedIn, props.state.selectedEntry.logType);
+    }
   }
 
   public refresh() {
@@ -50,7 +52,7 @@ export class LogLineComments extends React.Component<LogLineCommentsProps, Parti
   public componentWillReceiveProps(nextProps: LogLineCommentsProps) {
     const newSignInStatus = nextProps.state.isCooperSignedIn !== this.props.state.isCooperSignedIn;
 
-    if (nextProps.state.selectedEntry && nextProps.state.selectedEntry.message || newSignInStatus) {
+    if (nextProps.state.selectedEntry && nextProps.state.selectedEntry.message || newSignInStatus && nextProps.state.selectedEntry) {
       const line = lineToCooperLine.convert(nextProps.state.selectedEntry.message);
       this.setState({ line });
       this.fetchComments(line, nextProps.state.isCooperSignedIn, nextProps.state.selectedEntry.logType);
@@ -71,7 +73,7 @@ export class LogLineComments extends React.Component<LogLineCommentsProps, Parti
   }
 
   public async fetchComments(line?: string, isSignedIn?: boolean, log?: string) {
-    log = log || this.props.state.selectedEntry.logType;
+    log = log || this.props.state.selectedEntry ? this.props.state.selectedEntry!.logType : 'browser';
     line = line || this.state.line;
     isSignedIn = isSignedIn || this.props.state.isCooperSignedIn;
 

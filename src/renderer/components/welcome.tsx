@@ -16,7 +16,7 @@ export interface WelcomeState {
 }
 
 export interface WelcomeProps {
-  openFile: Function;
+  openFile: (filePath: string) => void;
 }
 
 export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>> {
