@@ -23,7 +23,7 @@ export class IpcManager {
       if (!url.startsWith('file:///')) {
         shell.openExternal(url);
       } else {
-        this.openFile(decodeURIComponent(url.replace('file:///', '/')))
+        this.openFile(decodeURIComponent(url.replace('file:///', '/')));
       }
     });
   }

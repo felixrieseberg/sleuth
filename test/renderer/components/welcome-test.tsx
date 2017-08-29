@@ -17,9 +17,10 @@ describe('Welcome', () => {
 
   it('welcome renders correctly', () => {
     const tree = renderer.create(
+      // tslint:disable-next-line:no-empty
       <Welcome openFile={() => {}} />
     ).toJSON();
 
     expect(tree).toMatchSnapshot();
   });
-})
+});

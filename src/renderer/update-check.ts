@@ -4,12 +4,12 @@ const debug = require('debug')('sleuth:update-check');
 
 const packageInfo = require('../../package.json');
 const { version } = packageInfo;
-const platformModifier = process.platform === 'win32' ? 'windows': 'mac';
+const platformModifier = process.platform === 'win32' ? 'windows' : 'mac';
 const fetch = window.fetch || require('node-fetch');
 
 export interface LatestInfo {
   latest: string;
-};
+}
 
 export interface UpdateUrls {
   checkUpdate: string;

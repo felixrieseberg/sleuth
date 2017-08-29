@@ -12,7 +12,7 @@ const app = {
 
     return __dirname;
   }
-}
+};
 
 const remote = {
   app

@@ -2,7 +2,7 @@ import { SleuthState } from '../../state/sleuth';
 import * as React from 'react';
 import {observer} from 'mobx-react';
 import * as Ladda from 'react-ladda';
-import { cooperAuth } from "../../cooper/auth";
+import { cooperAuth } from '../../cooper/auth';
 
 const LaddaButton = Ladda.default;
 

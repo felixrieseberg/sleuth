@@ -84,7 +84,7 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
       webapp: getNames(logFiles.webapp),
       webview: getNames(logFiles.webview),
       call: getNames(logFiles.call)
-    }
+    };
   }
 
   /**

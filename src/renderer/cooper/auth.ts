@@ -108,7 +108,7 @@ export class CooperAuth {
       fetch(this.signInUrl, { credentials: 'include' }).then(async (response) => {
         const { url } = response;
 
-        if (url.includes('slack.com') && (!options || !options.silent) ) {
+        if (url.includes('slack.com') && (!options || !options.silent)) {
           resolve(this.showSignInWindow());
         } else if (url.startsWith('https://slack.com/signin')) {
           debug(`Tried to silently sign in and couldn't`);

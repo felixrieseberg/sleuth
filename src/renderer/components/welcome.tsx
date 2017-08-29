@@ -65,7 +65,8 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
         <ReactCSSTransitionGroup
           transitionName='filter'
           transitionEnterTimeout={250}
-          transitionLeaveTimeout={250}>
+          transitionLeaveTimeout={250}
+        >
           <p className='UpdateAvailable'>
             <a href={defaultUrls.downloadUpdate}>By the way, a new version is available!</a>
           </p>
