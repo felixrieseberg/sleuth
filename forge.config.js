@@ -32,6 +32,10 @@ const options = {
 if (process.env.SLEUTH_CERTIFICATE_FILE && process.env.SLEUTH_CERTIFICATE_PASSWORD) {
   options.electronWinstallerConfig.certificateFile = process.env.SLEUTH_CERTIFICATE_FILE;
   options.electronWinstallerConfig.certificatePassword = process.env.SLEUTH_CERTIFICATE_PASSWORD;
+} else {
+  console.warn(`-------------------------------------------------------`)
+  console.warn(`            Codesign password not present!`)
+  console.warn(`-------------------------------------------------------`)
 }
 
 module.exports = options;
