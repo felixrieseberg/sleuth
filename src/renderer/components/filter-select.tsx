@@ -118,7 +118,7 @@ export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
             <i className='ts_icon ts_icon_poo' />
             <span className='block label'>Filter Error</span>
           </a>
-          <a className={classNames({ Engaged: warn })} onClick={() => this.onFilterToggle('warning')}>
+          <a className={classNames({ Engaged: warn })} onClick={() => this.onFilterToggle('warn')}>
             <i className='ts_icon ts_icon_warning' />
             <span className='block label'>Filter Warning</span>
           </a>
