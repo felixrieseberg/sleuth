@@ -52,7 +52,7 @@ if (require('electron-squirrel-startup')) {
       mainWindow = null;
     });
 
-    ipcManager = new IpcManager(mainWindow);
+    ipcManager = new IpcManager();
   };
 
   // Whenever the app has finished launching
@@ -60,9 +60,15 @@ if (require('electron-squirrel-startup')) {
     app.on('open-file', (event, path) => {
       event.preventDefault();
 
-      if (ipcManager) {
-        ipcManager.openFile(path);
+      function openWhenReady() {
+        if (ipcManager) {
+          ipcManager.openFile(path);
+        } else {
+          setTimeout(openWhenReady, 500);
+        }
       }
+
+      openWhenReady();
     });
   });
 
