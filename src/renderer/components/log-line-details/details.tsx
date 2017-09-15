@@ -15,7 +15,7 @@ export interface LogLineDetailsProps {
 export interface LogLineDetailsState {}
 
 @observer
-export class LogLineDetails extends React.PureComponent<LogLineDetailsProps, LogLineDetailsState> {
+export class LogLineDetails extends React.Component<LogLineDetailsProps, LogLineDetailsState> {
   constructor(props: LogLineDetailsProps) {
     super(props);
     this.toggle = this.toggle.bind(this);

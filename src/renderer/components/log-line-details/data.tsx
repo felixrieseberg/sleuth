@@ -8,7 +8,7 @@ export interface LogLineDataProps {
 
 export interface LogLineDataState {}
 
-export class LogLineData extends React.Component<LogLineDataProps, LogLineDataState> {
+export class LogLineData extends React.PureComponent<LogLineDataProps, LogLineDataState> {
   constructor(props: LogLineDataProps) {
     super(props);
   }

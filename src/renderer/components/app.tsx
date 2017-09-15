@@ -33,15 +33,6 @@ export class App extends React.Component<undefined, Partial<AppState>> {
 
     localStorage.debug = 'sleuth*';
 
-    const isDevMode = process.execPath.match(/[\\/]electron/);
-    if (isDevMode) {
-      try {
-        (window as any).Perf = require('react-addons-perf');
-      } catch (e) {
-        debug(`Could not add React Perf`, e);
-      }
-    }
-
     this.openFile = this.openFile.bind(this);
   }
 
