@@ -11,7 +11,7 @@ export interface AlertProps {
 export interface AlertState {}
 
 @observer
-export class Alert extends React.PureComponent<AlertProps, AlertState> {
+export class Alert extends React.Component<AlertProps, AlertState> {
   constructor(props: AlertProps) {
     super(props);
 

@@ -6,7 +6,7 @@ export interface LogLineDataProps {
   raw: string;
 }
 
-export interface LogLineDataState {}
+export interface LogLineDataState { }
 
 export class LogLineData extends React.PureComponent<LogLineDataProps, LogLineDataState> {
   constructor(props: LogLineDataProps) {
@@ -14,15 +14,13 @@ export class LogLineData extends React.PureComponent<LogLineDataProps, LogLineDa
   }
 
   /**
-   * Takes a meta string (probably dirty JSON) and attempts to pretty-print it.
+   * Renders pretty JSON
    *
-   * @returns {(JSX.Element | null)}
+   * @param {string} raw
+   * @returns {JSX.Element}
    */
-  public render(): JSX.Element | null {
-    const { raw } = this.props;
+  public renderJSON(raw: string): JSX.Element {
     let data = null;
-
-    if (!raw) return null;
 
     try {
       const parsedJSON = dirtyJSON(raw);
@@ -38,6 +36,86 @@ export class LogLineData extends React.PureComponent<LogLineDataProps, LogLineDa
     }
 
     return (<div className='LogLineData'>{data}</div>);
+  }
+
+  /**
+   * Takes a string table line and tries to return columns
+   *
+   * @param {string} line
+   * @returns {Array<string>}
+   */
+  public splitTableLine(line: string): Array<string> {
+    return line.split('│').map((column) => {
+      const nameMatch = column.match(/^(║| ){1}(.*)( |║){1}$/);
+
+      if (nameMatch && nameMatch.length === 4) {
+        return nameMatch[2].trim();
+      } else {
+        return column;
+      }
+    });
+  }
+
+  /**
+   * Renders a ASCII table as a pretty table
+   *
+   * @param {string} raw
+   * @returns {JSX.Element}
+   */
+  public renderTable(raw: string): JSX.Element {
+    let data = null;
+
+    try {
+      const splitRaw = raw.split(/\r?\n/).filter((l) => {
+        return l && l !== '' && !l.includes('┼');
+      });
+
+      // Ensure at least 3 lines
+      if (!splitRaw || splitRaw.length < 3) {
+        throw new Error('Split lines, but less than 3 - no way this is a table');
+      }
+
+      // Ensure beginning and end are as expected
+      if (!/^╔(═|╤)*╗$/.test(splitRaw[0]) || !/^╚(═|╧)*╝$/.test(splitRaw[splitRaw.length - 1])) {
+        throw new Error('Split lines, but beginning and end not recognized');
+      }
+
+      // Let's make a table
+      const tableRows = [];
+
+      for (let i = 1; i < splitRaw.length - 2; i++) {
+        const line = splitRaw[i];
+        const columns = this.splitTableLine(line);
+        const elements = columns.map((c) => {
+          return i === 1 ? <th>{c}</th> : <td>{c}</td>;
+        });
+
+        tableRows.push((<tr>{elements}</tr>));
+      }
+
+      return (<table className='ConvertedTable'>{tableRows}</table>);
+    } catch (e) {
+      data = <code>{raw}</code>;
+    }
+
+    return (<div className='LogLineData'>{data}</div>);
+  }
+
+  /**
+   * Takes a meta string (probably dirty JSON) and attempts to pretty-print it.
+   *
+   * @returns {(JSX.Element | null)}
+   */
+  public render(): JSX.Element | null {
+    const { raw } = this.props;
+
+    if (!raw) {
+      return null;
+    } else if (raw && raw.startsWith(`╔══`) && raw.endsWith('═══╝\n')) {
+      return this.renderTable(raw);
+    } else {
+      return this.renderJSON(raw);
+    }
   }
 
   /**

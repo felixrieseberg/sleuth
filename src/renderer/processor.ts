@@ -277,7 +277,7 @@ export function readFile(logFile: UnzippedFile, logType: string = ''): Promise<A
           current.message += line;
         } else {
           // This is (hopefully) part of a meta object
-          toParse += line;
+          toParse += line + '\n';
         }
       }
 
