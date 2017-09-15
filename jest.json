@@ -13,6 +13,9 @@
     "ts",
     "tsx"
   ],
+  "setupFiles": [
+    "raf/polyfill"
+  ],
   "testPathIgnorePatterns": [
     "/.tmp/",
     "/src/main/"
