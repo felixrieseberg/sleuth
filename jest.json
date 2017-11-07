@@ -2,6 +2,7 @@
   "transform": {
     ".(js|jsx|ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
   },
+  "setupTestFrameworkScriptFile": "<rootDir>/test/setup.ts",
   "testRegex": "(-test)\\.(ts|tsx)$",
   "bail": true,
   "resetMocks": true,

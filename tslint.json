@@ -24,6 +24,7 @@
     "no-unused-expression-chai": true,
     "no-reference": true,
     "no-use-before-declare": true,
+    "no-implicit-dependencies": false,
     "interface-name": [
       false
     ],
