@@ -38,6 +38,13 @@
 
 .fixedDataTableLayout_main {
   border: none;
+  outline: none;
+
+  &:focus,
+  &:active {
+    border: none;
+    outline: none;
+  }
 
   .HighlightRow {
     background-color: @mention_yellow;
