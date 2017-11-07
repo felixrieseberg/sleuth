@@ -10,6 +10,12 @@
   .StateTable-Content {
     overflow: auto;
     height: calc(~"100vh - 100px");
+
+    ul li,
+    li span,
+    li label {
+      user-select: initial;
+    }
   }
 }
 
@@ -23,6 +29,7 @@
 
   ul li {
     display: inline;
+    user-select: initial;
   }
 
   ul li:after {
