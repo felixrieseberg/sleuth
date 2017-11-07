@@ -1,9 +1,11 @@
 import { SleuthState, sleuthState } from '../state/sleuth';
+import * as debounce from 'debounce';
 import * as React from 'react';
 import * as classNames from 'classnames';
 import * as moment from 'moment';
 import { Table, Column, Cell } from 'fixed-data-table-2';
 import { AutoSizer } from 'react-virtualized';
+import { default as keydown, Keys } from 'react-keydown';
 
 import { LevelFilter, LogEntry, MergedLogFile, ProcessedLogFile } from '../interfaces';
 import { didFilterChange } from '../../utils/did-filter-change';
@@ -11,6 +13,7 @@ import { Alert } from './alert';
 import { LogTableHeaderCell } from './log-table-headercell';
 
 const debug = require('debug')('sleuth:logtable');
+const { DOWN } = Keys;
 
 export const SORT_TYPES = {
   ASC: 'ASC',
@@ -40,6 +43,7 @@ export interface LogTableState {
   sortBy?: string;
   sortDirection?: string;
   ignoreSearchIndex: boolean;
+  scrollToSelection: boolean;
 }
 
 export interface SortFilterListOptions {
@@ -56,6 +60,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
   private readonly refHandlers = {
     table: (ref: any) => this.tableElement = ref,
   };
+  private changeSelectedEntry: any = null;
 
   constructor(props: LogTableProps) {
     super(props);
@@ -68,13 +73,14 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
       ignoreSearchIndex: false
     };
 
-    this.onRowClick = this.onRowClick.bind(this);
-    this.renderTable = this.renderTable.bind(this);
     this.messageCellRenderer = this.messageCellRenderer.bind(this);
-    this.timestampCellRenderer = this.timestampCellRenderer.bind(this);
-    this.sortFilterList = this.sortFilterList.bind(this);
+    this.onKeyboardNavigate = this.onKeyboardNavigate.bind(this);
+    this.onRowClick = this.onRowClick.bind(this);
     this.onSortChange = this.onSortChange.bind(this);
+    this.renderTable = this.renderTable.bind(this);
     this.rowClassNameGetter = this.rowClassNameGetter.bind(this);
+    this.sortFilterList = this.sortFilterList.bind(this);
+    this.timestampCellRenderer = this.timestampCellRenderer.bind(this);
   }
 
   /**
@@ -167,6 +173,16 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
   }
 
   /**
+   * Enables keyboard navigation of the table
+   *
+   * @param {React.KeyboardEvent<any>} { which }
+   */
+  @keydown('down', 'up')
+  public onKeyboardNavigate({ which }: React.KeyboardEvent<any>) {
+    this.changeSelection(which === DOWN ? 1 : -1);
+  }
+
+  /**
    * Handles a single click onto a row
    *
    * @param {RowClickEvent} { index }
@@ -176,7 +192,11 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
 
     this.props.state.selectedEntry = selectedEntry;
     this.props.state.isDetailsVisible = true;
-    this.setState({ selectedIndex: index, ignoreSearchIndex: true });
+    this.setState({
+      selectedIndex: index,
+      ignoreSearchIndex: true,
+      scrollToSelection: false
+    });
   }
 
   /**
@@ -192,6 +212,39 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
 
     if (newSort) {
       this.setState({ sortBy, sortDirection, sortedList: this.sortFilterList({ sortBy, sortDirection }) });
+    }
+  }
+
+  /**
+   * Changes the current selection in the table
+   *
+   * @param {number} change
+   */
+  public changeSelection(change: number) {
+    const { selectedIndex } = this.state;
+
+    if (selectedIndex || selectedIndex === 0) {
+      const nextIndex = selectedIndex + change;
+      const nextEntry = this.state.sortedList![nextIndex] || null;
+
+      if (nextEntry) {
+        // Schedule an app-state update. This ensures
+        // that we don't update the selection at a high
+        // frequency
+        if (this.changeSelectedEntry) {
+          this.changeSelectedEntry.clear();
+        }
+        this.changeSelectedEntry = debounce(() => {
+          this.props.state.selectedEntry = nextEntry;
+        }, 500);
+        this.changeSelectedEntry();
+
+        this.setState({
+          selectedIndex: nextIndex,
+          ignoreSearchIndex: false,
+          scrollToSelection: true
+        });
+      }
     }
   }
 
@@ -393,7 +446,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    * @returns {JSX.Element}
    */
   public renderTable(options: any): JSX.Element {
-    const { sortedList, sortDirection, sortBy, searchList, ignoreSearchIndex } = this.state;
+    const { sortedList, selectedIndex, sortDirection, sortBy, searchList, ignoreSearchIndex, scrollToSelection } = this.state;
     const { searchIndex } = this.props;
     // tslint:disable-next-line:no-this-assignment
     const self = this;
@@ -417,6 +470,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     };
 
     if (!ignoreSearchIndex) tableOptions.scrollToRow = searchList![searchIndex] || 0;
+    if (scrollToSelection) tableOptions.scrollToRow = selectedIndex || 0;
 
     function renderIndex(props: any) {
       return <Cell {...props}>{sortedList![props.rowIndex].index}</Cell>;
