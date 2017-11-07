@@ -8,7 +8,7 @@
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
-    "lint": "tslint --type-check -c tslint.json -p tsconfig.json -e \"node_modules/**/*.ts\"",
+    "lint": "tslint -c tslint.json -p tsconfig.json -e \"node_modules/**/*.ts\"",
     "test": "npm run lint && jest --config=jest.json --coverage"
   },
   "keywords": [],
