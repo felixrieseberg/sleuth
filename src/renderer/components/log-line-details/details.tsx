@@ -22,6 +22,10 @@ export class LogLineDetails extends React.Component<LogLineDetailsProps, LogLine
     super(props);
     this.toggle = this.toggle.bind(this);
     this.openSource = this.openSource.bind(this);
+
+    if (process.platform !== 'win32') {
+      process.env.PATH = process.env.PATH + ':/usr/local/bin';
+    }
   }
 
   /**
