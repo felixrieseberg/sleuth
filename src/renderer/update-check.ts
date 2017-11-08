@@ -4,7 +4,7 @@ const debug = require('debug')('sleuth:update-check');
 
 const packageInfo = require('../../package.json');
 const { version } = packageInfo;
-const platformModifier = process.platform === 'win32' ? 'windows' : 'mac';
+const platformModifier = process.platform === 'win32' ? 'windows' : 'macos';
 const fetch = window.fetch || require('node-fetch');
 
 export interface LatestInfo {
@@ -16,9 +16,11 @@ export interface UpdateUrls {
   downloadUpdate: string;
 }
 
+export const host = 'https://desktop-sleuth-updates.herokuapp.com';
+
 export const defaultUrls: UpdateUrls = {
-  checkUpdate: `https://downloads.slack-edge.com/sleuth_${platformModifier}/latest-version.json`,
-  downloadUpdate: `https://downloads.slack-edge.com/sleuth_${platformModifier}/latest.zip`
+  checkUpdate: `${host}/${platformModifier}/latest-version.json`,
+  downloadUpdate: `${host}/${platformModifier}/latest.zip`
 };
 
 /**
