@@ -33,9 +33,11 @@ if (process.env.SLEUTH_CERTIFICATE_FILE && process.env.SLEUTH_CERTIFICATE_PASSWO
   options.electronWinstallerConfig.certificateFile = process.env.SLEUTH_CERTIFICATE_FILE;
   options.electronWinstallerConfig.certificatePassword = process.env.SLEUTH_CERTIFICATE_PASSWORD;
 } else {
-  console.warn(`-------------------------------------------------------`)
-  console.warn(`            Codesign password not present!`)
-  console.warn(`-------------------------------------------------------`)
+  console.log(`Warning: Password or certificate missing`);
+  console.log(`You can set it with SLEUTH_CERTIFICATE_FILE and SLEUTH_CERTIFICATE_PASSWORD`);
+  console.log(`Currently set:`);
+  console.log(`SLEUTH_CERTIFICATE_FILE: ${process.env.SLEUTH_CERTIFICATE_FILE}`);
+  console.log(`SLEUTH_CERTIFICATE_PASSWORD: ${process.env.SLEUTH_CERTIFICATE_PASSWORD}`);
 }
 
 module.exports = options;
