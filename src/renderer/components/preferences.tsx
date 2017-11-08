@@ -19,7 +19,7 @@ const exampleTime = 1493475035123;
  */
 export const defaults = {
   dateTimeFormat: 'HH:mm:ss (DD/MM)',
-  defaultEditor: 'code --goto {filename}:{line}'
+  defaultEditor: 'code --goto {filepath}:{line}'
 };
 
 /**
