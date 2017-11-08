@@ -351,6 +351,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     // Named definition here allows V8 to go craaaaaazy, speed-wise.
     function doSortByMessage(a: LogEntry, b: LogEntry) { return a.message.localeCompare(b.message); }
     function doSortByLevel(a: LogEntry, b: LogEntry) { return a.level.localeCompare(b.level); }
+    function doSortByLine(a: LogEntry, b: LogEntry) { return a.line > b.line ? 1 : -1; }
     function doFilter(a: LogEntry) { return (a.level && filter![a.level]); }
 
     // Filter
@@ -372,6 +373,9 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     } else if (sortBy === 'level') {
       debug('Sorting by level');
       sortedList = sortedList.sort(doSortByLevel);
+    } else if (sortBy === 'line') {
+      debug('Sorting by line');
+      sortedList = sortedList.sort(doSortByLine);
     }
 
     if (sortDirection === SORT_TYPES.DESC) {
@@ -458,6 +462,8 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     const levelHeader = <LogTableHeaderCell {...levelHeaderOptions}>Level</LogTableHeaderCell>;
     const messageHeaderOptions = { sortKey: 'message', onSortChange: this.onSortChange, sortDirection, sortBy };
     const messageHeader = <LogTableHeaderCell {...messageHeaderOptions}>Message</LogTableHeaderCell>;
+    const lineHeaderOptions = { sortKey: 'line', onSortChange: this.onSortChange, sortDirection, sortBy };
+    const lineHeader = <LogTableHeaderCell {...lineHeaderOptions}>Line</LogTableHeaderCell>;
 
     const tableOptions = {
       ...options,
@@ -484,10 +490,14 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     function renderLevel(props: any) {
       return <Cell {...props}>{sortedList![props.rowIndex].level}</Cell>;
     }
+    function renderLine(props: any) {
+      return <Cell {...props}>{sortedList![props.rowIndex].line}</Cell>;
+    }
 
     return (
       <Table {...tableOptions}>
-        <Column header={indexHeader} cell={renderIndex} width={100}  />
+        <Column header={indexHeader} cell={renderIndex} width={70}  />
+        <Column header={lineHeader} cell={renderLine} width={70} />
         <Column header={timestampHeader} cell={renderTimestamp} width={220}  />
         <Column header={levelHeader} cell={renderLevel} width={70}  />
         <Column header={messageHeader} flexGrow={1} cell={renderMessageCell} width={300} />

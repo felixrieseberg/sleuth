@@ -45,9 +45,11 @@ export class LogLineDetails extends React.Component<LogLineDetailsProps, LogLine
         const { exec } = require('child_process');
         const cmd = defaultEditor
           .replace('{filepath}', `"${sourceFile}"`)
-          .replace('{line}', line.toString());
+          .replace('{line}', line.toString(10));
 
+        debug(`Executing ${cmd}`);
         exec(cmd, (error: Error) => {
+          if (!error) return;
           debug(`Tried to open source file, but failed`, error);
           remote.shell.showItemInFolder(sourceFile);
         });
