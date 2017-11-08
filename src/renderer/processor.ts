@@ -207,14 +207,16 @@ export function processLogFile(logFile: UnzippedFile): Promise<ProcessedLogFile>
  * @export
  * @param {MatchResult} options
  * @param {string} logType
+ * @param {number} line
+ * @param {string} sourceFile
  * @returns {LogEntry}
  */
-export function makeLogEntry(options: MatchResult, logType: string): LogEntry {
+export function makeLogEntry(options: MatchResult, logType: string, line: number, sourceFile: string): LogEntry {
   options.message = options.message || '';
   options.timestamp = options.timestamp || '';
   options.level = options.level || '';
 
-  const logEntry = {...options, logType };
+  const logEntry = {...options, logType, line, sourceFile };
   return logEntry as LogEntry;
 }
 
@@ -240,6 +242,7 @@ export function readFile(logFile: UnzippedFile, logType: string = ''): Promise<A
     let toParse = '';
 
     readInterface.on('line', function onLine(line: any) {
+      readLines = readLines + 1;
       if (!line || line.length === 0) {
         return;
       }
@@ -268,7 +271,7 @@ export function readFile(logFile: UnzippedFile, logType: string = ''): Promise<A
 
         // Create new entry
         toParse = matched.toParseHead || '';
-        current = makeLogEntry(matched, logType);
+        current = makeLogEntry(matched, logType, readLines, logFile.fullPath);
       } else {
         // We couldn't match, let's treat it
 
@@ -282,7 +285,6 @@ export function readFile(logFile: UnzippedFile, logType: string = ''): Promise<A
       }
 
       // Update Status
-      readLines = readLines + 1;
       if (readLines > lastLogged + 999) {
         sendProcStatus(`Processed ${readLines} log lines in ${logFile.fileName}`);
         lastLogged = readLines;

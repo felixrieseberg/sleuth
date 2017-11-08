@@ -10,6 +10,8 @@ export interface LogEntry {
   message: string;
   level: string;
   logType: LogType;
+  line: number;
+  sourceFile: string;
   meta?: any;
   momentValue?: number;
   repeated?: Array<string>;
@@ -91,5 +93,6 @@ export interface LevelFilter {
 
 export interface UserPreferences {
   dateTimeFormat: string;
+  defaultEditor: string;
 }
 

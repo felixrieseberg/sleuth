@@ -8,6 +8,8 @@ import { LogEntry } from '../../interfaces';
 import { LogLineData } from './data';
 import { LogLineComments } from './comments';
 
+const debug = require('debug')('sleuth:details');
+
 export interface LogLineDetailsProps {
   state: SleuthState;
 }
@@ -19,6 +21,7 @@ export class LogLineDetails extends React.Component<LogLineDetailsProps, LogLine
   constructor(props: LogLineDetailsProps) {
     super(props);
     this.toggle = this.toggle.bind(this);
+    this.openSource = this.openSource.bind(this);
   }
 
   /**
@@ -26,6 +29,32 @@ export class LogLineDetails extends React.Component<LogLineDetailsProps, LogLine
    */
   public toggle() {
     this.props.state.isDetailsVisible = !this.props.state.isDetailsVisible;
+  }
+
+  /**
+   * Opens the file in the default editor (or tries, at least)
+   */
+  public openSource() {
+    const { selectedEntry, defaultEditor } = this.props.state;
+
+    if (selectedEntry && selectedEntry.sourceFile) {
+      const { sourceFile, line } = selectedEntry;
+      const { remote } = require('electron');
+
+      if (defaultEditor) {
+        const { exec } = require('child_process');
+        const cmd = defaultEditor
+          .replace('{filepath}', `"${sourceFile}"`)
+          .replace('{line}', line.toString());
+
+        exec(cmd, (error: Error) => {
+          debug(`Tried to open source file, but failed`, error);
+          remote.shell.showItemInFolder(sourceFile);
+        });
+      } else {
+        remote.shell.showItemInFolder(sourceFile);
+      }
+    }
   }
 
   /**
@@ -45,6 +74,7 @@ export class LogLineDetails extends React.Component<LogLineDetailsProps, LogLine
           <div className='Details-Moment'>{datetime}</div>
           <div className='Details-LogType'>
               Level <span className='level'>{level}</span> Type <span className='type'>{type}</span>
+              <span> <a className='source' onClick={this.openSource}>Source</a></span>
               <span> <a className='close' onClick={this.toggle}>Close</a></span>
           </div>
         </div>

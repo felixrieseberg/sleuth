@@ -1,10 +1,7 @@
 import { UnzippedFile } from '../unzip';
 import { LevelFilter, LogEntry, MergedLogFile, ProcessedLogFile } from '../interfaces';
 import { observable } from 'mobx';
-
-export const defaults = {
-  dateTimeFormat: 'HH:mm:ss (DD/MM)'
-};
+import { defaults } from '../components/preferences';
 
 export class SleuthState {
   @observable public slackUserId?: string;
@@ -23,6 +20,7 @@ export class SleuthState {
   @observable public showOnlySearchResults: boolean = false;
   @observable public isDetailsVisible: boolean = false;
   @observable public dateTimeFormat: string = localStorage.getItem('dateTimeFormat') || defaults.dateTimeFormat;
+  @observable public defaultEditor: string = localStorage.getItem('defaultEditor') || defaults.defaultEditor;
   @observable public webAppLogsWarningDismissed: boolean = false;
 
   @observable public opened: number = 0;
