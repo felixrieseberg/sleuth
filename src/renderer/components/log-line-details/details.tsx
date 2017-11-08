@@ -76,7 +76,7 @@ export class LogLineDetails extends React.Component<LogLineDetailsProps, LogLine
           <div className='Details-Moment'>{datetime}</div>
           <div className='Details-LogType'>
               Level <span className='level'>{level}</span> Type <span className='type'>{type}</span>
-              <span> <a className='source' onClick={this.openSource}>Source</a></span>
+              <span> <a className='source' onClick={this.openSource}>Open Source</a></span>
               <span> <a className='close' onClick={this.toggle}>Close</a></span>
           </div>
         </div>
