@@ -9,14 +9,29 @@ const { Menu, shell, app, dialog } = remote;
 const debug = require('debug')('sleuth:menu');
 
 export class AppMenu {
+  private productionLogs: string;
+  private devEnvLogs: string;
+  private devModeLogs: string;
+  private productionLogsExist: boolean;
+  private devEnvLogsExist: boolean;
+  private devModeLogsExist: boolean;
   private menu: Array<any> | null = null;
   private webContents = remote.getCurrentWebContents();
 
   constructor() {
+    const appData = app.getPath('appData');
+
+    this.productionLogs = path.join(appData, `Slack`, 'logs');
+    this.devEnvLogs = path.join(appData, `SlackDevEnv`, 'logs');
+    this.devModeLogs = path.join(appData, `SlackDevMode`, 'logs');
+    this.productionLogsExist = !!fs.statSyncNoException(this.productionLogs);
+    this.devEnvLogsExist = !!fs.statSyncNoException(this.devEnvLogs);
+    this.devModeLogsExist = !!fs.statSyncNoException(this.devModeLogs);
+
     this.setupMenu();
   }
 
-  /**
+  /**`
    * Returns a MenuItemOption for a given Slack logs location.
    *
    * @param {('' | 'DevEnv' | 'DevMode')} [type='']
@@ -48,15 +63,6 @@ export class AppMenu {
    * @returns {Array<Electron.MenuItemOptions>}
    */
   public getOpenItems(): Array<Electron.MenuItemConstructorOptions> {
-    const appData = app.getPath('appData');
-    const productionLogs = path.join(appData, `Slack`, 'logs');
-    const devEnvLogs = path.join(appData, `SlackDevEnv`, 'logs');
-    const devModeLogs = path.join(appData, `SlackDevMode`, 'logs');
-
-    const productionLogsExist = !!fs.statSyncNoException(productionLogs);
-    const devEnvLogsExist = !!fs.statSyncNoException(devEnvLogs);
-    const devModeLogsExist = !!fs.statSyncNoException(devModeLogs);
-
     const handleFilePaths = (filePaths: Array<string>) => {
       if (filePaths && filePaths.length > 0) {
         this.webContents.send('file-dropped', filePaths[0]);
@@ -97,12 +103,51 @@ export class AppMenu {
       openItems.push(openFile);
     }
 
-    if (productionLogsExist || devEnvLogsExist || devModeLogsExist) openItems.push({ type: 'separator' });
-    if (productionLogsExist) openItems.push(this.getOpenItem());
-    if (devEnvLogsExist) openItems.push(this.getOpenItem('DevEnv'));
-    if (devModeLogsExist) openItems.push(this.getOpenItem('DevMode'));
+    if (this.productionLogsExist || this.devEnvLogsExist || this.devModeLogsExist) {
+      openItems.push({ type: 'separator' });
+    }
+
+    if (this.productionLogsExist) openItems.push(this.getOpenItem());
+    if (this.devEnvLogsExist) openItems.push(this.getOpenItem('DevEnv'));
+    if (this.devModeLogsExist) openItems.push(this.getOpenItem('DevMode'));
 
     return openItems;
+  }
+
+  /**
+   * Get "Prune ..." items
+   */
+  public getPruneItems(): Array<Electron.MenuItemConstructorOptions> {
+    const getPruneItem = (name: string, targetPath: string) => ({
+      label: `Prune ${name}`,
+      click: async () => {
+        try {
+          fs.emptyDir(targetPath);
+        } catch (error) {
+          dialog.showMessageBox({
+            type: 'error',
+            title: 'Could not prune logs',
+            message: `We attempted to prune logs at ${targetPath}, but failed with the following error: "${error}".`
+          });
+        }
+      }
+    });
+
+    const result = [];
+
+    if (this.productionLogsExist) {
+      result.push(getPruneItem('Slack Logs (Production)', this.productionLogs));
+    }
+
+    if (this.devModeLogsExist) {
+      result.push(getPruneItem('Slack Logs (DevMode)', this.devModeLogs));
+    }
+
+    if (this.devEnvLogsExist) {
+      result.push(getPruneItem('Slack Logs (DevEnv)', this.devEnvLogs));
+    }
+
+    return result;
   }
 
   /**
@@ -123,6 +168,11 @@ export class AppMenu {
     } else {
       this.menu.splice(0, 1, { label: 'File', submenu: [ ...this.getOpenItems(), preferencesItem ] });
     }
+
+    this.menu.push({
+      label: 'Utilities',
+      submenu: this.getPruneItems()
+    });
 
     Menu.setApplicationMenu(Menu.buildFromTemplate(this.menu));
   }
