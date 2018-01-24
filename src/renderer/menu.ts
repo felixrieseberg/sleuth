@@ -3,6 +3,8 @@ import { remote } from 'electron';
 
 import * as fs from 'fs-extra';
 import * as path from 'path';
+import * as tmp from 'tmp';
+import * as promisify from 'es6-promisify';
 
 const { Menu, shell, app, dialog } = remote;
 
@@ -40,18 +42,33 @@ export class AppMenu {
   public getOpenItem(type: '' | 'DevEnv' | 'DevMode' = ''): Electron.MenuItemConstructorOptions {
     const appData = app.getPath('appData');
     const logsPath = path.join(appData, `Slack${type}`, 'logs');
+    const storagePath = path.join(appData, `Slack${type}`, 'storage');
 
     return {
       label: `Open local Slack${type} logs...`,
-      click: () => {
-        fs.readdir(logsPath).then((results) => {
-          if (results) return this.webContents.send('file-dropped', logsPath);
+      click: async () => {
+        let files: Array<string> = [];
+
+        try {
+          files = await fs.readdir(logsPath);
+        } catch (error) {
+          debug(`Tried to read logs directory, but failed`, { error });
+        }
+
+        if (files && files.length > 0) {
+          const tmpdir = await promisify(tmp.dir)({ unsafeCleanup: true });
+
+          await fs.copy(logsPath, tmpdir);
+          await fs.copy(storagePath, tmpdir);
+
+          this.webContents.send('file-dropped', tmpdir);
+        } else {
           dialog.showMessageBox({
             type: 'error',
             title: 'Could not find local Slack logs',
             message: `We attempted to find your local Slack's logs, but we couldn't find them. We checked for them in ${logsPath}.`
           });
-        }).catch((err) => debug(`Tried to open local Slack logs folder, but failed`, err));
+        }
       }
     };
   }
