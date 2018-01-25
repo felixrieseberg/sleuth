@@ -5,6 +5,7 @@ import * as dirtyJSON from 'jsonic';
 import JSONTree from 'react-json-tree';
 import * as fs from 'fs-extra';
 
+import { getSettingsInfo } from '../analytics/settings-analytics';
 import { UnzippedFile } from '../unzip';
 import { shell } from 'electron';
 
@@ -135,22 +136,10 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
   }
 
   public renderSettingsInfo(): JSX.Element | null {
-    const data = this.state.data || {};
-    const { appVersion, versionName, platform, platformVersion, isWin10, isBeforeWin10, pretendNotReallyWindows10, releaseChannel, zoomLevel } = data;
-
-    const version = appVersion ? <span>{appVersion} ({versionName || 'no name'})</span> : null;
-    const os = platform ? platform.replace('darwin', 'macOS').replace('win32', 'Windows').replace('linux', 'Linux') : null;
-    const osVersion = platformVersion && platformVersion.major ? `(${platformVersion.major}.${platformVersion.minor})` : '(unknown version)';
-    const pretendInfo = pretendNotReallyWindows10 ? `but we're pretending it's not` : `and we're not pretending otherwise`;
-    const oldWinInfo = isBeforeWin10 ? ` That's an older version of Windows (not 10!).` : '';
-    const win10Info = isWin10 ? ` That's Windows 10 (${pretendInfo})` : '';
-    const channelInfo = releaseChannel ? ` Updates are coming from the ${releaseChannel} channel.` : '';
-    const zoomInfo = zoomLevel === 0 ? ` The app is not zoomed.` : zoomLevel ? ` The app is zoomed (level ${zoomLevel})` : '';
 
     return (
         <div className='StateTable-Info'>
-          <p>This user is running Slack {version} on {os} {osVersion}.{oldWinInfo}{win10Info}{channelInfo}</p>
-          <p>{zoomInfo}</p>
+          {...getSettingsInfo(this.state.data || {})}
         </div>
       );
   }

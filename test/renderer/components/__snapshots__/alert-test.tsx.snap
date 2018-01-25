@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`alert-default 1`] = `
+exports[`Alert alert renders correctly (default): alert-default 1`] = `
 <div
   className="alert alert_undefined"
   onClick={[Function]}
@@ -12,7 +12,7 @@ exports[`alert-default 1`] = `
 </div>
 `;
 
-exports[`alert-error 1`] = `
+exports[`Alert alert renders correctly (error): alert-error 1`] = `
 <div
   className="alert alert_error"
   onClick={[Function]}
@@ -24,7 +24,7 @@ exports[`alert-error 1`] = `
 </div>
 `;
 
-exports[`alert-info 1`] = `
+exports[`Alert alert renders correctly (info): alert-info 1`] = `
 <div
   className="alert alert_info"
   onClick={[Function]}
@@ -36,7 +36,7 @@ exports[`alert-info 1`] = `
 </div>
 `;
 
-exports[`alert-success 1`] = `
+exports[`Alert alert renders correctly (success): alert-success 1`] = `
 <div
   className="alert alert_success"
   onClick={[Function]}
@@ -48,7 +48,7 @@ exports[`alert-success 1`] = `
 </div>
 `;
 
-exports[`alert-warning 1`] = `
+exports[`Alert alert renders correctly (warning): alert-warning 1`] = `
 <div
   className="alert alert_warning"
   onClick={[Function]}
