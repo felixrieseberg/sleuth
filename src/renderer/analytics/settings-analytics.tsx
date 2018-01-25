@@ -48,7 +48,7 @@ export function getNotificationsInfo({ notificationMethod, notificationPlayback 
   if (notificationMethod) {
     const type = notificationMethod
       .replace(`html`, `Slack's built-in notifications (html)`)
-      .repace(`winrt`, `default Windows 10 notifications for the Windows Action Center (winrt)`)
+      .replace(`winrt`, `default Windows 10 notifications for the Windows Action Center (winrt)`)
       .replace(`window`, `Electron's default for the current operating system (window)`);
     notificationsInfo += `Notifications are set to be delivered via ${type}. `;
   } else {
