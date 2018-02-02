@@ -11,6 +11,7 @@ import { LevelFilter, LogEntry, MergedLogFile, ProcessedLogFile } from '../inter
 import { didFilterChange } from '../../utils/did-filter-change';
 import { Alert } from './alert';
 import { LogTableHeaderCell } from './log-table-headercell';
+import { isReduxAction } from '../../utils/is-redux-action';
 
 const debug = require('debug')('sleuth:logtable');
 const { DOWN } = Keys;
@@ -407,7 +408,15 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    */
   public messageCellRenderer(entry: LogEntry): JSX.Element | string {
     if (entry && entry.meta) {
-      return (<span title={entry.message}><i className='ts_icon ts_icon_all_files_alt HasData'/> {entry.message}</span>);
+      const icon = isReduxAction(entry.message)
+        ? <img className='ReduxIcon' src='./img/redux.png' alt='Redux Action' />
+        : <i className='ts_icon ts_icon_all_files_alt HasData'/>;
+
+      return (
+        <span title={entry.message}>
+          {icon} {entry.message}
+        </span>
+      );
     } else if (entry && entry.repeated) {
       return `(Repeated ${entry.repeated.length} times) ${entry.message}`;
     } else {
