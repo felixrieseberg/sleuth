@@ -26,6 +26,14 @@ export interface RowClickEvent {
   rowData: any;
 }
 
+export interface LogTableColumnWidths {
+  index: number;
+  line: number;
+  timestamp: number;
+  level: number;
+  message: number;
+}
+
 export interface LogTableProps {
   logFile: ProcessedLogFile | MergedLogFile;
   levelFilter: LevelFilter;
@@ -45,6 +53,7 @@ export interface LogTableState {
   sortDirection?: string;
   ignoreSearchIndex: boolean;
   scrollToSelection: boolean;
+  columnWidths: LogTableColumnWidths;
 }
 
 export interface SortFilterListOptions {
@@ -71,7 +80,14 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
       sortBy: 'index',
       sortDirection: 'ASC',
       searchList: [],
-      ignoreSearchIndex: false
+      ignoreSearchIndex: false,
+      columnWidths: {
+        index: 70,
+        level: 70,
+        timestamp: 220,
+        line: 70,
+        message: 300
+      }
     };
 
     this.messageCellRenderer = this.messageCellRenderer.bind(this);
@@ -82,6 +98,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     this.rowClassNameGetter = this.rowClassNameGetter.bind(this);
     this.sortFilterList = this.sortFilterList.bind(this);
     this.timestampCellRenderer = this.timestampCellRenderer.bind(this);
+    this.onColumnResizeEndCallback = this.onColumnResizeEndCallback.bind(this);
   }
 
   /**
@@ -93,9 +110,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    */
   public shouldComponentUpdate(nextProps: LogTableProps, nextState: LogTableState): boolean {
     const { dateTimeFormat, levelFilter, logFile, searchIndex } = this.props;
-    const { sortBy, sortDirection, sortedList, searchList, selectedIndex } = this.state;
-    const nextFile = nextProps.logFile;
-    const newSort = (nextState.sortBy !== sortBy || nextState.sortDirection !== sortDirection);
+    const { sortBy, sortDirection, sortedList, searchList, selectedIndex, columnWidths } = this.state;
 
     // Selected row changed
     if (selectedIndex !== nextState.selectedIndex) return true;
@@ -104,9 +119,14 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     if (dateTimeFormat !== nextProps.dateTimeFormat) return true;
 
     // Sort direction changed
+    const newSort = (nextState.sortBy !== sortBy || nextState.sortDirection !== sortDirection);
     if (newSort) return true;
 
+    // Column widths changed
+    if (columnWidths !== nextState.columnWidths) return true;
+
     // File changed - and update is in order
+    const nextFile = nextProps.logFile;
     const newFile = ((!nextFile && logFile)
       || nextFile && logFile && nextFile.logType !== logFile.logType);
     const newEntries = (nextFile && logFile
@@ -388,6 +408,21 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
   }
 
   /**
+   * Handles resizing the columns
+   *
+   * @param {number} newColumnWidth
+   * @param {string} columnKey
+   */
+  public onColumnResizeEndCallback(newColumnWidth: number, columnKey: string) {
+    this.setState(({ columnWidths }) => ({
+      columnWidths: {
+        ...columnWidths!,
+        [columnKey]: newColumnWidth,
+      }
+    }));
+  }
+
+  /**
    * Checks if we're looking at a web app log and returns a warning, so that users know
    * the app didn't all over
    *
@@ -459,7 +494,16 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    * @returns {JSX.Element}
    */
   public renderTable(options: any): JSX.Element {
-    const { sortedList, selectedIndex, sortDirection, sortBy, searchList, ignoreSearchIndex, scrollToSelection } = this.state;
+    const {
+      sortedList,
+      selectedIndex,
+      sortDirection,
+      sortBy,
+      searchList,
+      ignoreSearchIndex,
+      scrollToSelection,
+      columnWidths
+    } = this.state;
     const { searchIndex } = this.props;
     // tslint:disable-next-line:no-this-assignment
     const self = this;
@@ -481,7 +525,9 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
       onRowClick: this.onRowClick,
       rowClassNameGetter: this.rowClassNameGetter,
       ref: this.refHandlers.table,
-      headerHeight: 30
+      headerHeight: 30,
+      onColumnResizeEndCallback: this.onColumnResizeEndCallback,
+      isColumnResizing: false
     };
 
     if (!ignoreSearchIndex) tableOptions.scrollToRow = searchList![searchIndex] || 0;
@@ -505,11 +551,11 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
 
     return (
       <Table {...tableOptions}>
-        <Column header={indexHeader} cell={renderIndex} width={70}  />
-        <Column header={lineHeader} cell={renderLine} width={70} />
-        <Column header={timestampHeader} cell={renderTimestamp} width={220}  />
-        <Column header={levelHeader} cell={renderLevel} width={70}  />
-        <Column header={messageHeader} flexGrow={1} cell={renderMessageCell} width={300} />
+        <Column columnKey='index' header={indexHeader} cell={renderIndex} width={columnWidths!.index} isResizable={true} />
+        <Column columnKey='line' header={lineHeader} cell={renderLine} width={columnWidths!.line} isResizable={true} />
+        <Column columnKey='timestamp' header={timestampHeader} cell={renderTimestamp} width={columnWidths!.timestamp} isResizable={true}  />
+        <Column columnKey='level' header={levelHeader} cell={renderLevel} width={columnWidths!.level} isResizable={true} />
+        <Column columnKey='message' header={messageHeader} flexGrow={1} cell={renderMessageCell} width={columnWidths!.message} isResizable={true} />
       </Table>);
   }
 

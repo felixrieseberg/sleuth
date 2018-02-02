@@ -106,7 +106,9 @@
     opacity: 1;
   }
 
-  .ScrollbarLau
+  .fixedDataTableCellLayout_columnResizerContainer {
+    border-left: 1px solid rgba(50,50,50,.25);
+  }
 
   .fixedDataTableRowLayout_body {
     font-size: 1rem;
@@ -118,8 +120,12 @@
 
   .fixedDataTableLayout_header {
     font-weight: 700;
-    background-color: @neutral_grey;
+    background-color: #F9F9F9;
     border-bottom-color: @cloud_silver;
+
+    .fixedDataTableCellGroupLayout_cellGroup:hover {
+      background-color: initial;
+    }
   }
 
   .fixedDataTableCellGroupLayout_cellGroup:hover {
