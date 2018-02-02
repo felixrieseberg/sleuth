@@ -1,13 +1,13 @@
-import { MergedLogFile, ProcessedLogFile } from '../interfaces';
-import { SleuthState } from '../state/sleuth';
 import * as React from 'react';
 import * as dirtyJSON from 'jsonic';
 import JSONTree from 'react-json-tree';
 import * as fs from 'fs-extra';
+import { shell } from 'electron';
 
+import { MergedLogFile, ProcessedLogFile } from '../interfaces';
+import { SleuthState } from '../state/sleuth';
 import { getSettingsInfo } from '../analytics/settings-analytics';
 import { UnzippedFile } from '../unzip';
-import { shell } from 'electron';
 
 const debug = require('debug')('sleuth:statetable');
 
@@ -195,7 +195,7 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
     const info = this.renderInfo();
 
     return (
-      <div className='StateTable'>
+      <div className='StateTable' style={{ fontFamily: this.props.state.font }}>
         <div className='StateTable-Content'>
           {info}
           <JSONTree data={data} theme={theme}  />

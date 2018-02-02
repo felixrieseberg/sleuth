@@ -20,6 +20,7 @@ export class SleuthState {
   @observable public showOnlySearchResults: boolean = false;
   @observable public isDetailsVisible: boolean = false;
   @observable public dateTimeFormat: string = localStorage.getItem('dateTimeFormat') || defaults.dateTimeFormat;
+  @observable public font: string = localStorage.getItem('font') || defaults.font;
   @observable public defaultEditor: string = localStorage.getItem('defaultEditor') || defaults.defaultEditor;
   @observable public webAppLogsWarningDismissed: boolean = false;
 

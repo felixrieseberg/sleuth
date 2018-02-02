@@ -24,8 +24,8 @@ export interface AppState {
 export class App extends React.Component<undefined, Partial<AppState>> {
   public readonly menu: AppMenu = new AppMenu();
 
-  constructor() {
-    super();
+  constructor(props: undefined) {
+    super(props);
 
     this.state = {
       unzippedFiles: []
