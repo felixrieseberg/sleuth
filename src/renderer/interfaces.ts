@@ -94,5 +94,6 @@ export interface LevelFilter {
 export interface UserPreferences {
   dateTimeFormat: string;
   defaultEditor: string;
+  font: string;
 }
 

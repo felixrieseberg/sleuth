@@ -8,6 +8,7 @@ import * as React from 'react';
 
 import { LogLineDetails } from './log-line-details/details';
 import { Scrubber } from './scrubber';
+import { getPreference } from './preferences';
 
 export interface LogContentProps {
   state: SleuthState;
@@ -44,10 +45,11 @@ export class LogContent extends React.Component<LogContentProps, Partial<LogCont
     const isLog = isLogFile(selectedLogFile);
     const tableStyle = { height: isDetailsVisible ? `${this.state.tableHeight}px` : '100%' };
     const scrubber = <Scrubber elementSelector='div#LogTableContainer' onResizeHandler={this.resizeHandler} />;
+    const fontFamily = getPreference('font') || 'Slack-Lato';
 
     if (isLog) {
       return (
-        <div className='LogContent'>
+        <div className='LogContent' style={{ fontFamily }}>
           <div id='LogTableContainer' style={tableStyle}>
             <LogTable
               state={sleuthState}

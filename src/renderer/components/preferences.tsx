@@ -19,7 +19,8 @@ const exampleTime = 1493475035123;
  */
 export const defaults = {
   dateTimeFormat: 'HH:mm:ss (DD/MM)',
-  defaultEditor: 'code --goto {filepath}:{line}'
+  defaultEditor: 'code --goto {filepath}:{line}',
+  font: 'Slack-Lato'
 };
 
 /**
@@ -40,7 +41,8 @@ export function getPreference(preference: string): any {
 export function getPreferences(): UserPreferences {
   const userPrefs: UserPreferences = {
     dateTimeFormat: getPreference('dateTimeFormat'),
-    defaultEditor: getPreference('defaultEditor')
+    defaultEditor: getPreference('defaultEditor'),
+    font: getPreference('font')
   };
 
   return userPrefs;
@@ -49,6 +51,7 @@ export function getPreferences(): UserPreferences {
 export interface PreferencesState {
   dateTimeFormat: string;
   defaultEditor: string;
+  font: string;
   isCooperButtonLoading: boolean;
 }
 
@@ -72,12 +75,20 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
     'ddd, hA'
   ];
 
-  constructor() {
-    super();
+  private readonly fontPresets: Array<string> = [
+    'Slack-Lato',
+    'Verdana',
+    'Arial',
+    process.platform === 'darwin' ? 'Menlo' : 'Consolas'
+  ];
+
+  constructor(props: PreferencesProps) {
+    super(props);
 
     this.state = { ...getPreferences() };
     this.handleDateFormatChange = this.handleDateFormatChange.bind(this);
     this.handleEditorChange = this.handleEditorChange.bind(this);
+    this.handleFontChange = this.handleFontChange.bind(this);
     this.beforeClose = this.beforeClose.bind(this);
     ipcRenderer.on('preferences-show', () => this.show());
   }
@@ -97,22 +108,41 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
     if (this.skylightElement) this.skylightElement.hide();
   }
 
-  public handleDateFormatChange({ target }: any) {
-    if (target && target.value) {
-      localStorage.setItem('dateTimeFormat', target.value);
-      this.setState({ dateTimeFormat: target.value });
+  /**
+   * Changes the local preference given an DOM input target
+   * and a preference key
+   *
+   * @param {*} target
+   * @param {string} key
+   */
+  public handleValueChange(target: any, key: string) {
+    if (target && (target.value || target.value === '')) {
+      const stateUpdate = {};
+      stateUpdate[key] = target.value;
+
+      localStorage.setItem(key, target.value);
+      this.setState(stateUpdate);
     }
   }
 
+  public handleDateFormatChange({ target }: any) {
+    this.handleValueChange(target, 'dateTimeFormat');
+  }
+
   public handleEditorChange({ target }: any) {
-    if (target && (target.value || target.value === '')) {
-      localStorage.setItem('defaultEditor', target.value);
-      this.setState({ defaultEditor: target.value });
-    }
+    this.handleValueChange(target, 'defaultEditor');
+  }
+
+  public handleFontChange({ target }: any) {
+    this.handleValueChange(target, 'font');
   }
 
   public isDateTimePreset(value: string) {
     return !!(this.dateTimePresets.find((v) => v === value));
+  }
+
+  public isFontPreset(value: string) {
+    return !!(this.fontPresets.find((v) => v === value));
   }
 
   public renderEditorOptions() {
@@ -132,6 +162,10 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
     return <option key={value} value={value}>{moment(exampleTime).format(value)}</option>;
   }
 
+  public renderFontOption(value: string) {
+    return <option key={value} value={value}>{value}</option>;
+  }
+
   public renderCooperOptions() {
     return (
       <div>
@@ -142,23 +176,50 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
   }
 
   public render(): JSX.Element {
-    const { dateTimeFormat, defaultEditor } = this.state;
+    const { dateTimeFormat, defaultEditor, font } = this.state;
     const dateTimePresets = this.dateTimePresets.map(this.renderDateTimeOption);
+    const fontPresets = this.fontPresets.map(this.renderFontOption);
     const editorPresets = this.renderEditorOptions();
     const closeButtonStyle = { top: '10px' };
     const customDateTimePreset = this.isDateTimePreset(dateTimeFormat!) ? null :
       <option key='custom' value={dateTimeFormat}>{moment(exampleTime).format(dateTimeFormat)}</option>;
+    const customFontPreset = this.isFontPreset(font!) ? null :
+      <option key='custom' value={font}>{font}</option>;
+    const fontStyle = { fontFamily: font };
 
     return (
       <div>
         <Skylight
           {...closeButtonStyle}
-          dialogStyles={{ height: 484 }}
+          dialogStyles={{ height: 600, marginTop: -300 }}
           ref={this.refHandlers.skylight}
           title='Preferences'
           beforeClose={this.beforeClose}
         >
           <p>You're running Sleuth {packageInfo.version} {getSleuth()}</p>
+          <div className='Font'>
+            <div>
+              <label className='select small'>
+                Font Family
+                <select className='small' value={font} onChange={this.handleFontChange}>
+                  {fontPresets}
+                  {customFontPreset}
+                </select>
+              </label>
+            </div>
+            <div>
+              <label className='small' htmlFor='dfa'>Font Family (Raw Input)</label>
+              <input
+                type='text'
+                style={fontStyle}
+                id='dfa'
+                className='small'
+                value={font}
+                onChange={this.handleFontChange}
+              />
+            </div>
+          </div>
+          <p>Changing the date format allows you to configure how exactly dates and times are displayed.</p>
           <div className='DateTime'>
             <div>
               <label className='select small'>
