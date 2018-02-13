@@ -1,4 +1,3 @@
-import { SleuthState, sleuthState } from '../state/sleuth';
 import * as debounce from 'debounce';
 import * as React from 'react';
 import * as classNames from 'classnames';
@@ -7,63 +6,22 @@ import { Table, Column, Cell } from 'fixed-data-table-2';
 import { AutoSizer } from 'react-virtualized';
 import { default as keydown, Keys } from 'react-keydown';
 
-import { LevelFilter, LogEntry, MergedLogFile, ProcessedLogFile } from '../interfaces';
+import { LevelFilter, LogEntry } from '../interfaces';
+import { sleuthState } from '../state/sleuth';
 import { didFilterChange } from '../../utils/did-filter-change';
 import { Alert } from './alert';
 import { LogTableHeaderCell } from './log-table-headercell';
 import { isReduxAction } from '../../utils/is-redux-action';
+import { LogTableProps, LogTableState, COLUMN_WIDTHS, SORT_TYPES, SortFilterListOptions, COLUMN_TITLES } from './log-table-constants';
 
 const debug = require('debug')('sleuth:logtable');
 const { DOWN } = Keys;
 
-export const SORT_TYPES = {
-  ASC: 'ASC',
-  DESC: 'DESC',
-};
-
-export interface RowClickEvent {
-  index: number;
-  rowData: any;
-}
-
-export interface LogTableColumnWidths {
-  index: number;
-  line: number;
-  timestamp: number;
-  level: number;
-  message: number;
-}
-
-export interface LogTableProps {
-  logFile: ProcessedLogFile | MergedLogFile;
-  levelFilter: LevelFilter;
-  search?: string;
-  dateTimeFormat: string;
-  state: SleuthState;
-  showOnlySearchResults: boolean;
-  searchIndex: number;
-}
-
-export interface LogTableState {
-  sortedList: Array<LogEntry>;
-  searchList: Array<number>;
-  selectedEntry?: LogEntry;
-  selectedIndex?: number;
-  sortBy?: string;
-  sortDirection?: string;
-  ignoreSearchIndex: boolean;
-  scrollToSelection: boolean;
-  columnWidths: LogTableColumnWidths;
-}
-
-export interface SortFilterListOptions {
-  sortBy?: string;
-  sortDirection?: string;
-  filter?: LevelFilter;
-  search?: string;
-  logFile?: ProcessedLogFile | MergedLogFile;
-  showOnlySearchResults?: boolean;
-}
+/**
+ * Welcome! This is the biggest class in this application - it's the table that displays logging
+ * information. This is also the class that could most easily destroy performance, so be careful
+ * here!
+ */
 
 export class LogTable extends React.Component<LogTableProps, Partial<LogTableState>> {
   private tableElement: any;
@@ -81,13 +39,8 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
       sortDirection: 'ASC',
       searchList: [],
       ignoreSearchIndex: false,
-      columnWidths: {
-        index: 70,
-        level: 70,
-        timestamp: 220,
-        line: 70,
-        message: 300
-      }
+      columnWidths: COLUMN_WIDTHS,
+      columnOrder: Object.keys(COLUMN_TITLES)
     };
 
     this.messageCellRenderer = this.messageCellRenderer.bind(this);
@@ -99,6 +52,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     this.sortFilterList = this.sortFilterList.bind(this);
     this.timestampCellRenderer = this.timestampCellRenderer.bind(this);
     this.onColumnResizeEndCallback = this.onColumnResizeEndCallback.bind(this);
+    this.onColumnChange = this.onColumnChange.bind(this);
   }
 
   /**
@@ -110,7 +64,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    */
   public shouldComponentUpdate(nextProps: LogTableProps, nextState: LogTableState): boolean {
     const { dateTimeFormat, levelFilter, logFile, searchIndex } = this.props;
-    const { sortBy, sortDirection, sortedList, searchList, selectedIndex, columnWidths } = this.state;
+    const { sortBy, sortDirection, sortedList, searchList, selectedIndex, columnWidths, columnOrder } = this.state;
 
     // Selected row changed
     if (selectedIndex !== nextState.selectedIndex) return true;
@@ -124,6 +78,9 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
 
     // Column widths changed
     if (columnWidths !== nextState.columnWidths) return true;
+
+    // Column order changed
+    if (columnOrder !== nextState.columnOrder) return true;
 
     // File changed - and update is in order
     const nextFile = nextProps.logFile;
@@ -234,6 +191,16 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     if (newSort) {
       this.setState({ sortBy, sortDirection, sortedList: this.sortFilterList({ sortBy, sortDirection }) });
     }
+  }
+
+  /**
+   * Change the column order
+   *
+   * @param {string} columnKey
+   */
+  public onColumnChange(newColumnOrder: Array<string>): void {
+    debug(`Updating column order: ${newColumnOrder.join(', ')}`);
+    this.setState({ columnOrder: newColumnOrder });
   }
 
   /**
@@ -487,6 +454,92 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
   }
 
   /**
+   * Render the headers for the columns
+   */
+  public renderHeaders() {
+    const { sortDirection, sortBy, columnOrder } = this.state;
+
+    const commonOptions = {
+      columnsToShow: columnOrder!,
+      onColumnChange: this.onColumnChange,
+      onSortChange: this.onSortChange,
+      sortDirection,
+      sortBy };
+    const timestampHeaderOptions = { sortKey: 'timestamp', ...commonOptions };
+    const timestampHeader = <LogTableHeaderCell {...timestampHeaderOptions}>Timestamp</LogTableHeaderCell>;
+    const indexHeaderOptions = { sortKey: 'index', ...commonOptions };
+    const indexHeader = <LogTableHeaderCell {...indexHeaderOptions}>#</LogTableHeaderCell>;
+    const levelHeaderOptions = { sortKey: 'level', ...commonOptions };
+    const levelHeader = <LogTableHeaderCell {...levelHeaderOptions}>Level</LogTableHeaderCell>;
+    const messageHeaderOptions = { sortKey: 'message', ...commonOptions };
+    const messageHeader = <LogTableHeaderCell {...messageHeaderOptions}>Message</LogTableHeaderCell>;
+    const lineHeaderOptions = { sortKey: 'line', ...commonOptions };
+    const lineHeader = <LogTableHeaderCell {...lineHeaderOptions}>Line</LogTableHeaderCell>;
+
+    return {
+      index: indexHeader,
+      line: lineHeader,
+      timestamp: timestampHeader,
+      level: levelHeader,
+      message: messageHeader
+    };
+  }
+
+  /**
+   * Render the individual columns for the table
+   *
+   * @returns {Array<JSX.Element>}
+   */
+  public renderColumns(): Array<JSX.Element> {
+    const { sortedList, columnWidths, columnOrder } = this.state;
+    const headers = this.renderHeaders();
+    // tslint:disable-next-line:no-this-assignment
+    const self = this;
+
+    if (!columnOrder || !columnWidths || !sortedList) return [];
+
+    function renderIndex(props: any) {
+      return <Cell {...props}>{sortedList![props.rowIndex].index}</Cell>;
+    }
+    function renderTimestamp(props: any) {
+      return <Cell {...props}>{self.timestampCellRenderer(sortedList![props.rowIndex])}</Cell>;
+    }
+    function renderMessage(props: any) {
+      return <Cell {...props}>{self.messageCellRenderer(sortedList![props.rowIndex])}</Cell>;
+    }
+    function renderLevel(props: any) {
+      return <Cell {...props}>{sortedList![props.rowIndex].level}</Cell>;
+    }
+    function renderLine(props: any) {
+      return <Cell {...props}>{sortedList![props.rowIndex].line}</Cell>;
+    }
+
+    const cellRenderers = {
+      index: renderIndex,
+      line: renderLine,
+      timestamp: renderTimestamp,
+      level: renderLevel,
+      message: renderMessage
+    };
+
+    return columnOrder.map((key, i) => {
+      const flexGrow = i + 1 === columnOrder.length ? 1 : 0;
+
+      return (
+        <Column
+          key={key}
+          columnKey={key}
+          header={headers[key]}
+          cell={cellRenderers[key]}
+          width={columnWidths[key]}
+          isResizable={true}
+          flexGrow={flexGrow}
+        />
+      );
+    });
+  }
+
+  /**
    * Renders the table
    *
    * @param {*} options
@@ -494,29 +547,9 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    * @returns {JSX.Element}
    */
   public renderTable(options: any): JSX.Element {
-    const {
-      sortedList,
-      selectedIndex,
-      sortDirection,
-      sortBy,
-      searchList,
-      ignoreSearchIndex,
-      scrollToSelection,
-      columnWidths
-    } = this.state;
+    const { sortedList, selectedIndex, searchList, ignoreSearchIndex, scrollToSelection } = this.state;
     const { searchIndex } = this.props;
-    // tslint:disable-next-line:no-this-assignment
-    const self = this;
-    const timestampHeaderOptions = { sortKey: 'timestamp', onSortChange: this.onSortChange, sortDirection, sortBy };
-    const timestampHeader = <LogTableHeaderCell {...timestampHeaderOptions}>Timestamp</LogTableHeaderCell>;
-    const indexHeaderOptions = { sortKey: 'index', onSortChange: this.onSortChange, sortDirection, sortBy };
-    const indexHeader = <LogTableHeaderCell {...indexHeaderOptions}>#</LogTableHeaderCell>;
-    const levelHeaderOptions = { sortKey: 'level', onSortChange: this.onSortChange, sortDirection, sortBy };
-    const levelHeader = <LogTableHeaderCell {...levelHeaderOptions}>Level</LogTableHeaderCell>;
-    const messageHeaderOptions = { sortKey: 'message', onSortChange: this.onSortChange, sortDirection, sortBy };
-    const messageHeader = <LogTableHeaderCell {...messageHeaderOptions}>Message</LogTableHeaderCell>;
-    const lineHeaderOptions = { sortKey: 'line', onSortChange: this.onSortChange, sortDirection, sortBy };
-    const lineHeader = <LogTableHeaderCell {...lineHeaderOptions}>Line</LogTableHeaderCell>;
+    const columns = this.renderColumns();
 
     const tableOptions = {
       ...options,
@@ -533,32 +566,15 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     if (!ignoreSearchIndex) tableOptions.scrollToRow = searchList![searchIndex] || 0;
     if (scrollToSelection) tableOptions.scrollToRow = selectedIndex || 0;
 
-    function renderIndex(props: any) {
-      return <Cell {...props}>{sortedList![props.rowIndex].index}</Cell>;
-    }
-    function renderTimestamp(props: any) {
-      return <Cell {...props}>{self.timestampCellRenderer(sortedList![props.rowIndex])}</Cell>;
-    }
-    function renderMessageCell(props: any) {
-      return <Cell {...props}>{self.messageCellRenderer(sortedList![props.rowIndex])}</Cell>;
-    }
-    function renderLevel(props: any) {
-      return <Cell {...props}>{sortedList![props.rowIndex].level}</Cell>;
-    }
-    function renderLine(props: any) {
-      return <Cell {...props}>{sortedList![props.rowIndex].line}</Cell>;
-    }
-
-    return (
-      <Table {...tableOptions}>
-        <Column columnKey='index' header={indexHeader} cell={renderIndex} width={columnWidths!.index} isResizable={true} />
-        <Column columnKey='line' header={lineHeader} cell={renderLine} width={columnWidths!.line} isResizable={true} />
-        <Column columnKey='timestamp' header={timestampHeader} cell={renderTimestamp} width={columnWidths!.timestamp} isResizable={true}  />
-        <Column columnKey='level' header={levelHeader} cell={renderLevel} width={columnWidths!.level} isResizable={true} />
-        <Column columnKey='message' header={messageHeader} flexGrow={1} cell={renderMessageCell} width={columnWidths!.message} isResizable={true} />
-      </Table>);
+    return <Table {...tableOptions}>{columns}</Table>;
   }
 
+  /**
+   * The main render method
+   *
+   * @returns {(JSX.Element | null)}
+   * @memberof LogTable
+   */
   public render(): JSX.Element | null {
     const { logFile } = this.props;
 
