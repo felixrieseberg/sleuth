@@ -30,11 +30,16 @@ export function getHWInfo({ isAeroGlassEnabled, platform, useHwAcceleration }: a
   let hwInfo = '';
 
   if (platform === 'win32') {
-    hwInfo += `Aero Glass is enabled, meaning that Slack can display the built-in notifications. `;
+    if (isAeroGlassEnabled) {
+      hwInfo += `Aero Glass (DWM) is enabled, meaning that Slack can display the built-in notifications. `;
+    } else {
+      hwInfo += `Aero Glass (DWM) is disabled, meaning that Slack cannot display built-in notifications. `;
+      hwInfo += `The notifications field manual has information on how to enabled DWM. `;
+    }
   }
 
   if (useHwAcceleration !== undefined) {
-    hwInfo += `HW acceleration is ${useHwAcceleration ? 'enabled' : 'disabled'}`;
+    hwInfo += `HW acceleration is ${useHwAcceleration ? 'enabled' : 'disabled'}.`;
   } else {
     hwInfo += `HW acceleration isn't configured, so likely being used. `;
   }
@@ -106,9 +111,48 @@ export function getVersionInfo({ appVersion, versionName }: any): string {
 export function getOSInfo({ platform, platformVersion, pretendNotReallyWindows10, isBeforeWin10, isWin10 }: any): string {
   const os = platform ? platform.replace('darwin', 'macOS').replace('win32', 'Windows').replace('linux', 'Linux') : null;
   const osVersion = platformVersion && platformVersion.major ? `(${platformVersion.major}.${platformVersion.minor})` : '(unknown version)';
-  const pretendInfo = pretendNotReallyWindows10 ? `but we're pretending it's not` : `and we're not pretending otherwise`;
-  const oldWinInfo = isBeforeWin10 ? ` That's an older version of Windows (not 10!).` : '';
-  const win10Info = isWin10 ? ` That's Windows 10 (${pretendInfo})` : '';
+  let windowsInfo = '';
 
-  return `${os} ${osVersion}.${oldWinInfo}${win10Info}`;
+  if (os === 'Windows') {
+    const niceName = getWindowsVersion(platformVersion);
+    windowsInfo = pretendNotReallyWindows10
+      ? ` We're pretending it's an older version, but the user is running on ${niceName}`
+      : ` That's ${niceName}`;
+  }
+
+  return `${os} ${osVersion}.${windowsInfo}`;
+}
+
+/**
+ * Takes major, minor, and build number and returns the actual Windows version.
+ *
+ * @param {number} major
+ * @param {number} minor
+ * @param {number} build
+ * @returns {string}
+ */
+export function getWindowsVersion({ major, minor, build}: { major: number, minor: number, build: number }): string {
+  if (major === 10 && minor === 0) {
+    let buildName = '';
+
+    if (build <= 10240) buildName = 'Original Release (RTM), ';
+    if (build >= 10586) buildName = 'Threshold 2 (First major round of updates in 2015), ';
+    if (build >= 14393) buildName = 'Anniversary Update, ';
+    if (build >= 15063) buildName = 'Creators Update, ';
+    if (build >= 16299) buildName = 'Fall Creators Update, ';
+    if (build >= 17000) buildName = 'Redstone 4 (Future version of Windows), ';
+    if (build >= 17600) buildName = 'Redstone 5 (Future version of Windows), ';
+
+    return `Windows 10 (${buildName}Build ${build})`;
+  }
+
+  // Windows NT 6 and up
+  if (major === 6) {
+    if (minor === 0) return (`Windows Vista (NT 6.0, Build ${build})`);
+    if (minor === 1) return (`Windows 7 (NT 6.1, Build ${build})`);
+    if (minor === 2) return (`Windows 8 (NT 6.2, Build ${build})`);
+    if (minor === 3) return (`Windows 8.1 (NT 6.3, Build ${build})`);
+  }
+
+  return `an unknown Windows version (${major}.${minor}, Build ${build})`;
 }
