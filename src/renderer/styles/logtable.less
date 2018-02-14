@@ -120,8 +120,10 @@
 
   .fixedDataTableLayout_header {
     font-weight: 700;
-    background-color: #F9F9F9;
-    border-bottom-color: @cloud_silver;
+    background-color: #efefef;
+    border-bottom-color: #BABBBF;
+    border-top: 1px solid #BABBBF;
+    border-left: 1px solid #BABBBF;
 
     .fixedDataTableCellGroupLayout_cellGroup:hover {
       background-color: initial;
@@ -133,10 +135,37 @@
   }
 
   .fixedDataTableCellLayout_wrap1 {
-    width: calc(100% - 10px);
+    width: calc(100% - 20px);
+    display: inline-block;
 
     a {
       display: block;
+    }
+  }
+
+  .fixedDataTableCellLayout_columnReorderContainer {
+    height: 26px!important;
+    width: 13px;
+    display: inline-block;
+    margin: 0;
+  }
+
+  .fixedDataTableCellLayout_columnReorderContainer:hover::after {
+    color: black;
+  }
+
+  .fixedDataTableCellLayout_columnReorderContainer::after {
+    content: " \22EE";
+    top: 3px;
+    position: absolute;
+  }
+
+  .public_fixedDataTableCell_hasReorderHandle {
+    background-color: #efefef;
+
+    .fixedDataTableCellLayout_wrap2,
+    .fixedDataTableCellLayout_wrap3 {
+      vertical-align: bottom;
     }
   }
 }

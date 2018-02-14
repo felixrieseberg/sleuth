@@ -91,7 +91,7 @@ export class LogTableHeaderCell extends React.Component<LogTableHeaderCellProps,
     const { columnsToShow } = this.props;
 
     const items: Array<any> = Object.keys(COLUMN_TITLES).map((key) => ({
-      label: key,
+      label: COLUMN_TITLES[key],
       type: 'checkbox',
       checked: columnsToShow.includes(key),
       click: () => {

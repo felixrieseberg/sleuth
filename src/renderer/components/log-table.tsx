@@ -5,6 +5,7 @@ import * as moment from 'moment';
 import { Table, Column, Cell } from 'fixed-data-table-2';
 import { AutoSizer } from 'react-virtualized';
 import { default as keydown, Keys } from 'react-keydown';
+import * as autoBind from 'react-autobind';
 
 import { LevelFilter, LogEntry } from '../interfaces';
 import { sleuthState } from '../state/sleuth';
@@ -43,16 +44,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
       columnOrder: Object.keys(COLUMN_TITLES)
     };
 
-    this.messageCellRenderer = this.messageCellRenderer.bind(this);
-    this.onKeyboardNavigate = this.onKeyboardNavigate.bind(this);
-    this.onRowClick = this.onRowClick.bind(this);
-    this.onSortChange = this.onSortChange.bind(this);
-    this.renderTable = this.renderTable.bind(this);
-    this.rowClassNameGetter = this.rowClassNameGetter.bind(this);
-    this.sortFilterList = this.sortFilterList.bind(this);
-    this.timestampCellRenderer = this.timestampCellRenderer.bind(this);
-    this.onColumnResizeEndCallback = this.onColumnResizeEndCallback.bind(this);
-    this.onColumnChange = this.onColumnChange.bind(this);
+    autoBind(this);
   }
 
   /**
@@ -390,6 +382,24 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
   }
 
   /**
+   * Handles reodering the columns
+   */
+  public onColumnReorderEndCallback(event: any) {
+    if (!this.state.columnOrder) return;
+
+    const columnOrder = this.state.columnOrder.filter((columnKey) => columnKey !== event.reorderColumn);
+
+    if (event.columnAfter) {
+      const index = columnOrder.indexOf(event.columnAfter);
+      columnOrder.splice(index, 0, event.reorderColumn);
+    } else {
+      columnOrder.push(event.reorderColumn);
+    }
+
+    this.setState({ columnOrder });
+  }
+
+  /**
    * Checks if we're looking at a web app log and returns a warning, so that users know
    * the app didn't all over
    *
@@ -533,6 +543,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
           cell={cellRenderers[key]}
           width={columnWidths[key]}
           isResizable={true}
+          isReorderable={true}
           flexGrow={flexGrow}
         />
       );
@@ -560,7 +571,9 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
       ref: this.refHandlers.table,
       headerHeight: 30,
       onColumnResizeEndCallback: this.onColumnResizeEndCallback,
-      isColumnResizing: false
+      onColumnReorderEndCallback: this.onColumnReorderEndCallback,
+      isColumnResizing: false,
+      isColumnReordering: false
     };
 
     if (!ignoreSearchIndex) tableOptions.scrollToRow = searchList![searchIndex] || 0;
