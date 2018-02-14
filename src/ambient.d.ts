@@ -9,6 +9,7 @@ declare module 'react-skylight';
 declare module 'react-linkify';
 declare module 'react-ladda';
 declare module 'react-keydown';
+declare module 'react-autobind';
 declare module 'jsonic';
 declare module 'electron-devtools-installer';
 declare module 'electron-window-state';
