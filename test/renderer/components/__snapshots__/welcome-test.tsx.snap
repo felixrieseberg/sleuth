@@ -9,7 +9,7 @@ exports[`Welcome welcome renders correctly 1`] = `
     <h1
       className="Emoji"
     >
-      🕵🏿
+      :sleuth:
     </h1>
     <h2>
       Hey there!

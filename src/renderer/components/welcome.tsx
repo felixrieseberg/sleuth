@@ -16,15 +16,16 @@ export interface WelcomeState {
 }
 
 export interface WelcomeProps {
+  sleuth?: string;
   openFile: (filePath: string) => void;
 }
 
 export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>> {
-  constructor() {
-    super();
+  constructor(props: WelcomeProps) {
+    super(props);
 
     this.state = {
-      sleuth: getSleuth(),
+      sleuth: props.sleuth || getSleuth(),
       isUpdateAvailable: false
     };
 

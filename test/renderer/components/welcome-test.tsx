@@ -18,7 +18,7 @@ describe('Welcome', () => {
   it('welcome renders correctly', () => {
     const tree = renderer.create(
       // tslint:disable-next-line:no-empty
-      <Welcome openFile={() => {}} />
+      <Welcome sleuth=':sleuth:' openFile={() => {}} />
     ).toJSON();
 
     expect(tree).toMatchSnapshot();
