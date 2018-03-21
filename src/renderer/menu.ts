@@ -4,7 +4,7 @@ import { remote } from 'electron';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as tmp from 'tmp';
-import * as promisify from 'es6-promisify';
+import { promisify } from 'util';
 
 const { Menu, shell, app, dialog } = remote;
 

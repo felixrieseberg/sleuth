@@ -2,7 +2,6 @@
 declare module 'url';
 declare module 'yauzl';
 declare module 'fixed-data-table-2';
-declare module 'es6-promisify';
 declare module 'react-json-tree';
 declare module 'react-throttle';
 declare module 'react-skylight';
