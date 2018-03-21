@@ -2,7 +2,7 @@ import * as React from 'react';
 import { remote } from 'electron';
 import { Cell } from 'fixed-data-table-2';
 
-import { SORT_TYPES, COLUMN_TITLES } from './log-table-constants';
+import { SORT_DIRECTION, COLUMN_TITLES } from './log-table-constants';
 
 const debug = require('debug')('sleuth:logtable');
 
@@ -31,7 +31,7 @@ export class LogTableHeaderCell extends React.Component<LogTableHeaderCellProps,
   }
 
   public reverseSortDirection(sortDirection: string) {
-    return sortDirection === SORT_TYPES.DESC ? SORT_TYPES.ASC : SORT_TYPES.DESC;
+    return sortDirection === SORT_DIRECTION.DESC ? SORT_DIRECTION.ASC : SORT_DIRECTION.DESC;
   }
 
   public onContextMenu(e: React.MouseEvent<any>) {
@@ -49,14 +49,14 @@ export class LogTableHeaderCell extends React.Component<LogTableHeaderCellProps,
     if (this.props.onSortChange) {
       this.props.onSortChange(
         this.props.sortKey,
-        this.props.sortDirection ? this.reverseSortDirection(this.props.sortDirection) : SORT_TYPES.DESC
+        this.props.sortDirection ? this.reverseSortDirection(this.props.sortDirection) : SORT_DIRECTION.DESC
       );
     }
   }
 
   public render() {
     const { sortDirection, children, sortBy, sortKey } = this.props;
-    const sortIndicator = sortDirection && sortBy === sortKey ? (sortDirection === SORT_TYPES.DESC ? '↓' : '↑') : '';
+    const sortIndicator = sortDirection && sortBy === sortKey ? (sortDirection === SORT_DIRECTION.DESC ? '↓' : '↑') : '';
 
     return (
       <Cell onContextMenu={this.onContextMenu} onClick={this.onSortChange}>

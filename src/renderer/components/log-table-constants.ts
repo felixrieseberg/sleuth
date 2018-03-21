@@ -1,10 +1,10 @@
 import { LevelFilter, ProcessedLogFile, MergedLogFile, LogEntry } from '../interfaces';
 import { SleuthState } from '../state/sleuth';
 
-export const SORT_TYPES = {
-  ASC: 'ASC',
-  DESC: 'DESC',
-};
+export enum SORT_DIRECTION {
+  ASC = 'ASC',
+  DESC = 'DESC',
+}
 
 export interface RowClickEvent {
   index: number;
@@ -35,7 +35,7 @@ export interface LogTableState {
   selectedEntry?: LogEntry;
   selectedIndex?: number;
   sortBy?: string;
-  sortDirection?: string;
+  sortDirection?: SORT_DIRECTION;
   ignoreSearchIndex: boolean;
   scrollToSelection: boolean;
   columnWidths: LogTableColumnWidths;

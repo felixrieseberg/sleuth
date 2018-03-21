@@ -13,7 +13,7 @@ import { didFilterChange } from '../../utils/did-filter-change';
 import { Alert } from './alert';
 import { LogTableHeaderCell } from './log-table-headercell';
 import { isReduxAction } from '../../utils/is-redux-action';
-import { LogTableProps, LogTableState, COLUMN_WIDTHS, SORT_TYPES, SortFilterListOptions, COLUMN_TITLES } from './log-table-constants';
+import { LogTableProps, LogTableState, COLUMN_WIDTHS, SORT_DIRECTION, SortFilterListOptions, COLUMN_TITLES } from './log-table-constants';
 
 const debug = require('debug')('sleuth:logtable');
 const { DOWN } = Keys;
@@ -37,7 +37,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     this.state = {
       sortedList: [],
       sortBy: 'index',
-      sortDirection: 'ASC',
+      sortDirection: SORT_DIRECTION.DESC,
       searchList: [],
       ignoreSearchIndex: false,
       columnWidths: COLUMN_WIDTHS,
@@ -176,7 +176,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    * @param {string} sortBy
    * @param {string} sortDirection
    */
-  public onSortChange(sortBy: string, sortDirection: string) {
+  public onSortChange(sortBy: string, sortDirection: SORT_DIRECTION) {
     const currentState = this.state;
     const newSort = (currentState.sortBy !== sortBy || currentState.sortDirection !== sortDirection);
 
@@ -321,7 +321,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     if (!logFile) return [];
 
     const shouldFilter = this.shouldFilter(filter);
-    const noSort = (!sortBy || sortBy === 'index') && (!sortDirection || sortDirection === SORT_TYPES.ASC);
+    const noSort = (!sortBy || sortBy === 'index') && (!sortDirection || sortDirection === SORT_DIRECTION.ASC);
 
     // Check if we can bail early and just use the naked logEntries array
     if (noSort && !shouldFilter && !search) return logFile.logEntries;
@@ -358,7 +358,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
       sortedList = sortedList.sort(doSortByLine);
     }
 
-    if (sortDirection === SORT_TYPES.DESC) {
+    if (sortDirection === SORT_DIRECTION.DESC) {
       debug('Reversing');
       sortedList.reverse();
     }
