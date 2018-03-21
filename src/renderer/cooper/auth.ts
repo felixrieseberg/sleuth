@@ -61,24 +61,26 @@ export class CooperAuth {
         /https:\/\/\w*.slack.com\/messages$/i,
         /https:\/\/slack.com\/checkcookie\?redir/i
       ];
-
-      this.signInWindow.on('close', () => {
-        debug(`Signin window closed`);
-        resolve(false);
-      });
-
-      webContents.on('will-navigate', (e, navigatedUrl) => {
-        debug(`Sign in window navigation attempt:`, navigatedUrl);
+      const loadTeamMaybe = (e: any, url: string) => {
+        debug(`Sign in window navigation attempt:`, url);
 
         detectSlackRegex.forEach((rgx) => {
-          if (rgx.test(navigatedUrl)) {
+          if (rgx.test(url)) {
             // We ended up on slack.com/messages. Hopefully the cookie
             // is set, but let's restart;
             e.preventDefault();
             setTimeout(() => this.signInWindow.loadURL(this.signInUrl), 400);
           }
         });
+      };
+
+      this.signInWindow.on('close', () => {
+        debug(`Signin window closed`);
+        resolve(false);
       });
+
+      webContents.on('will-navigate', (e, url) => loadTeamMaybe(e, url));
+      webContents.on('new-window', (e, url) => loadTeamMaybe(e, url));
 
       webContents.on('did-finish-load', async () => {
         const url = webContents.getURL();
@@ -88,6 +90,10 @@ export class CooperAuth {
           this.signInWindow.show();
         } else {
           this.signInWindow.show();
+        }
+
+        if (url.startsWith('https://slack.enterprise.slack.com/?redir=')) {
+          this.tryToLaunchGlobal();
         }
 
         if (!url.startsWith(`${this.serverUrl}/cooper/signin/callback?access_token=`)) {
@@ -137,6 +143,16 @@ export class CooperAuth {
       if (!this.signInWindow) return reject('Tried to get results, but could not find window');
 
       this.signInWindow.webContents.executeJavaScript(`tryToEnterTeamDomain()`, false, () => {
+        resolve();
+      });
+    });
+  }
+
+  public tryToLaunchGlobal() {
+    return new Promise((resolve, reject) => {
+      if (!this.signInWindow) return reject('Tried to get results, but could not find window');
+
+      this.signInWindow.webContents.executeJavaScript(`tryToLaunchGlobal()`, false, () => {
         resolve();
       });
     });

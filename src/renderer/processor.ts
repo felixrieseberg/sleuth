@@ -306,9 +306,11 @@ export function readFile(logFile: UnzippedFile, logType: string = ''): Promise<A
  * @returns {(MatchResult | undefined)}
  */
 export function matchLineWebApp(line: string): MatchResult | undefined {
-  // Matcher for the webapp, which is a bit dirty
+  // Matcher for the webapp, which is a bit dirty. This beast of a regex
+  // matches two possible timestamps:
   // info: 2017/2/22 16:02:37.178 didStartLoading called TSSSB.timeout_tim set for ms:60000
-  const webappRegex = /^(\w{4,8}): (\d{4}\/\d{1,2}\/\d{1,2} \d{2}:\d{2}:\d{2}.\d{0,3}) ([\s\S]*)$/;
+  // info: Mar-19 13:50:41.676 [FOCUS-EVENT] Window focused
+  const webappRegex = /^(\w{4,8}): ((?:\d{4}\/\d{1,2}\/\d{1,2})|(?:.{3}-\d{1,2}) \d{2}:\d{2}:\d{2}.\d{0,3}) ([\s\S]*)$/;
   // Matcher for webapp logs that don't have a timestamp, but do have a level 🙄
   // info: ╔═══════════════════════════════════════════════════════════════════════╗
   // Sometimes they just log
