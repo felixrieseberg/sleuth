@@ -3,7 +3,7 @@ import { config } from '../../config';
 import { remote } from 'electron';
 import { sleuthState } from '../state/sleuth';
 
-const { BrowserWindow } = remote;
+const { BrowserWindow, dialog } = remote;
 const debug = require('debug')('sleuth:cooper');
 
 export interface SigninOptions {
@@ -43,8 +43,25 @@ export class CooperAuth {
       .catch((error) => debug(error));
   }
 
-  public showSignInWindow(): Promise<boolean> {
+  public showSignInWindowWarning(): Promise<void> {
     return new Promise((resolve) => {
+      const options: Electron.MessageBoxOptions = {
+        type: 'info',
+        buttons: [ 'Okay' ],
+        title: 'Sleuth tries to help',
+        message: `To sign in, please sign into the Slack team "tinyspeck". ` +
+          `If asked which workspace to launch, please select "Global".\n\n` +
+          `Sleuth will attempt to click the right buttons automatically.`
+      };
+
+      dialog.showMessageBox(remote.getCurrentWindow(), options, () => resolve());
+    });
+  }
+
+  public showSignInWindow(): Promise<boolean> {
+    return new Promise(async (resolve) => {
+      await this.showSignInWindowWarning();
+
       this.signInWindow = new BrowserWindow({
         height: 700,
         width: 800,
