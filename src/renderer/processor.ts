@@ -111,9 +111,9 @@ export function getTypeForFile(logFile: UnzippedFile): string {
   const fileName = path.basename(logFile.fileName);
   let logType: string = '';
 
-  if (fileName.startsWith('browser')) {
+  if (fileName.startsWith('browser') || fileName === 'epics-browser.log') {
     logType = 'browser';
-  } else if (fileName.startsWith('renderer')) {
+  } else if (fileName.startsWith('renderer') || fileName === 'epics-renderer.log') {
     logType = 'renderer';
   } else if (fileName.startsWith('webapp')) {
     logType = 'webapp';
