@@ -30,7 +30,7 @@ if (require('electron-squirrel-startup')) {
       show: !!config.isDevMode,
       minHeight: 500,
       minWidth: 1000,
-      titleBarStyle: process.platform === 'darwin' ? 'hidden-inset' : undefined
+      titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : undefined
     });
 
     mainWindowState.manage(mainWindow);
