@@ -274,7 +274,6 @@ export function readFile(logFile: UnzippedFile, logType: string = ''): Promise<A
         current = makeLogEntry(matched, logType, readLines, logFile.fullPath);
       } else {
         // We couldn't match, let's treat it
-
         if (logType === 'call' && current) {
           // Call logs sometimes have rando newlines, for like no reason.
           current.message += line;
@@ -354,11 +353,11 @@ export function matchLineWebApp(line: string): MatchResult | undefined {
 export function matchLineElectron(line: string): MatchResult | undefined {
   // Matcher for Slack Desktop, 2.6.0 and onwards!
   // [02/22/17, 16:02:33:371] info: Store: UPDATE_SETTINGS
-  const desktopRegex = /^\[([\d\/\,\s\:]{22})\] ([A-Za-z]{0,20})\: ([\s\S]*)$/;
+  const desktopRegex = /^\[([\d\/\,\s\:]{22})\] ([A-Za-z]{0,20})\: ([\s\S]*)$/g;
   // Matcher for Slack Desktop, older versions
   // 2016-10-19T19:19:56.485Z - info: LOAD_PERSISTENT : {
-  const desktopOldRegex = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{1,3}.) - (\w{4,8}): ([\s\S]*)$/;
-  const endsWithObjectRegex = /^([\s\S]*) : {$/;
+  const desktopOldRegex = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{1,3}.) - (\w{4,8}): ([\s\S]*)$/g;
+  const endsWithObjectRegex = /^([\s\S]*) : {$/g;
 
   // Try the new format first
   let results = desktopRegex.exec(line);

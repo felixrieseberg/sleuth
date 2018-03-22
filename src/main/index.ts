@@ -36,7 +36,7 @@ if (require('electron-squirrel-startup')) {
     mainWindowState.manage(mainWindow);
 
     // and load the index.html of the app.
-    mainWindow.loadURL(`file://${__dirname}/../static/index.jade`);
+    mainWindow.loadFile('src/static/index.jade');
 
     // Open the DevTools.
     if (config.isDevMode) {
