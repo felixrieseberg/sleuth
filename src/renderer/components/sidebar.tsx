@@ -208,7 +208,7 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
               <ul className='primary_nav'>
                 <li className='MenuTitle MenuTitle-Webview'>
                   <a onClick={() => selectLogFile(null, 'webview')} className={getSelectedClassName('webview')}>
-                    {this.renderIcon('webview')}WebView Process
+                    {this.renderIcon('webview')}BrowserView Process
                   </a>
                 </li>
                 {webviewFiles}
