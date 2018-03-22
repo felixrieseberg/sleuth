@@ -10,7 +10,7 @@ export interface SidebarProps {
   logFiles: ProcessedLogFiles;
   isOpen: boolean;
   selectedLogFileName: string;
-  selectLogFile: (logFile: ProcessedLogFile | UnzippedFile | null, logType?: string) => Promise<void>;
+  selectLogFile: (logFile: ProcessedLogFile | UnzippedFile | null, logType?: string) => void;
   mergedFilesStatus: MergedFilesLoadStatus;
 }
 

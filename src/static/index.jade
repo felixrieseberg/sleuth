@@ -10,6 +10,8 @@ html(style='width: 100%; height: 100%;')
   body(tabindex='-1', style='width: 100%; height: 100%; margin: 0; overflow: hidden')
     div#SlackApp
   script.
+    process.env.NODE_ENV = 'production';
+
     const React = require('react');
     const ReactDOM = require('react-dom');
     const { App } = require('../renderer/components/app');

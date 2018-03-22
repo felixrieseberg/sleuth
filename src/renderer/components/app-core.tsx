@@ -184,14 +184,19 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
    * @param {ProcessedLogFile} logFile
    * @param {string} [logType]
    */
-  public async selectLogFile(logFile: ProcessedLogFile | UnzippedFile | null, logType?: string): Promise<void> {
+  public selectLogFile(logFile: ProcessedLogFile | UnzippedFile | null, logType?: string): void {
     if (!logFile && logType) {
       const { mergedLogFiles } = this.state;
+
+      debug(`Selecting log type ${logType}`);
 
       if (mergedLogFiles && mergedLogFiles[logType]) {
         this.props.state.selectedLogFile = mergedLogFiles[logType];
       }
     } else if (logFile) {
+      const name = isProcessedLogFile(logFile) ? logFile.logType : logFile.fileName;
+      debug(`Selecting log file ${name}`);
+
       this.props.state.selectedLogFile = logFile;
     }
   }

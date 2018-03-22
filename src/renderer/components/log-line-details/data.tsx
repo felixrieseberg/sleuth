@@ -70,7 +70,7 @@ export class LogLineData extends React.PureComponent<LogLineDataProps, LogLineDa
       const tableRows = splitRaw.map((line, i) => {
         const columns = line.split('|').map((v) => (v || '').trim());
         const elements = columns.map((c) => i === 0 ? <th>{c}</th> : <td>{c}</td>);
-        return (<tr key={i}>{elements}</tr>);
+        return (<tr key={`${i}-${line}`}>{elements}</tr>);
       });
 
       return (<table className='ConvertedTable'>{tableRows}</table>);
