@@ -32,7 +32,7 @@ const options = {
 if (process.env.SLEUTH_CERTIFICATE_FILE && process.env.SLEUTH_CERTIFICATE_PASSWORD) {
   options.electronWinstallerConfig.certificateFile = process.env.SLEUTH_CERTIFICATE_FILE;
   options.electronWinstallerConfig.certificatePassword = process.env.SLEUTH_CERTIFICATE_PASSWORD;
-} else {
+} else if (process.platform === 'win32') {
   console.log(`Warning: Password or certificate missing`);
   console.log(`You can set it with SLEUTH_CERTIFICATE_FILE and SLEUTH_CERTIFICATE_PASSWORD`);
   console.log(`Currently set:`);
