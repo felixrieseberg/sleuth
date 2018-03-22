@@ -69,7 +69,7 @@ export class Comment extends React.Component<CommentProps, Partial<CommentState>
     e.preventDefault();
     if (!lineId || editValue === undefined) return;
 
-    cooperComments.updateComment(lineId, commentId, log, editValue)
+    cooperComments.updateComment(lineId, commentId, editValue, log)
       .then(async (result) => {
         debug(`Posted a comment to cooper`, result);
 
@@ -95,7 +95,9 @@ export class Comment extends React.Component<CommentProps, Partial<CommentState>
           onChange={this.handleChange}
           value={editValue}
         />
-        <LaddaButton type='submit' {...buttonOptions}>Edit</LaddaButton>
+        <LaddaButton type='submit' {...buttonOptions}>
+          {editValue ? 'Save' : 'Delete'}
+        </LaddaButton>
       </form>
     );
   }
