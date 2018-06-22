@@ -112,8 +112,13 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
     const isSelected = (selectedLogFileName === file.fileName);
     const className = classNames({ Selected: isSelected });
 
-    const nameMatch = file.fileName.match(/slack-(\w*)/);
-    const name = nameMatch && nameMatch.length > 1 ? nameMatch[1] : file.fileName;
+    let name;
+    if (file.fileName.endsWith('gpu-log.html')) {
+      name = 'gpuLog';
+    } else {
+      const nameMatch = file.fileName.match(/slack-(\w*)/);
+      name = nameMatch && nameMatch.length > 1 ? nameMatch[1] : file.fileName;
+    }
 
     return (
         <li key={file.fileName}>
