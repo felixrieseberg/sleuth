@@ -20,7 +20,7 @@ export interface StateTableState {
   path?: string;
 }
 
-export type StateFileType = 'appTeams' | 'teams' | 'dialog' | 'unkown' | 'unreads' | 'settings' | 'windowFrame' | 'gpuInfo';
+export type StateFileType = 'appTeams' | 'teams' | 'dialog' | 'unkown' | 'unreads' | 'settings' | 'windowFrame' | 'html';
 
 export class StateTable extends React.Component<StateTableProps, StateTableState> {
   constructor(props: StateTableProps) {
@@ -34,8 +34,8 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
     return !!_file.fullPath;
   }
 
-  public isGpuFile(file: UnzippedFile) {
-    return file.fullPath.endsWith('gpu-log.html');
+  public isHtmlFile(file: UnzippedFile) {
+    return file.fullPath.endsWith('.html');
   }
 
   public componentDidMount() {
@@ -59,8 +59,8 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
 
     if (!this.isStateFile(selectedLogFile)) throw new Error('StateTable: No file');
 
-    if (this.isGpuFile(selectedLogFile)) {
-      return 'gpuInfo' as StateFileType;
+    if (this.isHtmlFile(selectedLogFile)) {
+      return 'html' as StateFileType;
     }
 
     const nameMatch = selectedLogFile.fileName.match(/slack-(\w*)/);
@@ -76,7 +76,7 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
 
     debug(`Reading ${file.fullPath}`);
 
-    if (this.isGpuFile(file)) {
+    if (this.isHtmlFile(file)) {
       this.setState({ data: undefined, path: file.fullPath });
       return;
     }
