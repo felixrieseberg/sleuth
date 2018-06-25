@@ -13,7 +13,7 @@ export function getSettingsInfo(data: any): Array<JSX.Element> {
   result.push(<p>💻 {getHWInfo(data)}</p>);
   result.push(<p>⏰ {getMinWebInfo(data)}</p>);
 
-  return  result;
+  return result;
 }
 
 export function getMinWebInfo({ workspaceIdleTimeout }: any): string {

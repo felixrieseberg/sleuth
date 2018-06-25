@@ -145,7 +145,7 @@ export function getTypesForFiles(logFiles: UnzippedFiles): SortedUnzippedFiles {
   };
 
   logFiles.forEach((logFile) => {
-    if (isStateFile.test(logFile.fileName) || logFile.fileName.endsWith('.html')) {
+    if (isStateFile.test(logFile.fileName) || logFile.fileName.endsWith('.html') || logFile.fileName.endsWith('.json')) {
       result.state.push(logFile);
     } else {
       const logType = getTypeForFile(logFile);

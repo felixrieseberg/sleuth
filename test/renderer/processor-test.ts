@@ -229,6 +229,10 @@ describe('getTypesForFiles', () => {
       fileName: 'gpu-log.html',
       fullPath: '_',
       size: 0
+    }, {
+      fileName: 'notification-warnings.json',
+      fullPath: '_',
+      size: 0
     }];
 
     const result = getTypesForFiles(files as UnzippedFiles);
@@ -237,7 +241,7 @@ describe('getTypesForFiles', () => {
     expect(result.renderer.length).to.be.equal(2);
     expect(result.webapp.length).to.be.equal(1);
     expect(result.webview.length).to.be.equal(1);
-    expect(result.state.length).to.be.equal(2);
+    expect(result.state.length).to.be.equal(3);
   });
 });
 

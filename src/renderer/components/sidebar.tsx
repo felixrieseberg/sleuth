@@ -115,6 +115,8 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
     let name;
     if (file.fileName.endsWith('gpu-log.html')) {
       name = 'gpuLog';
+    } else if (file.fileName.endsWith('notification-warnings.json')) {
+      name = 'notifWarnings';
     } else {
       const nameMatch = file.fileName.match(/slack-(\w*)/);
       name = nameMatch && nameMatch.length > 1 ? nameMatch[1] : file.fileName;
