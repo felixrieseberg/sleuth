@@ -17,9 +17,10 @@ export interface StateTableProps {
 
 export interface StateTableState {
   data?: any;
+  path?: string;
 }
 
-export type StateFileType = 'appTeams' | 'teams' | 'dialog' | 'unkown' | 'unreads' | 'settings' | 'windowFrame';
+export type StateFileType = 'appTeams' | 'teams' | 'dialog' | 'unkown' | 'unreads' | 'settings' | 'windowFrame' | 'html';
 
 export class StateTable extends React.Component<StateTableProps, StateTableState> {
   constructor(props: StateTableProps) {
@@ -31,6 +32,10 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
   public isStateFile(file?: ProcessedLogFile | MergedLogFile | UnzippedFile): file is UnzippedFile {
     const _file = file as UnzippedFile;
     return !!_file.fullPath;
+  }
+
+  public isHtmlFile(file: UnzippedFile) {
+    return file.fullPath.endsWith('.html');
   }
 
   public componentDidMount() {
@@ -54,6 +59,10 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
 
     if (!this.isStateFile(selectedLogFile)) throw new Error('StateTable: No file');
 
+    if (this.isHtmlFile(selectedLogFile)) {
+      return 'html' as StateFileType;
+    }
+
     const nameMatch = selectedLogFile.fileName.match(/slack-(\w*)/);
     const type = nameMatch && nameMatch.length > 1 ? nameMatch[1] : 'unknown';
 
@@ -66,6 +75,11 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
     }
 
     debug(`Reading ${file.fullPath}`);
+
+    if (this.isHtmlFile(file)) {
+      this.setState({ data: undefined, path: file.fullPath });
+      return;
+    }
 
     fs.readFile(file.fullPath, 'utf8')
       .then((rawData) => {
@@ -81,7 +95,7 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
           }
         }
 
-        this.setState({ data });
+        this.setState({ data, path: undefined });
       })
       .catch((error) => {
         debug(error);
@@ -185,20 +199,24 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
   }
 
   public render(): JSX.Element {
-    const { data } = this.state;
+    const { data, path } = this.state;
 
-    if (!data) {
+    if (!data && !path) {
       return <div />;
     }
 
     const theme = this.getTheme();
     const info = this.renderInfo();
 
+    const content = (!data && path)
+      ? <iframe src={path} style={{ height: '100%', width: '100%' }} />
+      : <JSONTree data={data} theme={theme} />;
+
     return (
       <div className='StateTable' style={{ fontFamily: this.props.state.font }}>
         <div className='StateTable-Content'>
           {info}
-          <JSONTree data={data} theme={theme}  />
+          {content}
         </div>
       </div>
     );
