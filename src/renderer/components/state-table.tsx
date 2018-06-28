@@ -7,6 +7,7 @@ import { shell } from 'electron';
 import { MergedLogFile, ProcessedLogFile } from '../interfaces';
 import { SleuthState } from '../state/sleuth';
 import { getSettingsInfo } from '../analytics/settings-analytics';
+import { getNotifWarningsInfo } from '../analytics/notification-warning-analytics';
 import { UnzippedFile } from '../unzip';
 
 const debug = require('debug')('sleuth:statetable');
@@ -20,7 +21,7 @@ export interface StateTableState {
   path?: string;
 }
 
-export type StateFileType = 'appTeams' | 'teams' | 'dialog' | 'unkown' | 'unreads' | 'settings' | 'windowFrame' | 'html';
+export type StateFileType = 'appTeams' | 'teams' | 'dialog' | 'unknown' | 'unreads' | 'settings' | 'windowFrame' | 'html' | 'notifs';
 
 export class StateTable extends React.Component<StateTableProps, StateTableState> {
   constructor(props: StateTableProps) {
@@ -36,6 +37,10 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
 
   public isHtmlFile(file: UnzippedFile) {
     return file.fullPath.endsWith('.html');
+  }
+
+  public isNotifsFile(file: UnzippedFile) {
+    return file.fullPath.endsWith('notification-warnings.json');
   }
 
   public componentDidMount() {
@@ -61,6 +66,10 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
 
     if (this.isHtmlFile(selectedLogFile)) {
       return 'html' as StateFileType;
+    }
+
+    if (this.isNotifsFile(selectedLogFile)) {
+      return 'notifs' as StateFileType;
     }
 
     const nameMatch = selectedLogFile.fileName.match(/slack-(\w*)/);
@@ -158,7 +167,6 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
       );
   }
 
-
   public renderTeamsInfo(): JSX.Element | null {
     const { data } = this.state;
     const teams = data ? Object.keys(data).map((k) => data[k]) : null;
@@ -184,6 +192,24 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
       );
   }
 
+  public renderNotifsInfo(): JSX.Element | null {
+    const { data } = this.state;
+
+    if (!Array.isArray(data) || data.length === 0) {
+      return (
+        <div className='StateTable-Warning-Info'>
+          No notification warnings were found!
+        </div>
+      );
+    }
+
+    return (
+      <div className='StateTable-Warning-Info'>
+        {...getNotifWarningsInfo(data || {})}
+      </div>
+    );
+  }
+
   public renderInfo(): JSX.Element | null {
     const type = this.getFileType();
 
@@ -193,6 +219,8 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
       return this.renderWindowFrameInfo();
     } else if (type === 'settings') {
       return this.renderSettingsInfo();
+    } else if (type === 'notifs') {
+      return this.renderNotifsInfo();
     }
 
     return null;
