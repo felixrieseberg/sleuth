@@ -1,7 +1,6 @@
 import * as React from 'react';
 
 export const warningDescriptionDict = {
-
   'Quiet Hours': {
     QUIET_HOURS: 'Are Windows Quiet Hours (8 - 10) or Windows Focus Assist (10+) active?',
   },
@@ -62,15 +61,14 @@ export const categoryDescriptionDict = {
   'Slack Preferences': '',
 };
 
-export function getNotifWarningsInfo(data: any): Array<JSX.Element> {
+export function getNotifWarningsInfo(data: Array<string>): Array<JSX.Element> {
   const result: Array<JSX.Element> = [];
   result.push(<p>⚠️ The following notification warnings were detected. ⚠️</p>);
 
-  Object.keys(categoryDescriptionDict).forEach(function(category: string) {
-
+  Object.keys(categoryDescriptionDict).forEach((category: string) => {
     const categoryWarnings = intersect(category, data);
-    if (typeof categoryWarnings !== 'undefined' && categoryWarnings.length > 0) {
-      const warningList: Array<JSX.Element | null> = categoryWarnings.map((w: any) => {
+    if (categoryWarnings && categoryWarnings.length > 0) {
+      const warningList: Array<JSX.Element> = categoryWarnings.map((w: string) => {
         return (<li key={w}>{w}: {warningDescriptionDict[category][w]}</li>);
       });
 
@@ -83,6 +81,6 @@ export function getNotifWarningsInfo(data: any): Array<JSX.Element> {
   return result;
 }
 
-export function intersect(category: string, data: any): Array<string> {
+export function intersect(category: string, data: Array<string>): Array<string> {
   return Object.keys(warningDescriptionDict[category]).filter((value) => -1 !== data.indexOf(value.toString()));
 }
