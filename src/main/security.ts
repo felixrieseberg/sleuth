@@ -1,5 +1,5 @@
 import { app } from 'electron';
-import * as URL from 'url';
+import { URL } from 'url';
 
 /**
  * Attempts to secure the app by disallowing things we do
