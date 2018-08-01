@@ -31,7 +31,6 @@ export class AppCoreHeader extends React.Component<AppCoreHeaderProps, AppCoreHe
     return (
       <header className={appCoreHeaderClassName}>
         <a id='menu_toggle' onClick={() => this.props.menuToggle()}>
-          <span className='menu_icon' />
           <span className='menu_label'>Menu</span>
           <span className='vert_divider' />
         </a>
