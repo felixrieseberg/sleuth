@@ -1,6 +1,8 @@
 import { app } from 'electron';
 import { URL } from 'url';
 
+// tslint:disable:no-console
+
 /**
  * Attempts to secure the app by disallowing things we do
  * not need.
@@ -10,17 +12,26 @@ import { URL } from 'url';
 export function secureApp() {
   app.on('web-contents-created', (_event, webContents) => {
     // Disallow navigation
-    webContents.on('will-navigate', (event, navigationUrl) => {
-      const parsedUrl = new URL(navigationUrl);
+    webContents.on('will-navigate', (event, url) => {
+      const parsedUrl = new URL(url);
 
-      if (parsedUrl.hostname !== 'slack.com' && parsedUrl.protocol !== 'file') {
+      const isSlack = parsedUrl.hostname.endsWith('slack.com');
+      const isOkta = parsedUrl.hostname.endsWith('okta.com');
+      const isFile = parsedUrl.protocol === 'file';
+
+      if (!isSlack && !isOkta && !isFile) {
+        console.warn(`Prevented navigation to ${url}`);
+        console.log(`Hostname: ${parsedUrl.hostname}`);
         event.preventDefault();
       }
     });
 
     // Disallow new-window
-    webContents.on('new-window', (event) => {
+    webContents.on('new-window', (event, url) => {
+      console.warn(`Prevented new-window for ${url}`);
       event.preventDefault();
     });
   });
 }
+
+// tslint:enable:no-console
