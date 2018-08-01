@@ -1,9 +1,10 @@
-import { config } from '../config';
 import { app, BrowserWindow } from 'electron';
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
 import * as windowStateKeeper from 'electron-window-state';
 
+import { config } from '../config';
 import { IpcManager } from './ipc';
+import { secureApp } from './security';
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -15,6 +16,7 @@ if (require('electron-squirrel-startup')) {
 } else {
   const createWindow = async () => {
     require('electron-context-menu')();
+
 
     const mainWindowState = windowStateKeeper({
       defaultWidth: 1200,
@@ -30,7 +32,10 @@ if (require('electron-squirrel-startup')) {
       show: !!config.isDevMode,
       minHeight: 500,
       minWidth: 1000,
-      titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : undefined
+      titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : undefined,
+      webPreferences: {
+        webviewTag: false
+      }
     });
 
     mainWindowState.manage(mainWindow);
@@ -75,7 +80,10 @@ if (require('electron-squirrel-startup')) {
   // This method will be called when Electron has finished
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
-  app.on('ready', createWindow);
+  app.on('ready', () => {
+    secureApp();
+    createWindow();
+  });
 
   // Quit when all windows are closed.
   app.on('window-all-closed', () => {
