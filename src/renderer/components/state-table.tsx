@@ -235,9 +235,15 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
 
     const theme = this.getTheme();
     const info = this.renderInfo();
+    const onIFrameLoad = function(this: HTMLIFrameElement) {
+      if (this) {
+        const { document: idoc } = this.contentWindow!;
+        this.height = `${idoc.body.scrollHeight}px`;
+      }
+    };
 
     const content = (!data && path)
-      ? <iframe src={path} style={{ height: '100%', width: '100%' }} />
+      ? <iframe onLoad={onIFrameLoad} src={path} />
       : <JSONTree data={data} theme={theme} />;
 
     return (
