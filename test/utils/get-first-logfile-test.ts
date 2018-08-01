@@ -16,7 +16,7 @@ const files: ProcessedLogFiles = {
   renderer: [],
   call: [],
   webapp: [],
-  webview: [],
+  preload: [],
   state: []
 };
 
@@ -57,9 +57,9 @@ describe('getFirstLogFile', () => {
     expect(getFirstLogFile(files)).to.be.deep.equal(fakeFile);
   });
 
-  it('should return the first logfile (webview if available)', () => {
-    fakeFile.logType = 'webview';
-    files.webview = [fakeFile];
+  it('should return the first logfile (preload if available)', () => {
+    fakeFile.logType = 'preload';
+    files.preload = [fakeFile];
 
     expect(getFirstLogFile(files)).to.be.deep.equal(fakeFile);
   });

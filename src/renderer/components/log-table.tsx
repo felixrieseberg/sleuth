@@ -454,8 +454,8 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
       prefix = <i title='Renderer Log' className='Meta Color-Renderer ts_icon ts_icon_laptop'/>;
     } else if (entry.logType === 'webapp') {
       prefix = <i title='Webapp Log' className='Meta Color-Webapp ts_icon ts_icon_globe'/>;
-    } else if (entry.logType === 'webview') {
-      prefix = <i title='Webview Log' className='Meta Color-Webview ts_icon ts_icon_all_files_alt'/>;
+    } else if (entry.logType === 'preload') {
+      prefix = <i title='Preload Log' className='Meta Color-Preload ts_icon ts_icon_all_files_alt'/>;
     } else if (entry.logType === 'call') {
       prefix = <i title='Call Log' className='Meta Color-Call ts_icon ts_icon_phone'/>;
     }

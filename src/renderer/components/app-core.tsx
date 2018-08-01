@@ -50,7 +50,7 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
       processedLogFiles: {
         browser: [],
         renderer: [],
-        webview: [],
+        preload: [],
         webapp: [],
         state: [],
         call: []
@@ -121,8 +121,8 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
       .then((newFiles: Array<ProcessedLogFile>) => this.addFilesToState(newFiles, 'browser'));
     await processLogFiles(sortedUnzippedFiles.webapp)
       .then((newFiles: Array<ProcessedLogFile>) => this.addFilesToState(newFiles, 'webapp'));
-    await processLogFiles(sortedUnzippedFiles.webview)
-      .then((newFiles: Array<ProcessedLogFile>) => this.addFilesToState(newFiles, 'webview'));
+    await processLogFiles(sortedUnzippedFiles.preload)
+      .then((newFiles: Array<ProcessedLogFile>) => this.addFilesToState(newFiles, 'preload'));
     await processLogFiles(sortedUnzippedFiles.call)
       .then((newFiles: Array<ProcessedLogFile>) => this.addFilesToState(newFiles, 'call'));
 
@@ -161,12 +161,12 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
     if (processedLogFiles) {
       await mergeLogFiles(processedLogFiles.browser, 'browser').then((r) => this.setMergedFile(r));
       await mergeLogFiles(processedLogFiles.renderer, 'renderer').then((r) => this.setMergedFile(r));
-      await mergeLogFiles(processedLogFiles.webview, 'webview').then((r) => this.setMergedFile(r));
+      await mergeLogFiles(processedLogFiles.preload, 'preload').then((r) => this.setMergedFile(r));
       await mergeLogFiles(processedLogFiles.call, 'call').then((r) => this.setMergedFile(r));
 
       const merged = this.state.mergedLogFiles as MergedLogFiles;
 
-      mergeLogFiles([merged.browser, merged.renderer, merged.webview, merged.call], 'all').then((r) => this.setMergedFile(r));
+      mergeLogFiles([merged.browser, merged.renderer, merged.preload, merged.call], 'all').then((r) => this.setMergedFile(r));
     }
   }
 
@@ -248,7 +248,7 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
       all: !!(mergedLogFiles && mergedLogFiles.all && mergedLogFiles.all.logEntries),
       browser: !!(mergedLogFiles && mergedLogFiles.browser && mergedLogFiles.browser.logEntries),
       renderer: !!(mergedLogFiles && mergedLogFiles.renderer && mergedLogFiles.renderer.logEntries),
-      webview: !!(mergedLogFiles && mergedLogFiles.webview && mergedLogFiles.webview.logEntries),
+      preload: !!(mergedLogFiles && mergedLogFiles.preload && mergedLogFiles.preload.logEntries),
       webapp: !!(mergedLogFiles && mergedLogFiles.webapp && mergedLogFiles.webapp.logEntries),
       call: !!(mergedLogFiles && mergedLogFiles.call && mergedLogFiles.call.logEntries),
     };

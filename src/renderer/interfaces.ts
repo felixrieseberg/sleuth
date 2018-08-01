@@ -1,6 +1,6 @@
 import { UnzippedFile } from './unzip';
 
-export type LogType = 'browser' | 'renderer' | 'call' | 'webapp' | 'webview' | 'all';
+export type LogType = 'browser' | 'renderer' | 'call' | 'webapp' | 'preload' | 'all';
 
 export type LogFile = UnzippedFile | MergedLogFile | ProcessedLogFile;
 
@@ -31,7 +31,7 @@ export interface MergedLogFiles {
   browser: MergedLogFile;
   renderer: MergedLogFile;
   webapp: MergedLogFile;
-  webview: MergedLogFile;
+  preload: MergedLogFile;
   call: MergedLogFile;
   type: 'MergedLogFiles';
 }
@@ -46,7 +46,7 @@ export interface ProcessedLogFile {
 export interface ProcessedLogFiles {
   browser: Array<ProcessedLogFile>;
   renderer: Array<ProcessedLogFile>;
-  webview: Array<ProcessedLogFile>;
+  preload: Array<ProcessedLogFile>;
   webapp: Array<ProcessedLogFile>;
   state: Array<UnzippedFile>;
   call: Array<ProcessedLogFile>;
@@ -69,7 +69,7 @@ export interface CombinedLogFiles {
 export interface SortedUnzippedFiles {
   browser: Array<UnzippedFile>;
   renderer: Array<UnzippedFile>;
-  webview: Array<UnzippedFile>;
+  preload: Array<UnzippedFile>;
   webapp: Array<UnzippedFile>;
   state: Array<UnzippedFile>;
   call: Array<UnzippedFile>;
@@ -79,7 +79,7 @@ export interface MergedFilesLoadStatus {
   all: boolean;
   browser: boolean;
   renderer: boolean;
-  webview: boolean;
+  preload: boolean;
   webapp: boolean;
   call: boolean;
 }

@@ -39,7 +39,7 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
       mergedFilesStatus.browser !== next.mergedFilesStatus.browser ||
       mergedFilesStatus.renderer !== next.mergedFilesStatus.renderer ||
       mergedFilesStatus.webapp !== next.mergedFilesStatus.webapp ||
-      mergedFilesStatus.webview !== next.mergedFilesStatus.webview
+      mergedFilesStatus.preload !== next.mergedFilesStatus.preload
     ) {
       return true;
     }
@@ -54,7 +54,7 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
       !isEqualArrays(oldNames.browser, newNames.browser) ||
       !isEqualArrays(oldNames.renderer, newNames.renderer) ||
       !isEqualArrays(oldNames.webapp, newNames.webapp) ||
-      !isEqualArrays(oldNames.webview, newNames.webview)
+      !isEqualArrays(oldNames.preload, newNames.preload)
     ) {
       return true;
     }
@@ -73,7 +73,7 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
         browser: [],
         renderer: [],
         webapp: [],
-        webview: [],
+        preload: [],
         call: []
       };
     }
@@ -82,7 +82,7 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
       browser: getNames(logFiles.browser),
       renderer: getNames(logFiles.renderer),
       webapp: getNames(logFiles.webapp),
-      webview: getNames(logFiles.webview),
+      preload: getNames(logFiles.preload),
       call: getNames(logFiles.call)
     };
   }
@@ -114,9 +114,9 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
 
     let name;
     if (file.fileName.endsWith('gpu-log.html')) {
-      name = 'gpuLog';
+      name = 'GPU';
     } else if (file.fileName.endsWith('notification-warnings.json')) {
-      name = 'notifWarnings';
+      name = 'notification warnings';
     } else {
       const nameMatch = file.fileName.match(/slack-(\w*)/);
       name = nameMatch && nameMatch.length > 1 ? nameMatch[1] : file.fileName;
@@ -149,7 +149,7 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
         return <i className='ts_icon ts_icon_power_off' />;
       } else if (logType === 'renderer') {
         return <i className='ts_icon ts_icon_laptop' />;
-      } else if (logType === 'webview') {
+      } else if (logType === 'preload') {
         return <i className='ts_icon ts_icon_all_files_alt' />;
       } else if (logType === 'all') {
         return <i className='ts_icon ts_icon_archive' />;
@@ -173,7 +173,7 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
     const browserFiles = logFiles.browser.map(this.renderFile.bind(this));
     const rendererFiles = logFiles.renderer.map(this.renderFile.bind(this));
     const webappFiles = logFiles.webapp.map(this.renderFile.bind(this));
-    const webviewFiles = logFiles.webview.map(this.renderFile.bind(this));
+    const preloadFiles = logFiles.preload.map(this.renderFile.bind(this));
     const callFiles = logFiles.call.map(this.renderFile.bind(this));
 
     return (
@@ -213,17 +213,17 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
                 {rendererFiles}
               </ul>
               <ul className='primary_nav'>
-                <li className='MenuTitle MenuTitle-Webview'>
-                  <a onClick={() => selectLogFile(null, 'webview')} className={getSelectedClassName('webview')}>
-                    {this.renderIcon('webview')}BrowserView Process
+                <li className='MenuTitle MenuTitle-Preload'>
+                  <a onClick={() => selectLogFile(null, 'preload')} className={getSelectedClassName('preload')}>
+                    {this.renderIcon('preload')}BrowserView Process
                   </a>
                 </li>
-                {webviewFiles}
+                {preloadFiles}
               </ul>
               <ul className='primary_nav'>
                 <li className='MenuTitle MenuTitle-Call'>
                   <a onClick={() => selectLogFile(null, 'call')} className={getSelectedClassName('call')}>
-                    <i className='ts_icon ts_icon_phone' />Call
+                    <i className='ts_icon ts_icon_phone' />Calls
                   </a>
                 </li>
                 {callFiles}

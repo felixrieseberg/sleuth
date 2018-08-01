@@ -103,7 +103,7 @@ export function mergeLogFiles(logFiles: Array<ProcessedLogFile>|Array<MergedLogF
 }
 
 /**
- * Takes a logfile and returns the file's type (browser/renderer/webapp/webview).
+ * Takes a logfile and returns the file's type (browser/renderer/webapp/preload).
  * @param {UnzippedFile} logFile
  * @returns {string}
  */
@@ -113,12 +113,12 @@ export function getTypeForFile(logFile: UnzippedFile): string {
 
   if (fileName.startsWith('browser') || fileName === 'epics-browser.log') {
     logType = 'browser';
+  } else if (fileName.endsWith('preload.log') || fileName.startsWith('webview')) {
+    logType = 'preload';
   } else if (fileName.startsWith('renderer') || fileName === 'epics-renderer.log') {
     logType = 'renderer';
   } else if (fileName.startsWith('webapp')) {
     logType = 'webapp';
-  } else if (fileName.startsWith('webview')) {
-    logType = 'webview';
   } else if (fileName.startsWith('call')) {
     logType = 'call';
   }
@@ -140,7 +140,7 @@ export function getTypesForFiles(logFiles: UnzippedFiles): SortedUnzippedFiles {
     call: [] as Array<UnzippedFile>,
     renderer: [] as Array<UnzippedFile>,
     webapp: [] as Array<UnzippedFile>,
-    webview: [] as Array<UnzippedFile>,
+    preload: [] as Array<UnzippedFile>,
     state: [] as Array<UnzippedFile>
   };
 
@@ -345,7 +345,7 @@ export function matchLineWebApp(line: string): MatchResult | undefined {
 }
 
 /**
- * Matches an Electron line (Browser, Renderer, WebView)
+ * Matches an Electron line (Browser, Renderer, Preload)
  *
  * @param {string} line
  * @returns {(MatchResult | undefined)}

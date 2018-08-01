@@ -218,7 +218,7 @@ describe('getTypesForFiles', () => {
       fullPath: '_',
       size: 0
     }, {
-      fileName: 'webview-2.log',
+      fileName: 'renderer-webapp-123-preload.log',
       fullPath: '_',
       size: 0
     }, {
@@ -240,7 +240,7 @@ describe('getTypesForFiles', () => {
     expect(result.browser.length).to.be.equal(1);
     expect(result.renderer.length).to.be.equal(2);
     expect(result.webapp.length).to.be.equal(1);
-    expect(result.webview.length).to.be.equal(1);
+    expect(result.preload.length).to.be.equal(1);
     expect(result.state.length).to.be.equal(3);
   });
 });
@@ -258,8 +258,8 @@ describe('getTypeForFile', () => {
     expect(getTypeForFile({ fileName: 'webapp-4.log', fullPath: '_', size: 0 })).to.be.equal('webapp');
   });
 
-  it('should get the type for webview log files', () => {
-    expect(getTypeForFile({ fileName: 'webview-44.log', fullPath: '_', size: 0 })).to.be.equal('webview');
+  it('should get the type for preload log files', () => {
+    expect(getTypeForFile({ fileName: 'renderer-webapp-44-preload.log', fullPath: '_', size: 0 })).to.be.equal('preload');
   });
 });
 
