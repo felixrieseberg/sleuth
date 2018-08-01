@@ -26,9 +26,9 @@ export class AppMenu {
     this.productionLogs = path.join(appData, `Slack`, 'logs');
     this.devEnvLogs = path.join(appData, `SlackDevEnv`, 'logs');
     this.devModeLogs = path.join(appData, `SlackDevMode`, 'logs');
-    this.productionLogsExist = !!fs.statSyncNoException(this.productionLogs);
-    this.devEnvLogsExist = !!fs.statSyncNoException(this.devEnvLogs);
-    this.devModeLogsExist = !!fs.statSyncNoException(this.devModeLogs);
+    this.productionLogsExist = fs.existsSync(this.productionLogs);
+    this.devEnvLogsExist = fs.existsSync(this.devEnvLogs);
+    this.devModeLogsExist = fs.existsSync(this.devModeLogs);
 
     this.setupMenu();
   }

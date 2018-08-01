@@ -29,7 +29,7 @@
     "electron-squirrel-startup": "1.0.0",
     "electron-window-state": "4.1.1",
     "fixed-data-table-2": "0.8.13",
-    "fs-extra": "5.0.0",
+    "fs-extra": "7.0.0",
     "jsonic": "0.3.0",
     "markdown-it": "8.4.2",
     "markdown-it-emoji": "1.4.0",
