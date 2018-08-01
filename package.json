@@ -37,8 +37,8 @@
     "mobx": "5.0.3",
     "mobx-react": "5.2.3",
     "moment": "2.22.2",
-    "query-string": "5.1.0",
-    "react": "^16.2.0",
+    "query-string": "6.1.0",
+    "react": "^16.4.1",
     "react-addons-css-transition-group": "15.6.2",
     "react-autobind": "^1.0.6",
     "react-dom": "^16.4.1",
@@ -50,8 +50,8 @@
     "react-virtualized": "9.20.1",
     "semver": "5.5.0",
     "tmp": "0.0.33",
-    "tslib": "1.9.0",
-    "yauzl": "2.9.1"
+    "tslib": "1.9.3",
+    "yauzl": "2.10.0"
   },
   "devDependencies": {
     "@types/chai": "^4.1.4",
