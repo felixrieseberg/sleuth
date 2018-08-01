@@ -16,8 +16,8 @@ export interface SignInOutButtonState {
 
 @observer
 export class CooperSignInOutButton extends React.Component<SignInOutButtonProps, Partial<SignInOutButtonState>> {
-  constructor() {
-    super();
+  constructor(props: SignInOutButtonProps) {
+    super(props);
 
     this.state = { isLoading: false };
     this.onClick = this.onClick.bind(this);

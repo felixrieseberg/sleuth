@@ -8,8 +8,8 @@ export interface LoadingProps {
 export interface LoadingState {}
 
 export class Loading extends React.Component<LoadingProps, LoadingState> {
-  constructor() {
-    super();
+  constructor(props: LoadingProps) {
+    super(props);
   }
 
   public render(): JSX.Element {

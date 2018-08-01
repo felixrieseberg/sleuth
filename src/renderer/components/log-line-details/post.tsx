@@ -22,8 +22,8 @@ export interface PostCommentState {
 
 @observer
 export class PostComment extends React.Component<PostCommentProps, Partial<PostCommentState>> {
-  constructor() {
-    super();
+  constructor(props: PostCommentProps) {
+    super(props);
 
     this.state = {
       isPosting: false,
