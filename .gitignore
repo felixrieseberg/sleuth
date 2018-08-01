@@ -2,4 +2,6 @@ node_modules
 out
 coverage
 .DS_Store
-:w
+src/static/styles/styles.css
+src/static/styles/lato.css
+src/static/styles/slack-icon-font.css
