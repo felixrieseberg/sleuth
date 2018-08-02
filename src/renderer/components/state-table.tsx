@@ -243,7 +243,7 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
     };
 
     const content = (!data && path)
-      ? <iframe onLoad={onIFrameLoad} src={path} />
+      ? <iframe sandbox='' onLoad={onIFrameLoad} src={path} />
       : <JSONTree data={data} theme={theme} />;
 
     return (

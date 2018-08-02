@@ -5,6 +5,7 @@ import * as windowStateKeeper from 'electron-window-state';
 import { config } from '../config';
 import { IpcManager } from './ipc';
 import { secureApp } from './security';
+import { allowLoadGpuFile } from './compile';
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -82,6 +83,7 @@ if (require('electron-squirrel-startup')) {
   // Some APIs can only be used after this event occurs.
   app.on('ready', () => {
     secureApp();
+    allowLoadGpuFile();
     createWindow();
   });
 
