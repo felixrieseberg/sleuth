@@ -80,7 +80,7 @@
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "electron-forge": "^5.2.2",
-    "electron-prebuilt-compile": "2.0.6",
+    "electron-prebuilt-compile": "3.0.0",
     "enzyme": "^3.6.0",
     "enzyme-adapter-react-16": "^1.5.0",
     "jest": "^23.6.0",
