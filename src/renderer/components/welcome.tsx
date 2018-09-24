@@ -46,7 +46,7 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
         const suggestions: Array<string> = [];
 
         contents.forEach((file) => {
-          if (file.startsWith('logs')) {
+          if (file.startsWith('logs') || file.startsWith('slack-logs')) {
             suggestions.push(path.join(dir, file));
           }
         });
