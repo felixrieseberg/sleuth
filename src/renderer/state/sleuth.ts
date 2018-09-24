@@ -17,6 +17,8 @@ export class SleuthState {
   };
   @observable public searchIndex: number = 0;
   @observable public search: string = '';
+  @observable public dateFrom: undefined | Date;
+  @observable public dateTo: undefined | Date;
   @observable public showOnlySearchResults: boolean = false;
   @observable public isDetailsVisible: boolean = false;
   @observable public dateTimeFormat: string = localStorage.getItem('dateTimeFormat') || defaults.dateTimeFormat;
@@ -42,4 +44,6 @@ export function resetState() {
   sleuthState.searchIndex = 0;
   sleuthState.showOnlySearchResults = false;
   sleuthState.isDetailsVisible = false;
+  sleuthState.dateFrom = undefined;
+  sleuthState.dateTo = undefined;
 }

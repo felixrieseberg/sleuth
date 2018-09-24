@@ -1,9 +1,11 @@
-import { SleuthState } from '../state/sleuth';
 import { observer } from 'mobx-react';
 import * as React from 'react';
 import * as classNames from 'classnames';
 import * as debounce from 'debounce';
 import * as ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+
+import { SleuthState } from '../state/sleuth';
+import { DateRangePicker } from './date-range-picker';
 
 export interface FilterProps {
   state: SleuthState;
@@ -110,6 +112,7 @@ export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
     } else {
       items = (
         <div key='menu' className='FilterButtons'>
+          <DateRangePicker state={this.props.state} />
           <a onClick={() => this.onToggleSearch()}>
             <i className='ts_icon ts_icon_search' />
             <span className='block label'>Search</span>

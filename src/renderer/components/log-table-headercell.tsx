@@ -39,7 +39,7 @@ export class LogTableHeaderCell extends React.Component<LogTableHeaderCellProps,
     debug(`Header cell context menu invoked`);
 
     const contextMenu = this.createContextMenu();
-    contextMenu.popup();
+    contextMenu.popup({});
   }
 
   public onSortChange(e: React.MouseEvent<any>) {
