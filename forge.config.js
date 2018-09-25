@@ -8,7 +8,7 @@ const options = {
     icon: './src/static/sleuth-icon',
     asar: true,
     osxSign: {
-      identity: 'LT94ZKYDCJ'
+      identity: '6EAE76A75A316F8CE47BDBC19A95B44536FDCD2D'
     },
     extendInfo: './src/static/extend.plist',
     win32metadata: {
