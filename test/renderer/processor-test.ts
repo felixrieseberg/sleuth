@@ -146,7 +146,7 @@ describe('makeLogEntry', () => {
       momentValue: 1
     };
 
-    const result = makeLogEntry(options, 'browser');
+    const result = makeLogEntry(options, 'browser', 1, 'test-file');
     expect(result).to.exist;
     expect(result.message).to.be.equal('');
     expect(result.timestamp).to.be.equal('1');

@@ -34,8 +34,6 @@ export class DateRangePicker extends React.Component<DateRangePickerProps, Parti
     this.props.state.dateRange = DayPicker.DateUtils.addDayToRange(day, {
       ...this.props.state.dateRange as any
     });
-
-    console.log(this.props.state.dateRange.from, this.props.state.dateRange.to);
   }
 
   public render() {

@@ -88,7 +88,6 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     if (didFilterChange(levelFilter, nextProps.levelFilter)) return true;
 
     // DateRange changed
-    console.log(dateRange, nextProps.dateRange);
     if (dateRange !== nextProps.dateRange) return true;
 
     // Search changed

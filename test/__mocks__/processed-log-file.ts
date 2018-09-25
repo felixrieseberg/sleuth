@@ -8,21 +8,27 @@ export const mockBrowserFile1: ProcessedLogFile = {
       logType: 'browser',
       message: 'Hi!',
       momentValue: 1488837185497,
-      timestamp: '2017-03-06T13:53:05.497'
+      timestamp: '2017-03-06T13:53:05.497',
+      line: 0,
+      sourceFile: 'test-file'
     }, {
       index: 1,
       level: 'info',
       logType: 'browser',
       message: 'Yo!',
       momentValue: 1488837201751,
-      timestamp: '2017-03-06T13:53:21.751'
+      timestamp: '2017-03-06T13:53:21.751',
+      line: 1,
+      sourceFile: 'test-file'
     }, {
       index: 2,
       level: 'info',
       logType: 'browser',
       message: 'Hey!',
       momentValue: 1488837270030,
-      timestamp: '2017-03-06T13:54:30.030'
+      timestamp: '2017-03-06T13:54:30.030',
+      line: 2,
+      sourceFile: 'test-file'
     }
   ],
   logFile: {
@@ -43,21 +49,27 @@ export const mockBrowserFile2: ProcessedLogFile = {
       logType: 'browser',
       message: 'Hi!',
       momentValue: 1488837228089,
-      timestamp: '2017-03-06T13:53:48.089'
+      timestamp: '2017-03-06T13:53:48.089',
+      line: 0,
+      sourceFile: 'test-file'
     }, {
       index: 1,
       level: 'info',
       logType: 'browser',
       message: 'Yo!',
       momentValue: 1488837285150,
-      timestamp: '2017-03-06T13:54:45.150'
+      timestamp: '2017-03-06T13:54:45.150',
+      line: 1,
+      sourceFile: 'test-file'
     }, {
       index: 2,
       level: 'info',
       logType: 'browser',
       message: 'Hey!',
       momentValue: 1488837294254,
-      timestamp: '2017-03-06T13:54:54.254'
+      timestamp: '2017-03-06T13:54:54.254',
+      line: 2,
+      sourceFile: 'test-file'
     }
   ],
   logFile: {
