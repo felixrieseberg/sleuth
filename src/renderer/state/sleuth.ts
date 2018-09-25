@@ -1,5 +1,5 @@
 import { UnzippedFile } from '../unzip';
-import { LevelFilter, LogEntry, MergedLogFile, ProcessedLogFile } from '../interfaces';
+import { LevelFilter, LogEntry, MergedLogFile, ProcessedLogFile, DateRange } from '../interfaces';
 import { observable } from 'mobx';
 import { defaults } from '../components/preferences';
 
@@ -17,8 +17,7 @@ export class SleuthState {
   };
   @observable public searchIndex: number = 0;
   @observable public search: string = '';
-  @observable public dateFrom: undefined | Date;
-  @observable public dateTo: undefined | Date;
+  @observable public dateRange: DateRange = { from: null, to: null };
   @observable public showOnlySearchResults: boolean = false;
   @observable public isDetailsVisible: boolean = false;
   @observable public dateTimeFormat: string = localStorage.getItem('dateTimeFormat') || defaults.dateTimeFormat;
@@ -44,6 +43,5 @@ export function resetState() {
   sleuthState.searchIndex = 0;
   sleuthState.showOnlySearchResults = false;
   sleuthState.isDetailsVisible = false;
-  sleuthState.dateFrom = undefined;
-  sleuthState.dateTo = undefined;
+  sleuthState.dateRange = { from: null, to: null };
 }

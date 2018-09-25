@@ -88,6 +88,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     if (didFilterChange(levelFilter, nextProps.levelFilter)) return true;
 
     // DateRange changed
+    console.log(dateRange, nextProps.dateRange);
     if (dateRange !== nextProps.dateRange) return true;
 
     // Search changed
@@ -315,6 +316,8 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
   }
 
   public doRangeFilter({ from, to }: DateRange, list: Array<LogEntry>): Array<LogEntry> {
+    if (!from || !to) return list;
+
     const fromTs = from.getTime();
     const toTs = to.getTime();
 
@@ -364,7 +367,8 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     }
 
     // DateRange
-    if (dateRange && dateRange.to && dateRange.from) {
+    if (dateRange) {
+      debug(`Performing date range filter (from: ${dateRange.from}, to: ${dateRange.to})`);
       sortedList = this.doRangeFilter(dateRange, sortedList);
     }
 

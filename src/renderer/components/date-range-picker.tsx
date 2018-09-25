@@ -31,20 +31,16 @@ export class DateRangePicker extends React.Component<DateRangePickerProps, Parti
   }
 
   public onDayClick(day: Date) {
-    const range = DayPicker.DateUtils.addDayToRange(day, {
-      from: this.props.state.dateFrom!,
-      to: this.props.state.dateTo!
+    this.props.state.dateRange = DayPicker.DateUtils.addDayToRange(day, {
+      ...this.props.state.dateRange as any
     });
 
-    this.props.state.dateFrom = range.from;
-    this.props.state.dateTo = range.to;
+    console.log(this.props.state.dateRange.from, this.props.state.dateRange.to);
   }
 
   public render() {
-    const { isOpen } = this.state;
-    const { dateFrom, dateTo } = this.props.state;
-    const isEngaged = dateFrom && dateTo;
-    const picker = isOpen ? this.renderPicker() : null;
+    const { dateRange } = this.props.state;
+    const isEngaged = dateRange && dateRange.from && dateRange.to;
 
     return (
       <>
@@ -55,18 +51,19 @@ export class DateRangePicker extends React.Component<DateRangePickerProps, Parti
           <i className='ts_icon ts_icon_calendar' />
           <span className='block label'>Select Dates</span>
         </a>
-        {picker}
+        {this.renderPicker()}
       </>
     );
   }
 
   public renderPicker() {
-    const { dateFrom, dateTo } = this.props.state;
-    const modifiers = { start: dateFrom, end: dateTo };
-    const selectedDays = [ dateFrom, { from: dateFrom, to: dateTo } ];
+    const isOpen = this.state.isOpen;
+    const { dateRange } = this.props.state;
+    const modifiers = { start: dateRange.from, end: dateRange.to };
+    const selectedDays = [ dateRange.from, { ...dateRange } ];
 
     return (
-      <div className='DateRangePicker'>
+      <div className={classNames({ Visible: isOpen, DateRangePicker: true })}>
         <DayPicker
           className='Selectable'
           numberOfMonths={2}

@@ -4,6 +4,11 @@
   background: white;
   border-radius: 5px;
   box-shadow: 0 0 5px 0 #3333336e;
+  display: none;
+
+  &.Visible {
+    display: block;
+  }
 
   .Selectable .DayPicker-Day--selected:not(.DayPicker-Day--start):not(.DayPicker-Day--end):not(.DayPicker-Day--outside) {
     background-color: #f0f8ff !important;

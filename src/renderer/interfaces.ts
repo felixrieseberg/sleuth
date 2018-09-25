@@ -5,8 +5,8 @@ export type LogType = 'browser' | 'renderer' | 'call' | 'webapp' | 'preload' | '
 export type LogFile = UnzippedFile | MergedLogFile | ProcessedLogFile;
 
 export interface DateRange {
-  from: Date;
-  to: Date;
+  from: Date | null;
+  to: Date | null;
 }
 
 export interface LogEntry {
