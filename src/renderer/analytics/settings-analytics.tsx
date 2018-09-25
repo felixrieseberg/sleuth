@@ -140,8 +140,8 @@ export function getWindowsVersion({ major, minor, build}: { major: number, minor
     if (build >= 14393) buildName = 'Anniversary Update, ';
     if (build >= 15063) buildName = 'Creators Update, ';
     if (build >= 16299) buildName = 'Fall Creators Update, ';
-    if (build >= 17000) buildName = 'Redstone 4 (Future version of Windows), ';
-    if (build >= 17600) buildName = 'Redstone 5 (Future version of Windows), ';
+    if (build >= 17000) buildName = 'April 2018 Update, ';
+    if (build >= 17600) buildName = 'October 2018 Update, ';
 
     return `Windows 10 (${buildName}Build ${build})`;
   }
