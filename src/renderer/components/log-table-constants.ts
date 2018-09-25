@@ -1,4 +1,4 @@
-import { LevelFilter, ProcessedLogFile, MergedLogFile, LogEntry } from '../interfaces';
+import { LevelFilter, ProcessedLogFile, MergedLogFile, LogEntry, DateRange } from '../interfaces';
 import { SleuthState } from '../state/sleuth';
 
 export enum SORT_DIRECTION {
@@ -27,6 +27,7 @@ export interface LogTableProps {
   state: SleuthState;
   showOnlySearchResults: boolean;
   searchIndex: number;
+  dateRange?: DateRange;
 }
 
 export interface LogTableState {
@@ -49,6 +50,7 @@ export interface SortFilterListOptions {
   search?: string;
   logFile?: ProcessedLogFile | MergedLogFile;
   showOnlySearchResults?: boolean;
+  dateRange?: DateRange;
 }
 
 export const COLUMN_TITLES = {

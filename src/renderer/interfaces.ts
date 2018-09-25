@@ -4,6 +4,11 @@ export type LogType = 'browser' | 'renderer' | 'call' | 'webapp' | 'preload' | '
 
 export type LogFile = UnzippedFile | MergedLogFile | ProcessedLogFile;
 
+export interface DateRange {
+  from: Date;
+  to: Date;
+}
+
 export interface LogEntry {
   index: number;
   timestamp: string;

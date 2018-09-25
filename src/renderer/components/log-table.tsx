@@ -7,7 +7,7 @@ import { AutoSizer } from 'react-virtualized';
 import { default as keydown, Keys } from 'react-keydown';
 import * as autoBind from 'react-autobind';
 
-import { LevelFilter, LogEntry } from '../interfaces';
+import { LevelFilter, LogEntry, DateRange } from '../interfaces';
 import { sleuthState } from '../state/sleuth';
 import { didFilterChange } from '../../utils/did-filter-change';
 import { Alert } from './alert';
@@ -55,7 +55,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    * @returns {boolean}
    */
   public shouldComponentUpdate(nextProps: LogTableProps, nextState: LogTableState): boolean {
-    const { dateTimeFormat, levelFilter, logFile, searchIndex } = this.props;
+    const { dateTimeFormat, levelFilter, logFile, searchIndex, dateRange } = this.props;
     const { sortBy, sortDirection, sortedList, searchList, selectedIndex, columnWidths, columnOrder } = this.state;
 
     // Selected row changed
@@ -87,6 +87,9 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     // Filter changed
     if (didFilterChange(levelFilter, nextProps.levelFilter)) return true;
 
+    // DateRange changed
+    if (dateRange !== nextProps.dateRange) return true;
+
     // Search changed
     if (searchList !== nextState.searchList || searchIndex !== nextProps.searchIndex) return true;
 
@@ -99,7 +102,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    * @param {LogTableProps} nextProps
    */
   public componentWillReceiveProps(nextProps: LogTableProps): void {
-    const { levelFilter, search, logFile, showOnlySearchResults, searchIndex } = this.props;
+    const { levelFilter, search, logFile, showOnlySearchResults, searchIndex, dateRange } = this.props;
     const searchChanged = search !== nextProps.search || showOnlySearchResults !== nextProps.showOnlySearchResults;
     const nextFile = nextProps.logFile;
     const fileChanged = ((!logFile && nextFile)
@@ -111,12 +114,17 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     const filterChanged = didFilterChange(levelFilter, nextLevelFilter);
     const nextSearch = nextProps.search;
 
-    if (filterChanged || searchChanged || fileChanged) {
+    // Date range changed
+    const rangeChanged = dateRange !== nextProps.dateRange;
+    const nextRange = nextProps.dateRange;
+
+    if (filterChanged || searchChanged || fileChanged || rangeChanged) {
       const sortOptions: SortFilterListOptions = {
         showOnlySearchResults: nextProps.showOnlySearchResults,
         filter: nextLevelFilter,
         search: nextSearch,
-        logFile: nextFile
+        logFile: nextFile,
+        dateRange: nextRange
       };
       const sortedList = this.sortFilterList(sortOptions);
       let searchList: Array<number> = [];
@@ -306,6 +314,16 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     return foundIndices;
   }
 
+  public doRangeFilter({ from, to }: DateRange, list: Array<LogEntry>): Array<LogEntry> {
+    const fromTs = from.getTime();
+    const toTs = to.getTime();
+
+    return list.filter((e) => {
+      const ts = e.momentValue || 0;
+      return ts >= fromTs && ts <= toTs;
+    });
+  }
+
   /**
    * Sorts the list
    */
@@ -314,6 +332,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     const filter = options.filter || this.props.levelFilter;
     const search = options.search !== undefined ? options.search : this.props.search;
     const sortBy = options.sortBy || this.state.sortBy;
+    const dateRange = options.dateRange || this.props.dateRange;
     const showOnlySearchResults = options.showOnlySearchResults !== undefined ? options.showOnlySearchResults : this.props.showOnlySearchResults;
     const sortDirection = options.sortDirection || this.state.sortDirection;
 
@@ -342,6 +361,11 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     // Search
     if (search && showOnlySearchResults) {
       sortedList = this.doSearchFilter(search, sortedList);
+    }
+
+    // DateRange
+    if (dateRange && dateRange.to && dateRange.from) {
+      sortedList = this.doRangeFilter(dateRange, sortedList);
     }
 
     // Sort

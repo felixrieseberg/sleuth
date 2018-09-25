@@ -43,13 +43,16 @@ export class LogContent extends React.Component<LogContentProps, Partial<LogCont
       font,
       isDetailsVisible,
       showOnlySearchResults,
-      searchIndex
+      searchIndex,
+      dateFrom,
+      dateTo
     } = this.props.state;
 
     if (!selectedLogFile) return null;
     const isLog = isLogFile(selectedLogFile);
     const tableStyle = { height: isDetailsVisible ? `${this.state.tableHeight}px` : '100%' };
     const scrubber = <Scrubber elementSelector='div#LogTableContainer' onResizeHandler={this.resizeHandler} />;
+    const dateRange = dateFrom && dateTo ? { from: dateFrom, to: dateTo } : undefined;
 
     if (isLog) {
       return (
@@ -63,6 +66,7 @@ export class LogContent extends React.Component<LogContentProps, Partial<LogCont
               search={search}
               showOnlySearchResults={showOnlySearchResults}
               searchIndex={searchIndex}
+              dateRange={dateRange}
             />
           </div>
           {isDetailsVisible ? scrubber : null}
