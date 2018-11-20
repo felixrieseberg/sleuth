@@ -1,7 +1,7 @@
-import * as React from 'react';
-import * as dirtyJSON from 'jsonic';
+import React from 'react';
+import dirtyJSON from 'jsonic';
 import JSONTree from 'react-json-tree';
-import * as fs from 'fs-extra';
+import fs from 'fs-extra';
 import { shell } from 'electron';
 
 import { MergedLogFile, ProcessedLogFile } from '../interfaces';

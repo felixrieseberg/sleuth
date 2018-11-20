@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react';
 import { SleuthState } from '../state/sleuth';
-import * as React from 'react';
+import React from 'react';
 
 export interface AlertProps {
   text: string;

@@ -1,10 +1,8 @@
 import { SleuthState } from '../../state/sleuth';
-import * as React from 'react';
+import React from 'react';
 import {observer} from 'mobx-react';
-import * as Ladda from 'react-ladda';
+import Ladda from 'react-ladda';
 import { cooperAuth } from '../../cooper/auth';
-
-const LaddaButton = Ladda.default;
 
 export interface SignInOutButtonProps {
   state: SleuthState;
@@ -38,7 +36,7 @@ export class CooperSignInOutButton extends React.Component<SignInOutButtonProps,
 
     return (
       <div>
-        <LaddaButton {...buttonOptions}>Sign {isCooperSignedIn ? 'Out' : 'In'}</LaddaButton>
+        <Ladda {...buttonOptions}>Sign {isCooperSignedIn ? 'Out' : 'In'}</Ladda>
       </div>
     );
   }

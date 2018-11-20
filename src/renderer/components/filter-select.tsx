@@ -1,8 +1,8 @@
 import { observer } from 'mobx-react';
-import * as React from 'react';
-import * as classNames from 'classnames';
-import * as debounce from 'debounce';
-import * as ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+import React from 'react';
+import classNames from 'classnames';
+import debounce from 'debounce';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 import { SleuthState } from '../state/sleuth';
 import { DateRangePicker } from './date-range-picker';

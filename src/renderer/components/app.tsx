@@ -1,11 +1,11 @@
 import { resetState, sleuthState } from '../state/sleuth';
 import { UserPreferences } from '../interfaces';
 import { shouldIgnoreFile } from '../../utils/should-ignore-file';
-import * as React from 'react';
+import React from 'react';
 import { ipcRenderer, remote } from 'electron';
-import * as classNames from 'classnames';
-import * as fs from 'fs-extra';
-import * as path from 'path';
+import classNames from 'classnames';
+import fs from 'fs-extra';
+import path from 'path';
 
 import { UnzippedFile, UnzippedFiles, Unzipper } from '../unzip';
 import { Welcome } from './welcome';

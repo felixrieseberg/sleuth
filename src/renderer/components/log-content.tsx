@@ -4,7 +4,7 @@ import { StateTable } from './state-table';
 import { SleuthState, sleuthState } from '../state/sleuth';
 import { LogTable } from './log-table';
 import { observer } from 'mobx-react';
-import * as React from 'react';
+import React from 'react';
 
 import { LogLineDetails } from './log-line-details/details';
 import { Scrubber } from './scrubber';

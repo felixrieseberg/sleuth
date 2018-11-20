@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react';
 import { sleuthState, SleuthState } from '../state/sleuth';
-import * as React from 'react';
-import * as moment from 'moment';
+import React from 'react';
+import moment from 'moment';
 import { ipcRenderer } from 'electron';
 import { default as Skylight } from 'react-skylight';
 import { default as keydown } from 'react-keydown';

@@ -1,18 +1,17 @@
 import { cooperComments } from '../../cooper/comments';
 import { SleuthState } from '../../state/sleuth';
 import { observer } from 'mobx-react';
-import * as React from 'react';
-import * as moment from 'moment';
-import * as Ladda from 'react-ladda';
-import * as Markdown from 'markdown-it';
-import * as emoji from 'markdown-it-emoji';
-import * as highlight from 'markdown-it-highlightjs';
+import React from 'react';
+import moment from 'moment';
+import Ladda from 'react-ladda';
+import Markdown from 'markdown-it';
+import emoji from 'markdown-it-emoji';
+import highlight from 'markdown-it-highlightjs';
 
 const markdown = new Markdown({ linkify: true })
   .use(highlight)
   .use(emoji);
 
-const LaddaButton = Ladda.default;
 const debug = require('debug')('sleuth:comment');
 
 export interface CommentProps {
@@ -95,9 +94,9 @@ export class Comment extends React.Component<CommentProps, Partial<CommentState>
           onChange={this.handleChange}
           value={editValue}
         />
-        <LaddaButton type='submit' {...buttonOptions}>
+        <Ladda type='submit' {...buttonOptions}>
           {editValue ? 'Save' : 'Delete'}
-        </LaddaButton>
+        </Ladda>
       </form>
     );
   }

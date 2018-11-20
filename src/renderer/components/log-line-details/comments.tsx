@@ -1,7 +1,7 @@
 import { CooperSignInOutButton } from '../cooper/sign-in-out-button';
 import { lineToCooperLine } from '../../cooper/line-to-cooper-line';
 import { SleuthState, sleuthState } from '../../state/sleuth';
-import * as React from 'react';
+import React from 'react';
 import { cooperComments, IAuthor, IComment, IGetCommentResponse } from '../../cooper/comments';
 import { observer } from 'mobx-react';
 import { PostComment } from './post';

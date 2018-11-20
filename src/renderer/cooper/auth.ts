@@ -1,4 +1,4 @@
-import * as path from 'path';
+import path from 'path';
 import { config } from '../../config';
 import { remote } from 'electron';
 import { sleuthState } from '../state/sleuth';

@@ -1,7 +1,7 @@
-import * as React from 'react';
-import * as fs from 'fs-extra';
-import * as path from 'path';
-import * as ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+import React from 'react';
+import fs from 'fs-extra';
+import path from 'path';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 import { remote } from 'electron';
 import { getSleuth } from '../sleuth';

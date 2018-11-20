@@ -1,4 +1,4 @@
-import * as semver from 'semver';
+import semver from 'semver';
 
 const debug = require('debug')('sleuth:update-check');
 

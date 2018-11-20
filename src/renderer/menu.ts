@@ -1,9 +1,9 @@
-import * as defaultMenu from 'electron-default-menu';
+import defaultMenu from 'electron-default-menu';
 import { remote } from 'electron';
 
-import * as fs from 'fs-extra';
-import * as path from 'path';
-import * as tmp from 'tmp';
+import fs from 'fs-extra';
+import path from 'path';
+import tmp from 'tmp';
 import { promisify } from 'util';
 
 const { Menu, shell, app, dialog } = remote;

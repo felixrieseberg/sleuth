@@ -2,8 +2,8 @@ import { getFirstLogFile } from '../../utils/get-first-logfile';
 import { isMergedLogFile, isProcessedLogFile, isUnzippedFile } from '../../utils/is-logfile';
 import { observer } from 'mobx-react';
 import { sleuthState, SleuthState } from '../state/sleuth';
-import * as React from 'react';
-import * as classNames from 'classnames';
+import React from 'react';
+import classNames from 'classnames';
 
 import { ipcRenderer, remote } from 'electron';
 import { UnzippedFile, UnzippedFiles } from '../unzip';

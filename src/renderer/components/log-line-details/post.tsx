@@ -1,11 +1,10 @@
 import { SleuthState } from '../../state/sleuth';
 import { observer } from 'mobx-react';
-import * as React from 'react';
-import * as Ladda from 'react-ladda';
+import React from 'react';
+import Ladda from 'react-ladda';
 import { remote } from 'electron';
 import { cooperComments } from '../../cooper/comments';
 
-const LaddaButton = Ladda.default;
 const debug = require('debug')('sleuth:cooper');
 
 export interface PostCommentProps {
@@ -86,7 +85,7 @@ export class PostComment extends React.Component<PostCommentProps, Partial<PostC
           value={value}
           placeholder='Got some interesting information about this log line to share?'
         />
-        <LaddaButton type='submit' {...buttonOptions}>Post</LaddaButton>
+        <Ladda type='submit' {...buttonOptions}>Post</Ladda>
       </form>
     );
   }

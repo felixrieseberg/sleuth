@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react';
-import * as React from 'react';
-import * as classNames from 'classnames';
+import React from 'react';
+import classNames from 'classnames';
 
 import { UnzippedFile } from '../unzip';
 import { isEqualArrays } from '../../utils/array-is-equal';

@@ -1,5 +1,5 @@
 import { config } from '../../config';
-import * as queryString from 'query-string';
+import queryString from 'query-string';
 
 const debug = require('debug')('sleuth:cooper');
 

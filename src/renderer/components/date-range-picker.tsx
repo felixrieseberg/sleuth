@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react';
-import * as React from 'react';
+import React from 'react';
 import DayPicker from 'react-day-picker';
-import * as classNames from 'classnames';
+import classNames from 'classnames';
 
 import { SleuthState } from '../state/sleuth';
 

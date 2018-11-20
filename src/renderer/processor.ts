@@ -2,10 +2,10 @@ import { UnzippedFile, UnzippedFiles } from './unzip';
 import { LogEntry, LogType, MatchResult, MergedLogFile, ProcessedLogFile, SortedUnzippedFiles } from './interfaces';
 import { ipcRenderer } from 'electron';
 
-import * as fs from 'fs-extra';
-import * as readline from 'readline';
-import * as moment from 'moment';
-import * as path from 'path';
+import fs from 'fs-extra';
+import readline from 'readline';
+import moment from 'moment';
+import path from 'path';
 
 const debug = require('debug')('sleuth:processor');
 

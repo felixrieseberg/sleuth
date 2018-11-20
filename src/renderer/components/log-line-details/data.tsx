@@ -1,5 +1,5 @@
-import * as React from 'react';
-import * as dirtyJSON from 'jsonic';
+import React from 'react';
+import dirtyJSON from 'jsonic';
 import JSONTree from 'react-json-tree';
 
 const debug = require('debug')('sleuth:data');

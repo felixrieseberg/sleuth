@@ -1,11 +1,11 @@
-import * as debounce from 'debounce';
-import * as React from 'react';
-import * as classNames from 'classnames';
-import * as moment from 'moment';
+import debounce from 'debounce';
+import React from 'react';
+import classNames from 'classnames';
+import moment from 'moment';
 import { Table, Column, Cell } from 'fixed-data-table-2';
 import { AutoSizer } from 'react-virtualized';
 import { default as keydown, Keys } from 'react-keydown';
-import * as autoBind from 'react-autobind';
+import autoBind from 'react-autobind';
 
 import { LevelFilter, LogEntry, DateRange } from '../interfaces';
 import { sleuthState } from '../state/sleuth';

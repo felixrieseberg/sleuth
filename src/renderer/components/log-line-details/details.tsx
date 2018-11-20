@@ -1,8 +1,8 @@
 import { observer } from 'mobx-react';
 import { sleuthState, SleuthState } from '../../state/sleuth';
-import * as React from 'react';
-import * as classNames from 'classnames';
-import * as moment from 'moment';
+import React from 'react';
+import classNames from 'classnames';
+import moment from 'moment';
 
 import { LogEntry } from '../../interfaces';
 import { LogLineData } from './data';
