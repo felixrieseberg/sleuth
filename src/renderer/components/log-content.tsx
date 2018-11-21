@@ -72,7 +72,7 @@ export class LogContent extends React.Component<LogContentProps, Partial<LogCont
         </div>
       );
     } else {
-      return <div><StateTable state={sleuthState} /></div>;
+      return <StateTable state={sleuthState} />;
     }
   }
 }

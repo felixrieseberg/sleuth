@@ -3,6 +3,7 @@ import dirtyJSON from 'jsonic';
 import JSONTree from 'react-json-tree';
 import fs from 'fs-extra';
 import { shell } from 'electron';
+import { Card, Elevation } from '@blueprintjs/core';
 
 import { MergedLogFile, ProcessedLogFile } from '../interfaces';
 import { SleuthState } from '../state/sleuth';
@@ -152,18 +153,18 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
     const maximizedInfo = isMaximized ? <span>and maximized.</span> : <span>and not maximized</span>;
 
     return (
-        <div className='StateTable-Info'>
+        <Card className='StateTable-Info'>
           This user's window is {sizeInfo}{posInfo}{maximizedInfo}.
-        </div>
+        </Card>
       );
   }
 
   public renderSettingsInfo(): JSX.Element | null {
 
     return (
-        <div className='StateTable-Info'>
+        <Card className='StateTable-Info' elevation={Elevation.ONE}>
           {...getSettingsInfo(this.state.data || {})}
-        </div>
+        </Card>
       );
   }
 
@@ -186,9 +187,9 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
     });
 
     return (
-        <div className='StateTable-Info'>
+        <Card className='StateTable-Info' elevation={Elevation.TWO}>
           This user has {teams.length} teams: <ul>{teamLinks}</ul>.
-        </div>
+        </Card>
       );
   }
 
@@ -197,16 +198,16 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
 
     if (!Array.isArray(data) || data.length === 0) {
       return (
-        <div className='StateTable-Warning-Info'>
+        <Card className='StateTable-Info'>
           No notification warnings were found!
-        </div>
+        </Card>
       );
     }
 
     return (
-      <div className='StateTable-Warning-Info'>
+      <Card className='StateTable-Info'>
         {...getNotifWarningsInfo(data || {})}
-      </div>
+      </Card>
     );
   }
 
@@ -250,7 +251,9 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
       <div className='StateTable' style={{ fontFamily: this.props.state.font }}>
         <div className='StateTable-Content'>
           {info}
-          {content}
+          <Card>
+            {content}
+          </Card>
         </div>
       </div>
     );
