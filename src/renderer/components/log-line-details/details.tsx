@@ -3,6 +3,7 @@ import { sleuthState, SleuthState } from '../../state/sleuth';
 import React from 'react';
 import classNames from 'classnames';
 import moment from 'moment';
+import { Card, Button, ButtonGroup, Tag, Elevation } from '@blueprintjs/core';
 
 import { LogEntry } from '../../interfaces';
 import { LogLineData } from './data';
@@ -79,12 +80,15 @@ export class LogLineDetails extends React.Component<LogLineDetailsProps, LogLine
         <div className='MetaInfo'>
           <div className='Details-Moment'>{datetime}</div>
           <div className='Details-LogType'>
-              Level <span className='level'>{level}</span> Type <span className='type'>{type}</span>
-              <span> <a className='source' onClick={this.openSource}>Open Source</a></span>
-              <span> <a className='close' onClick={this.toggle}>Close</a></span>
+            <Tag large={true} icon='box'>{level}</Tag>
+            <Tag large={true} icon='applications'>{type}</Tag>
+            <ButtonGroup>
+              <Button icon='document-open' onClick={this.openSource} text='Open Source' />
+              <Button icon='cross' onClick={this.toggle} text='Close' />
+            </ButtonGroup>
           </div>
         </div>
-        <div className='Message'>{message}</div>
+        <Card className='Message Monospace' elevation={Elevation.THREE}>{message}</Card>
       </div>
     );
   }

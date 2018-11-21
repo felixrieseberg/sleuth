@@ -1,5 +1,7 @@
+@import "../../../node_modules/@blueprintjs/core/lib/less/variables.less";
+
 .Details {
-  background: white;
+  background: @white;
   border-top: 1px solid @neutral_grey;
   overflow: auto;
   font-size: 1rem;
@@ -96,6 +98,10 @@
 
   .Details-LogType {
     user-select: none;
+
+    > * {
+      margin-left: .5rem;
+    }
   }
 
   .MetaInfo {
@@ -106,17 +112,11 @@
   }
 
   .Message {
+    background: @gray5;
     font-size: 15px;
     line-height: 18px;
     margin-bottom: 0.625rem;
-    color: rgb(61, 60, 64);
     margin-top: 10px;
-    background-color: rgba(255, 247, 235, 0.470588);
-    border-top: 1px solid rgba(0, 0, 0, 0.0901961);
-    border-right: 1px solid rgba(0, 0, 0, 0.0980392);
-    border-left: 1px solid rgba(0, 0, 0, 0.0980392);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.117647);
-    border-radius: 6px;
     padding: 12px 25px 12px 12px;
   }
 }

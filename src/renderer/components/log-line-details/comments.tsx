@@ -112,7 +112,7 @@ export class LogLineComments extends React.Component<LogLineCommentsProps, Parti
     return (
       <div className='Comments'>
         <h4>Log Intelligence</h4>
-        <p>Sign in to see and post information about this log line left by fellow sibs.</p>
+        <p>Sign in to see and post information about this log line left by fellow Slack employees.</p>
         <CooperSignInOutButton state={sleuthState} />
       </div>
     );

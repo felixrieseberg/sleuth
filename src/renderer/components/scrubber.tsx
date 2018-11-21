@@ -31,7 +31,7 @@ export class Scrubber extends React.Component<ScrubberProps, ScrubberState> {
   }
 
   public mouseDownHandler(e: any) {
-    const resizeTarget = document.querySelector(this.props.elementSelector);
+    const resizeTarget = document.getElementById(this.props.elementSelector);
 
     if (!resizeTarget) return;
 
