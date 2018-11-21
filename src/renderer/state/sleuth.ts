@@ -15,6 +15,7 @@ export class SleuthState {
     info: false,
     warn: false
   };
+
   @observable public searchIndex: number = 0;
   @observable public search: string = '';
   @observable public dateRange: DateRange = { from: null, to: null };

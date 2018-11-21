@@ -3,6 +3,4 @@ out
 coverage
 .DS_Store
 src/static/styles/styles.css
-src/static/styles/lato.css
-src/static/styles/slack-icon-font.css
 dist

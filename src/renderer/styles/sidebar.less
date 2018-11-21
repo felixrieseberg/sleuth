@@ -1,32 +1,36 @@
+@import "../../../node_modules/@blueprintjs/core/lib/less/variables.less";
 @import "./colors.less";
 
 .Sidebar {
-  #site_nav {
-    &::-webkit-scrollbar {
-      width: 10px;
-      height: 10px;
-    }
+  width: 300px;
+  background: @light-gray1;
+  overflow: scroll;
+  flex-shrink: 0;
 
-    &::-webkit-scrollbar-thumb {
-      background-color: rgba(50,50,50,.5);
-      border: 2px solid transparent;
-      border-radius: 10px;
-      background-clip: padding-box;
+  &::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
 
-      &:hover {
-        background-color: rgba(50,50,50,.8);
-      }
-    }
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(50,50,50,.5);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    background-clip: padding-box;
 
-    &::-webkit-scrollbar-button {
-        width: 0;
-        height: 0;
-        display: none;
+    &:hover {
+      background-color: rgba(50,50,50,.8);
     }
+  }
 
-    &::-webkit-scrollbar-corner {
-        background-color: transparent;
-    }
+  &::-webkit-scrollbar-button {
+      width: 0;
+      height: 0;
+      display: none;
+  }
+
+  &::-webkit-scrollbar-corner {
+      background-color: transparent;
   }
 
   .MenuTitle {
@@ -86,6 +90,6 @@
   }
 }
 
-.Darwin nav#site_nav {
+.Darwin .Sidebar {
   padding-top: 25px;
 }

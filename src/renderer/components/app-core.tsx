@@ -274,6 +274,7 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
           selectLogFile={this.selectLogFile}
           selectedLogFileName={selectedLogFileName}
         />
+
         <div id='content' className={logContentClassName}>
           <AppCoreHeader state={sleuthState} menuToggle={this.toggleSidebar} />
           {tableOrLoading}

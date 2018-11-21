@@ -20,7 +20,7 @@ const exampleTime = 1493475035123;
 export const defaults = {
   dateTimeFormat: 'HH:mm:ss (DD/MM)',
   defaultEditor: 'code --goto {filepath}:{line}',
-  font: 'Slack-Lato'
+  font: process.platform === 'darwin' ? 'BlinkMacSystemFont' : 'Segoe UI'
 };
 
 /**
@@ -76,7 +76,7 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
   ];
 
   private readonly fontPresets: Array<string> = [
-    'Slack-Lato',
+    process.platform === 'darwin' ? 'BlinkMacSystemFont' : 'Helvetica',
     'Verdana',
     'Arial',
     process.platform === 'darwin' ? 'Menlo' : 'Consolas'

@@ -6,8 +6,10 @@ import fs from 'fs-extra';
 import readline from 'readline';
 import moment from 'moment';
 import path from 'path';
+import debounce from 'debounce';
 
 const debug = require('debug')('sleuth:processor');
+const debouncedProcStatus = debounce(ipcRenderer.send, 500);
 
 // It's okay in this file
 // tslint:disable:no-console
@@ -19,7 +21,7 @@ const debug = require('debug')('sleuth:processor');
  * @param {*} status
  */
 export function sendProcStatus(status: any): void {
-  ipcRenderer.send('processing-status', status);
+  debouncedProcStatus('processing-status', status);
 }
 
 /**
