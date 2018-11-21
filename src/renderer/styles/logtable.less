@@ -1,8 +1,16 @@
+@import "../../../node_modules/@blueprintjs/core/lib/less/variables.less";
+
+#LogTableContainer {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
 .LogTable {
-  padding-top: 100px;
-  height: 100%;
-  padding: 6.2rem 0 0 0;
-  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  padding: 2.2rem 2.2rem 0 0;
   font-size: 1rem;
   user-select: none;
 
@@ -17,12 +25,8 @@
   }
 
   .Sizer {
-    height: 100%;
     padding-left: 2rem;
-
-    .HasWarning {
-      height: calc(~"100% - 76px");
-    }
+    flex-grow: 1;
   }
 
   .HasData {
@@ -117,11 +121,14 @@
   }
 
   .fixedDataTableLayout_header {
-    font-weight: 700;
-    background-color: #efefef;
-    border-bottom-color: #BABBBF;
-    border-top: 1px solid #BABBBF;
-    border-left: 1px solid #BABBBF;
+    font-weight: 600;
+    color: @dark-gray1;
+    background-color: @light-gray1;
+    border: 1px solid #BABBBF;
+
+    .bp3-icon {
+      margin-bottom: 1px;
+    }
 
     .fixedDataTableCellGroupLayout_cellGroup:hover {
       background-color: initial;
@@ -135,9 +142,11 @@
   .fixedDataTableCellLayout_wrap1 {
     width: calc(100% - 20px);
     display: inline-block;
+    line-height: 25px;
 
     a {
       display: block;
+      color: @dark-gray1;
     }
   }
 
@@ -149,7 +158,7 @@
   }
 
   .fixedDataTableCellLayout_columnReorderContainer:hover::after {
-    color: black;
+    color: @black;
   }
 
   .fixedDataTableCellLayout_columnReorderContainer::after {
@@ -159,8 +168,6 @@
   }
 
   .public_fixedDataTableCell_hasReorderHandle {
-    background-color: #efefef;
-
     .fixedDataTableCellLayout_wrap2,
     .fixedDataTableCellLayout_wrap3 {
       vertical-align: bottom;

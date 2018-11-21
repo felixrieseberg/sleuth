@@ -1,6 +1,7 @@
 import React from 'react';
 import { remote } from 'electron';
 import { Cell } from 'fixed-data-table-2';
+import { Icon } from '@blueprintjs/core';
 
 import { SORT_DIRECTION, COLUMN_TITLES } from './log-table-constants';
 
@@ -56,7 +57,10 @@ export class LogTableHeaderCell extends React.Component<LogTableHeaderCellProps,
 
   public render() {
     const { sortDirection, children, sortBy, sortKey } = this.props;
-    const sortIndicator = sortDirection && sortBy === sortKey ? (sortDirection === SORT_DIRECTION.DESC ? '↓' : '↑') : '';
+    const sortIndicator = sortDirection && sortBy === sortKey
+      ? (sortDirection === SORT_DIRECTION.DESC
+        ? <Icon icon='sort-asc' /> : <Icon icon='sort-desc' />)
+        : '';
 
     return (
       <Cell onContextMenu={this.onContextMenu} onClick={this.onSortChange}>

@@ -14,6 +14,7 @@ import { Alert } from './alert';
 import { LogTableHeaderCell } from './log-table-headercell';
 import { isReduxAction } from '../../utils/is-redux-action';
 import { LogTableProps, LogTableState, COLUMN_WIDTHS, SORT_DIRECTION, SortFilterListOptions, COLUMN_TITLES } from './log-table-constants';
+import { Icon } from '@blueprintjs/core';
 
 const debug = require('debug')('sleuth:logtable');
 const { DOWN } = Keys;
@@ -448,8 +449,8 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
   public messageCellRenderer(entry: LogEntry): JSX.Element | string {
     if (entry && entry.meta) {
       const icon = isReduxAction(entry.message)
-        ? <img className='ReduxIcon' src='./img/redux.png' alt='Redux Action' />
-        : <i className='ts_icon ts_icon_all_files_alt HasData'/>;
+        ? <Icon icon='diagram-tree' />
+        : <Icon icon='paperclip' />;
 
       return (
         <span title={entry.message}>
