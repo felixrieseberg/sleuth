@@ -18,6 +18,7 @@ export class SleuthState {
 
   @observable public searchIndex: number = 0;
   @observable public search: string = '';
+  @observable public isDarkMode: boolean = false;
   @observable public dateRange: DateRange = { from: null, to: null };
   @observable public showOnlySearchResults: boolean = false;
   @observable public isDetailsVisible: boolean = false;
@@ -44,5 +45,5 @@ export function resetState() {
   sleuthState.searchIndex = 0;
   sleuthState.showOnlySearchResults = false;
   sleuthState.isDetailsVisible = false;
-  sleuthState.dateRange = { from: null, to: null };
+  sleuthState.dateRange = { from: undefined, to: undefined };
 }

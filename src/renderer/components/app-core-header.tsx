@@ -2,7 +2,7 @@ import { observer } from 'mobx-react';
 import { SleuthState, sleuthState } from '../state/sleuth';
 import React from 'react';
 import { remote } from 'electron';
-import { Alignment, Button, Classes, Navbar, NavbarDivider, NavbarGroup, NavbarHeading } from '@blueprintjs/core';
+import { Alignment, Button, ButtonGroup, Navbar, NavbarGroup } from '@blueprintjs/core';
 
 import { Filter } from './app-core-header-filter';
 
@@ -19,19 +19,25 @@ export class AppCoreHeader extends React.Component<AppCoreHeaderProps, AppCoreHe
     super(props);
 
     this.refresh = this.refresh.bind(this);
+    this.toggleDarkMode = this.toggleDarkMode.bind(this);
   }
 
   public refresh() {
     remote.getCurrentWindow().reload();
   }
 
+  public toggleDarkMode() {
+    this.props.state.isDarkMode = !this.props.state.isDarkMode;
+  }
+
   public render() {
     return (
       <Navbar className='AppHeader'>
         <NavbarGroup align={Alignment.LEFT}>
-          <NavbarHeading>Sleuth</NavbarHeading>
-          <NavbarDivider />
-          <Button className={Classes.MINIMAL} onClick={this.refresh} icon='home' text='Home' />
+          <ButtonGroup>
+            <Button onClick={this.refresh} icon='home' />
+            <Button active={this.props.state.isDarkMode} onClick={this.toggleDarkMode} icon='moon' />
+          </ButtonGroup>
         </NavbarGroup>
         <Filter state={sleuthState} />
       </Navbar>

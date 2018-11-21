@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@blueprintjs/core": "^3.9.0",
+    "@blueprintjs/datetime": "^3.4.0",
     "classnames": "2.2.6",
     "debounce": "^1.2.0",
     "debug": "4.0.1",
@@ -43,7 +44,6 @@
     "react": "^16.5.2",
     "react-addons-css-transition-group": "15.6.2",
     "react-autobind": "^1.0.6",
-    "react-day-picker": "^7.2.4",
     "react-dom": "^16.5.2",
     "react-fast-compare": "^2.0.4",
     "react-json-tree": "0.11.0",
