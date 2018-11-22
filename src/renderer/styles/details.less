@@ -1,11 +1,12 @@
 @import "../../../node_modules/@blueprintjs/core/lib/less/variables.less";
 
 .Details {
-  background: @white;
+  background: @light-gray4;
   border-top: 1px solid @neutral_grey;
   overflow: auto;
   font-size: 1rem;
   flex-grow: 1;
+  flex-shrink: 0;
   z-index: 1000;
 
   .ConvertedTable {
@@ -85,6 +86,7 @@
   cursor: ns-resize;
   height: 10px;
   flex-shrink: 0;
+  flex-grow: 0;
   background-color: #ececec;
   width: 100%;
   border-bottom: 1px solid #dadada;
@@ -118,5 +120,22 @@
     margin-bottom: 0.625rem;
     margin-top: 10px;
     padding: 12px 25px 12px 12px;
+  }
+}
+
+.bp3-dark {
+  .Details {
+    border-top: @dark-gray5;
+    background: @dark-gray4;
+  }
+
+  .Message {
+    background: @dark-gray1;
+  }
+
+  .Scrubber {
+    background-color: @dark-gray1;
+    border-bottom: 1px solid @dark-gray4;
+    border-top: 1px solid @dark-gray4;
   }
 }

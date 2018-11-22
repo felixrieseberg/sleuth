@@ -1,15 +1,15 @@
 import React from 'react';
-import dirtyJSON from 'jsonic';
-import JSONTree from 'react-json-tree';
 import fs from 'fs-extra';
 import { shell } from 'electron';
 import { Card, Elevation } from '@blueprintjs/core';
 
 import { MergedLogFile, ProcessedLogFile } from '../interfaces';
-import { SleuthState } from '../state/sleuth';
+import { SleuthState, sleuthState } from '../state/sleuth';
 import { getSettingsInfo } from '../analytics/settings-analytics';
 import { getNotifWarningsInfo } from '../analytics/notification-warning-analytics';
 import { UnzippedFile } from '../unzip';
+import { JSONView } from './json-view';
+import { parseJSON } from '../../utils/parse-json';
 
 const debug = require('debug')('sleuth:statetable');
 
@@ -79,7 +79,7 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
     return type as StateFileType;
   }
 
-  public parse(file: UnzippedFile) {
+  public async parse(file: UnzippedFile) {
     if (!file) {
       return;
     }
@@ -91,51 +91,12 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
       return;
     }
 
-    fs.readFile(file.fullPath, 'utf8')
-      .then((rawData) => {
-        let data;
-
-        try {
-          data = JSON.parse(rawData);
-        } catch (error) {
-          try {
-            data = dirtyJSON(rawData);
-          } catch (error) {
-            data = null;
-          }
-        }
-
-        this.setState({ data, path: undefined });
-      })
-      .catch((error) => {
-        debug(error);
-      });
-  }
-
-  /**
-   * A super-cool Base16 theme using Slack's 2016 colors.
-   *
-   * @returns {Object}
-   */
-  public getTheme() {
-    return {
-      base00: '#2C2D30',
-      base01: '#555459',
-      base02: '#8B898F',
-      base03: '#88919B',
-      base04: '#9e9ea6',
-      base05: '#F9F9F9',
-      base06: '#F9F9F9',
-      base07: '#F9F9F9',
-      base08: '#e32072',
-      base09: '#F96A38',
-      base0A: '#FFA940',
-      base0B: '#257337',
-      base0C: '#3971ED',
-      base0D: '#3971ED',
-      base0E: '#71105F',
-      base0F: '#4d6dc3'
-    };
+    try {
+      const raw = await fs.readFile(file.fullPath, 'utf8');
+      this.setState({ data: parseJSON(raw), path: undefined });
+    } catch (error) {
+      debug(error);
+    }
   }
 
   public getSearchLink(text: string, query: string): JSX.Element {
@@ -234,7 +195,6 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
       return <div />;
     }
 
-    const theme = this.getTheme();
     const info = this.renderInfo();
     const onIFrameLoad = function(this: HTMLIFrameElement) {
       if (this) {
@@ -245,7 +205,7 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
 
     const content = (!data && path)
       ? <iframe sandbox='' onLoad={onIFrameLoad} src={path} />
-      : <JSONTree data={data} theme={theme} />;
+      : <JSONView data={data} state={sleuthState} />;
 
     return (
       <div className='StateTable' style={{ fontFamily: this.props.state.font }}>

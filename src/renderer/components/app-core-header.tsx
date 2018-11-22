@@ -27,7 +27,7 @@ export class AppCoreHeader extends React.Component<AppCoreHeaderProps, AppCoreHe
   }
 
   public toggleDarkMode() {
-    this.props.state.isDarkMode = !this.props.state.isDarkMode;
+    this.props.state.toggleDarkMode();
   }
 
   public render() {
@@ -44,18 +44,3 @@ export class AppCoreHeader extends React.Component<AppCoreHeaderProps, AppCoreHe
     );
   }
 }
-
-{/* <header className={appCoreHeaderClassName}>
-        <a id='menu_toggle' onClick={() => this.props.menuToggle()}>
-          <span className='menu_label'>Menu</span>
-          <span className='vert_divider' />
-        </a>
-        <h1 id='header_team_name' className='inline_block'>
-          <a onClick={this.refresh}>
-            <i className='ts_icon ts_icon_home' />
-          </a>
-        </h1>
-        <div className='header_btns float_right'>
-          <Filter state={sleuthState} />
-        </div>
-      </header> */}

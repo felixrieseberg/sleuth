@@ -620,7 +620,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     const { logFile } = this.props;
 
     const typeClassName = logFile.type === 'MergedLogFile' ? 'Merged' : 'Single';
-    const className = classNames('LogTable', typeClassName);
+    const className = classNames('LogTable', 'bp3-text-muted', typeClassName);
     const warning = this.renderWebAppWarning();
 
     return (

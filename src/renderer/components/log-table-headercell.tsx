@@ -32,7 +32,7 @@ export class LogTableHeaderCell extends React.Component<LogTableHeaderCellProps,
   }
 
   public reverseSortDirection(sortDirection: string) {
-    return sortDirection === SORT_DIRECTION.DESC ? SORT_DIRECTION.ASC : SORT_DIRECTION.DESC;
+    return sortDirection === SORT_DIRECTION.DESC ? SORT_DIRECTION.DESC : SORT_DIRECTION.ASC;
   }
 
   public onContextMenu(e: React.MouseEvent<any>) {

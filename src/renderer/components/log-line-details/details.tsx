@@ -107,7 +107,6 @@ export class LogLineDetails extends React.Component<LogLineDetailsProps, LogLine
         {logEntryInfo}
         <LogLineData raw={selectedEntry ? selectedEntry.meta : ''} />
         <LogLineComments state={sleuthState} />
-        <div className='Background'><div /></div>
       </div>
     );
   }

@@ -49,7 +49,7 @@ export class LogContent extends React.Component<LogContentProps, Partial<LogCont
 
     if (!selectedLogFile) return null;
     const isLog = isLogFile(selectedLogFile);
-    const tableStyle = { height: isDetailsVisible ? `${this.state.tableHeight}px` : undefined };
+    const tableStyle = isDetailsVisible ? { height: this.state.tableHeight } : { flexGrow: 1 };
     const scrubber = <Scrubber elementSelector='LogTableContainer' onResizeHandler={this.resizeHandler} />;
 
     if (isLog) {

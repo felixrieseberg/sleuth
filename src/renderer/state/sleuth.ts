@@ -1,6 +1,6 @@
 import { UnzippedFile } from '../unzip';
 import { LevelFilter, LogEntry, MergedLogFile, ProcessedLogFile, DateRange } from '../interfaces';
-import { observable } from 'mobx';
+import { observable, action } from 'mobx';
 import { defaults } from '../components/preferences';
 
 export class SleuthState {
@@ -28,6 +28,17 @@ export class SleuthState {
   @observable public webAppLogsWarningDismissed: boolean = false;
 
   @observable public opened: number = 0;
+
+  @action
+  public toggleDarkMode() {
+    this.isDarkMode = !this.isDarkMode;
+
+    if (this.isDarkMode) {
+      document.body.classList.add('bp3-dark');
+    } else {
+      document.body.classList.remove('bp3-dark');
+    }
+  }
 }
 
 export const sleuthState = new SleuthState();
