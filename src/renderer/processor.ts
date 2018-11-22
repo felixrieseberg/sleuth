@@ -1,18 +1,22 @@
-import { UnzippedFile, UnzippedFiles } from './unzip';
-import { LogEntry, LogType, MatchResult, MergedLogFile, ProcessedLogFile, SortedUnzippedFiles } from './interfaces';
 import { ipcRenderer } from 'electron';
-
 import fs from 'fs-extra';
 import readline from 'readline';
-import moment from 'moment';
 import path from 'path';
 import debounce from 'debounce';
+
+import { logPerformance } from './processor/performance';
+import { UnzippedFile, UnzippedFiles } from './unzip';
+import { LogEntry, LogType, MatchResult, MergedLogFile, ProcessedLogFile, SortedUnzippedFiles, ProcessorPerformanceInfo } from './interfaces';
 
 const debug = require('debug')('sleuth:processor');
 const debouncedProcStatus = debounce(ipcRenderer.send, 500);
 
+const DESKTOP_RGX = /^\[([\d\/\,\s\:]{22})\] ([A-Za-z]{0,20})\: (.*)$/g;
+const WEBAPP_A_RGX = /^(\w*): (.{3}-\d{1,2} \d{2}:\d{2}:\d{2}.\d{0,3}) (.*)$/;
+const WEBAPP_B_RGX = /^(\w*): (\d{4}\/\d{1,2}\/\d{1,2} \d{2}:\d{2}:\d{2}.\d{0,3}) (.*)$/;
+const WEBAPP_LITE_RGX = /^(\w{4,8}): (.*)$/;
+
 // It's okay in this file
-// tslint:disable:no-console
 
 /**
  * Sends a status update via IPC. Using IPC allows us to possible use other
@@ -34,16 +38,10 @@ export function sendProcStatus(status: any): void {
 export function sortWithWebWorker(data: Array<any>, sortFn: string): Promise<Array<LogEntry>> {
   return new Promise((resolve) => {
     const code = `onmessage = function (evt) {evt.data.sort(${sortFn}); postMessage(evt.data)}`;
+    const worker = new Worker(URL.createObjectURL(new Blob([ code ])));
 
-    if (window && (window as any).Worker && window.URL) {
-      const worker = new Worker(URL.createObjectURL(new Blob([code])));
-      worker.onmessage = (e) => resolve(e.data);
-      worker.postMessage(data);
-    } else {
-      // Lols
-      const sortedData = data.sort(new Function(`return ${sortFn}`)());
-      resolve(sortedData);
-    }
+    worker.onmessage = (e) => resolve(e.data);
+    worker.postMessage(data);
   });
 }
 
@@ -53,13 +51,16 @@ export function sortWithWebWorker(data: Array<any>, sortFn: string): Promise<Arr
  *
  * @param {ProcessedLogFiles} logFiles
  */
-export function mergeLogFiles(logFiles: Array<ProcessedLogFile>|Array<MergedLogFile>, logType: LogType | 'all'): Promise<MergedLogFile> {
+export function mergeLogFiles(
+  logFiles: Array<ProcessedLogFile>|Array<MergedLogFile>, logType: LogType | LogType.ALL
+): Promise<MergedLogFile> {
   return new Promise((resolve) => {
     let logEntries: Array<LogEntry> = [];
-    const totalEntries = (logFiles as Array<ProcessedLogFile>).map((l) => l.logEntries.length).reduce((t, s) => t + s, 0);
-
-    debug(`Merging ${logFiles.length} log files with ${totalEntries} entries`, logFiles);
-    console.time(`merging-${logType}`);
+    const start = performance.now();
+    const performanceData = {
+      type: logType,
+      name: `Merged ${logType}`
+    };
 
     // Single file? Cool, shortcut!
     if (logFiles.length === 1) {
@@ -71,6 +72,13 @@ export function mergeLogFiles(logFiles: Array<ProcessedLogFile>|Array<MergedLogF
         type: 'MergedLogFile',
         logType
       };
+
+      logPerformance({
+        ...performanceData,
+        entries: singleResult.logEntries.length,
+        lines: 0,
+        processingTime: performance.now() - start
+      });
 
       return resolve(singleResult);
     }
@@ -90,14 +98,19 @@ export function mergeLogFiles(logFiles: Array<ProcessedLogFile>|Array<MergedLogF
 
     sortWithWebWorker(logEntries, sortFn)
       .then((sortedLogEntries) => {
-        console.timeEnd(`merging-${logType}`);
-
         const multiResult: MergedLogFile = {
           logFiles: logFiles as Array<ProcessedLogFile>,
           logEntries: sortedLogEntries,
           logType,
           type: 'MergedLogFile'
         };
+
+        logPerformance({
+          ...performanceData,
+          entries: multiResult.logEntries.length,
+          lines: 0,
+          processingTime: performance.now() - start
+        });
 
         resolve(multiResult);
       });
@@ -107,25 +120,24 @@ export function mergeLogFiles(logFiles: Array<ProcessedLogFile>|Array<MergedLogF
 /**
  * Takes a logfile and returns the file's type (browser/renderer/webapp/preload).
  * @param {UnzippedFile} logFile
- * @returns {string}
+ * @returns {LogType}
  */
-export function getTypeForFile(logFile: UnzippedFile): string {
+export function getTypeForFile(logFile: UnzippedFile): LogType {
   const fileName = path.basename(logFile.fileName);
-  let logType: string = '';
 
   if (fileName.startsWith('browser') || fileName === 'epics-browser.log') {
-    logType = 'browser';
+    return LogType.BROWSER;
   } else if (fileName.endsWith('preload.log') || fileName.startsWith('webview')) {
-    logType = 'preload';
+    return LogType.PRELOAD;
   } else if (fileName.startsWith('renderer') || fileName === 'epics-renderer.log') {
-    logType = 'renderer';
+    return LogType.RENDERER;
   } else if (fileName.startsWith('webapp')) {
-    logType = 'webapp';
+    return LogType.WEBAPP;
   } else if (fileName.startsWith('call')) {
-    logType = 'call';
+    return LogType.CALL;
   }
 
-  return logType;
+  return LogType.UNKNOWN;
 }
 
 /**
@@ -185,22 +197,24 @@ export function processLogFiles(logFiles: UnzippedFiles): Promise<Array<Processe
  * @param {UnzippedFile} logFile
  * @returns {Promise<ProcessedLogFile>}
  */
-export function processLogFile(logFile: UnzippedFile): Promise<ProcessedLogFile> {
-  return new Promise((resolve) => {
-    const logType = getTypeForFile(logFile);
+export async function processLogFile(logFile: UnzippedFile): Promise<ProcessedLogFile> {
+  const logType = getTypeForFile(logFile);
 
-    debug(`Processing file ${logFile.fileName}. Log type: ${logType}.`);
-    sendProcStatus(`Processing file ${logFile.fileName}...`);
+  sendProcStatus(`Processing file ${logFile.fileName}...`);
 
-    console.time(`read-file-${logFile.fileName}`);
-    readFile(logFile, logType)
-      .then((logEntries) => {
-        console.timeEnd(`read-file-${logFile.fileName}`);
+  const timeStart = performance.now();
+  const { entries, lines } = await readFile(logFile, logType);
+  const result = { logFile, logEntries: entries, logType, type: 'ProcessedLogFile'};
 
-        const result = { logFile, logEntries, logType, type: 'ProcessedLogFile'};
-        resolve(result as ProcessedLogFile);
-      });
+  logPerformance({
+    name: logFile.fileName,
+    type: logType,
+    lines,
+    entries: entries.length,
+    processingTime: performance.now() - timeStart
   });
+
+  return result as ProcessedLogFile;
 }
 
 /**
@@ -222,6 +236,11 @@ export function makeLogEntry(options: MatchResult, logType: string, line: number
   return logEntry as LogEntry;
 }
 
+export interface ReadFileResult {
+  entries: Array<LogEntry>;
+  lines: number;
+}
+
 /**
  * Reads a log file line by line, creating logEntries in a somewhat smart way.
  *
@@ -229,27 +248,30 @@ export function makeLogEntry(options: MatchResult, logType: string, line: number
  * @param {string} [logType='']
  * @returns {Promise<Array<LogEntry>>}
  */
-export function readFile(logFile: UnzippedFile, logType: string = ''): Promise<Array<LogEntry>> {
-  return new Promise((resolve) => {
-    const lines: Array<LogEntry> = [];
+export function readFile(
+  logFile: UnzippedFile, logType?: LogType
+): Promise<ReadFileResult> {
+  return new Promise(async (resolve) => {
+    const entries: Array<LogEntry> = [];
     const readStream = fs.createReadStream(logFile.fullPath);
     const readInterface = readline.createInterface({ input: readStream, terminal: false });
-    logType = logType || getTypeForFile(logFile);
+    const parsedlogType = logType || getTypeForFile(logFile);
+    const matchFn = getMatchFunction(parsedlogType);
+    const isCall = logType === 'call';
 
-    debug(`Reading file ${logFile.fileName}.`);
-
-    let readLines = 0;
+    let lines = 0;
     let lastLogged = 0;
     let current: LogEntry | null = null;
     let toParse = '';
 
-    readInterface.on('line', function onLine(line: any) {
-      readLines = readLines + 1;
+    function readLine(line: string) {
+      lines = lines + 1;
+
       if (!line || line.length === 0) {
         return;
       }
 
-      const matched = matchLine(line, logType);
+      const matched = matchFn(line);
 
       if (matched) {
         // Is there a meta object?
@@ -260,23 +282,24 @@ export function readFile(logFile: UnzippedFile, logType: string = ''): Promise<A
         // Push the last entry
         if (current) {
           // If this a repeated line, save as repeated
-          const lastIndex = lines.length - 1;
-          const previous = lines.length > 0 ? lines[lastIndex] : null;
+          const lastIndex = entries.length - 1;
+          const previous = entries.length > 0 ? entries[lastIndex] : null;
+
           if (previous && previous.message === current.message && previous.meta === current.meta) {
-            lines[lastIndex].repeated = lines[lastIndex].repeated || [];
-            lines[lastIndex].repeated!.push(current.timestamp);
+            entries[lastIndex].repeated = entries[lastIndex].repeated || [];
+            entries[lastIndex].repeated!.push(current.timestamp);
           } else {
-            current.index = lines.length;
-            lines.push(current);
+            current.index = entries.length;
+            entries.push(current);
           }
         }
 
         // Create new entry
         toParse = matched.toParseHead || '';
-        current = makeLogEntry(matched, logType, readLines, logFile.fullPath);
+        current = makeLogEntry(matched, parsedlogType, lines, logFile.fullPath);
       } else {
         // We couldn't match, let's treat it
-        if (logType === 'call' && current) {
+        if (isCall && current) {
           // Call logs sometimes have rando newlines, for like no reason.
           current.message += line;
         } else {
@@ -286,16 +309,14 @@ export function readFile(logFile: UnzippedFile, logType: string = ''): Promise<A
       }
 
       // Update Status
-      if (readLines > lastLogged + 999) {
-        sendProcStatus(`Processed ${readLines} log lines in ${logFile.fileName}`);
-        lastLogged = readLines;
+      if (lines > lastLogged + 999) {
+        sendProcStatus(`Processed ${lines} log lines in ${logFile.fileName}`);
+        lastLogged = lines;
       }
-    });
+    }
 
-    readInterface.on('close', () => {
-      debug(`Finished reading file ${logFile.fileName}. ${lines.length} entries!`);
-      resolve(lines);
-    });
+    readInterface.on('line', readLine);
+    readInterface.on('close', () => resolve({ entries, lines }));
   });
 }
 
@@ -311,14 +332,13 @@ export function matchLineWebApp(line: string): MatchResult | undefined {
   // matches two possible timestamps:
   // info: 2017/2/22 16:02:37.178 didStartLoading called TSSSB.timeout_tim set for ms:60000
   // info: Mar-19 13:50:41.676 [FOCUS-EVENT] Window focused
-  const webappRegex = /^(\w{4,8}): ((?:\d{4}\/\d{1,2}\/\d{1,2}|.{3}-\d{1,2}) \d{2}:\d{2}:\d{2}.\d{0,3}) ([\s\S]*)$/;
   // Matcher for webapp logs that don't have a timestamp, but do have a level 🙄
   // info: ╔═══════════════════════════════════════════════════════════════════════╗
   // Sometimes they just log
   // TS.storage.isUsingMemberBotCache():false
-  const webappLiteRegex = /^(\w{4,8}): ([\s\S]*)$/;
 
-  let results = webappRegex.exec(line);
+  WEBAPP_A_RGX.lastIndex = 0;
+  let results = WEBAPP_A_RGX.exec(line);
 
   // First, try the expected default format
   if (results && results.length === 4) {
@@ -329,8 +349,21 @@ export function matchLineWebApp(line: string): MatchResult | undefined {
     };
   }
 
+  // Let's try a different timestamp
+  WEBAPP_B_RGX.lastIndex = 0;
+  results = WEBAPP_B_RGX.exec(line);
+
+  if (results && results.length === 4) {
+    return {
+      timestamp: results[2],
+      level: results[1],
+      message: results[3]
+    };
+  }
+
   // Maybe there's a level?
-  results = webappLiteRegex.exec(line);
+  WEBAPP_LITE_RGX.lastIndex = 0;
+  results = WEBAPP_LITE_RGX.exec(line);
 
   if (results && results.length === 3) {
     return {
@@ -353,43 +386,22 @@ export function matchLineWebApp(line: string): MatchResult | undefined {
  * @returns {(MatchResult | undefined)}
  */
 export function matchLineElectron(line: string): MatchResult | undefined {
+  // If the line starts with a `{`, we're taking a shortcut and are expecting data.
+  if (line[0] === '{') return;
+
   // Matcher for Slack Desktop, 2.6.0 and onwards!
   // [02/22/17, 16:02:33:371] info: Store: UPDATE_SETTINGS
-  const desktopRegex = /^\[([\d\/\,\s\:]{22})\] ([A-Za-z]{0,20})\: ([\s\S]*)$/g;
-  // Matcher for Slack Desktop, older versions
-  // 2016-10-19T19:19:56.485Z - info: LOAD_PERSISTENT : {
-  const desktopOldRegex = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{1,3}.) - (\w{4,8}): ([\s\S]*)$/g;
-  const endsWithObjectRegex = /^([\s\S]*) : {$/g;
-
-  // Try the new format first
-  let results = desktopRegex.exec(line);
+  DESKTOP_RGX.lastIndex = 0;
+  const results = DESKTOP_RGX.exec(line);
 
   if (results && results.length === 4) {
-    const momentValue = moment(results[1], 'MM/DD/YY, HH:mm:ss:SSS').valueOf();
+    // Expected format: MM/DD/YY, HH:mm:ss:SSS'
+    const momentValue = new Date(results[1]).valueOf();
 
     return {
       timestamp: results[1],
       level: results[2],
       message: results[3],
-      momentValue
-    };
-  }
-
-  // Didn't work? Alright, try the old format
-  results = desktopOldRegex.exec(line);
-
-  if (results && results.length === 4) {
-    // Check if it ends with an object
-    const endsWithObject = endsWithObjectRegex.exec(results[3]);
-    const message = (endsWithObject && endsWithObject.length === 2) ? endsWithObject[1] : results[3];
-    const toParseHead = (endsWithObject && endsWithObject.length === 2) ? '{' : undefined;
-    const momentValue = moment(results[1], 'YYYY-MM-DDTHH:mm:ss.SSSZ').valueOf();
-
-    return {
-      timestamp: results[1],
-      level: results[2],
-      message,
-      toParseHead,
       momentValue
     };
   }
@@ -410,7 +422,8 @@ export function matchLineCall(line: string): MatchResult | undefined {
   const results = callRegex.exec(line);
 
   if (results && results.length === 4) {
-    const momentValue = moment(results[1], 'YYYY/MM/DD hh:mm:ss.SSS').valueOf();
+    // Expected format: YYYY/MM/DD hh:mm:ss.SSS
+    const momentValue = new Date(results[1]).valueOf();
 
     return {
       timestamp: results[1],
@@ -423,22 +436,20 @@ export function matchLineCall(line: string): MatchResult | undefined {
   return;
 }
 
+
 /**
- * The heart of the operation - matches a single line against regexes to understand what's
- * happening inside a logline.
+ * Returns the correct match line function for a given log type.
  *
- * @param {string} line
- * @param {string} logType
- * @returns {(MatchResult | undefined)}
+ * @export
+ * @param {LogType} logType
+ * @returns {((line: string) => MatchResult | undefined)}
  */
-export function matchLine(line: string, logType: string): MatchResult | undefined {
+export function getMatchFunction(logType: LogType): (line: string) => MatchResult | undefined {
   if (logType === 'webapp') {
-    return matchLineWebApp(line);
+    return matchLineWebApp;
   } else if (logType === 'call') {
-    return matchLineCall(line);
+    return matchLineCall;
   } else {
-    return matchLineElectron(line);
+    return matchLineElectron;
   }
 }
-
-// tslint:enable:no-console

@@ -1,8 +1,6 @@
 import { app } from 'electron';
 import { URL } from 'url';
 
-// tslint:disable:no-console
-
 /**
  * Attempts to secure the app by disallowing things we do
  * not need.
@@ -33,5 +31,3 @@ export function secureApp() {
     });
   });
 }
-
-// tslint:enable:no-console

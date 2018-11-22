@@ -1,8 +1,33 @@
 import { UnzippedFile } from './unzip';
 
-export type LogType = 'browser' | 'renderer' | 'call' | 'webapp' | 'preload' | 'all';
-
 export type LogFile = UnzippedFile | MergedLogFile | ProcessedLogFile;
+
+export const enum LogType {
+  BROWSER = 'browser',
+  RENDERER = 'renderer',
+  CALL = 'call',
+  WEBAPP = 'webapp',
+  PRELOAD = 'preload',
+  ALL = 'all',
+  UNKNOWN = ''
+}
+
+export const ALL_LOG_TYPES = [
+  LogType.BROWSER,
+  LogType.RENDERER,
+  LogType.CALL,
+  LogType.WEBAPP,
+  LogType.PRELOAD,
+  LogType.ALL
+];
+
+export interface ProcessorPerformanceInfo {
+  name: string;
+  type: LogType;
+  lines: number;
+  entries: number;
+  processingTime: number;
+}
 
 export interface DateRange {
   from?: Date;

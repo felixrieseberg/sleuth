@@ -108,34 +108,31 @@ export class App extends React.Component<undefined, Partial<AppState>> {
    * Takes a folder url as a string and opens it.
    *
    * @param {string} url
+   * @returns {Promise<void>}
    */
-  public openDirectory(url: string): void {
+  public async openDirectory(url: string): Promise<void> {
     debug(`Now opening directory ${url}`);
     this.reset();
 
-    fs.readdir(url)
-      .then((dir) => {
-        const unzippedFiles: UnzippedFiles = [];
-        const promises: Array<Promise<any>> = [];
+    const dir = await fs.readdir(url);
+    const unzippedFiles: UnzippedFiles = [];
 
-        dir.forEach((fileName) => {
-          if (shouldIgnoreFile(fileName)) return;
+    console.groupCollapsed(`Open directory`);
 
-          const fullPath = path.join(url, fileName);
-          debug(`Checking out file ${fileName}`);
+    for (const fileName of dir) {
+      if (!shouldIgnoreFile(fileName)) {
+        const fullPath = path.join(url, fileName);
+        const stats = fs.statSync(fullPath);
+        const file: UnzippedFile = { fileName, fullPath, size: stats.size };
 
-          const promise = fs.stat(fullPath)
-            .then((stats: fs.Stats) => {
-              const file: UnzippedFile = { fileName, fullPath, size: stats.size };
-              debug('Found file, adding to result.', file);
-              unzippedFiles.push(file);
-            });
+        debug('Found file, adding to result.', file);
+        unzippedFiles.push(file);
+      }
+    }
 
-          promises.push(promise);
-        });
+    this.setState({ unzippedFiles });
 
-        Promise.all(promises).then(() => this.setState({ unzippedFiles }));
-      });
+    console.groupEnd();
   }
 
   /**

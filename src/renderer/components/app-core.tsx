@@ -14,12 +14,14 @@ import {
   MergedLogFile,
   MergedLogFiles,
   ProcessedLogFile,
-  ProcessedLogFiles
+  ProcessedLogFiles,
+  LogType
 } from '../interfaces';
 import { AppCoreHeader } from './app-core-header';
 import { Sidebar } from './sidebar';
 import { Loading } from './loading';
 import { LogContent } from './log-content';
+import { flushLogPerformance } from '../processor/performance';
 
 const debug = require('debug')('sleuth:appCore');
 
@@ -60,6 +62,7 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
       loadedMergeFiles: false
     };
 
+    this.setMergedFile = this.setMergedFile.bind(this);
     this.toggleSidebar = this.toggleSidebar.bind(this);
     this.selectLogFile = this.selectLogFile.bind(this);
 
@@ -135,7 +138,8 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
     }
 
     // We're done processing the files, so let's get started on the merge files.
-    this.processMergeFiles();
+    await this.processMergeFiles();
+    flushLogPerformance();
   }
 
   /**
@@ -159,14 +163,14 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
     const { processedLogFiles } = this.state;
 
     if (processedLogFiles) {
-      await mergeLogFiles(processedLogFiles.browser, 'browser').then((r) => this.setMergedFile(r));
-      await mergeLogFiles(processedLogFiles.renderer, 'renderer').then((r) => this.setMergedFile(r));
-      await mergeLogFiles(processedLogFiles.preload, 'preload').then((r) => this.setMergedFile(r));
-      await mergeLogFiles(processedLogFiles.call, 'call').then((r) => this.setMergedFile(r));
+      await mergeLogFiles(processedLogFiles.browser, LogType.BROWSER).then(this.setMergedFile);
+      await mergeLogFiles(processedLogFiles.renderer, LogType.RENDERER).then(this.setMergedFile);
+      await mergeLogFiles(processedLogFiles.preload, LogType.PRELOAD).then(this.setMergedFile);
+      await mergeLogFiles(processedLogFiles.call, LogType.CALL).then(this.setMergedFile);
 
       const merged = this.state.mergedLogFiles as MergedLogFiles;
 
-      mergeLogFiles([merged.browser, merged.renderer, merged.preload, merged.call], 'all').then((r) => this.setMergedFile(r));
+      mergeLogFiles([merged.browser, merged.renderer, merged.preload, merged.call], LogType.ALL).then((r) => this.setMergedFile(r));
     }
   }
 
