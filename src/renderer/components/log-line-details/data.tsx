@@ -1,6 +1,7 @@
 import React from 'react';
 import { JSONView } from '../json-view';
 import { sleuthState } from '../../state/sleuth';
+import { Card, Elevation } from '@blueprintjs/core';
 
 const debug = require('debug')('sleuth:data');
 
@@ -24,7 +25,9 @@ export class LogLineData extends React.PureComponent<LogLineDataProps, LogLineDa
   public renderJSON(raw: string): JSX.Element {
     return (
       <div className='LogLineData'>
-        <JSONView raw={raw} state={sleuthState} />
+        <Card elevation={Elevation.TWO}>
+          <JSONView raw={raw} state={sleuthState} />
+        </Card>
       </div>
     );
   }

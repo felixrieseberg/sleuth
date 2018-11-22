@@ -21,6 +21,7 @@ export interface LogLineDetailsState {}
 export class LogLineDetails extends React.Component<LogLineDetailsProps, LogLineDetailsState> {
   constructor(props: LogLineDetailsProps) {
     super(props);
+
     this.toggle = this.toggle.bind(this);
     this.openSource = this.openSource.bind(this);
 
@@ -78,7 +79,9 @@ export class LogLineDetails extends React.Component<LogLineDetailsProps, LogLine
     return (
       <div className='Details-LogEntry'>
         <div className='MetaInfo'>
-          <div className='Details-Moment'>{datetime}</div>
+          <div className='Details-Moment'>
+            <Tag large={true} icon='calendar'>{datetime}</Tag>
+          </div>
           <div className='Details-LogType'>
             <Tag large={true} icon='box'>{level}</Tag>
             <Tag large={true} icon='applications'>{type}</Tag>

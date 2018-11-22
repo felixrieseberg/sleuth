@@ -4,7 +4,6 @@
   background: @light-gray4;
   border-top: 1px solid @neutral_grey;
   overflow: auto;
-  font-size: 1rem;
   flex-grow: 1;
   flex-shrink: 0;
   z-index: 1000;
@@ -33,33 +32,9 @@
     background: white;
   }
 
-  ul {
-    font-family: 'Inconsolata', monospace;
-    font-size: 1rem;
-  }
-
   .LogLineData {
     p, span {
       user-select: initial;
-    }
-  }
-
-  .Background {
-    width: 100%;
-    padding-top: 34.613%;
-    position: relative;
-
-    div {
-      position: absolute;
-      opacity: .4;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: url(../../../static/bg.png);
-      background-position: top;
-      background-size: cover;
-      background-repeat: no-repeat;
     }
   }
 
@@ -94,7 +69,6 @@
 }
 
 .Details-LogEntry {
-  font-size: 1rem;
   margin: .5rem 1.5rem 1rem;
   resize: horizontal;
 
@@ -125,8 +99,8 @@
 
 .bp3-dark {
   .Details {
-    border-top: @dark-gray5;
-    background: @dark-gray4;
+    border-top: @gray1;
+    background: @dark-gray5;
   }
 
   .Message {
