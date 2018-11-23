@@ -76,7 +76,7 @@ export function getLocaleInfo({ locale, spellcheckerLanguage }: any): string {
   let localeInfo = '';
 
   if (locale) {
-    const { name, label } = getLanguageNames(locale);
+    const { label } = getLanguageNames(locale);
     localeInfo += `The user's locale is ${label} (${locale}). `;
   } else {
     localeInfo += 'We could not determine a locale setting. ';
@@ -108,7 +108,7 @@ export function getVersionInfo({ appVersion, versionName }: any): string {
   return appVersion ? `${appVersion} (${versionName || 'no name'})` : '';
 }
 
-export function getOSInfo({ platform, platformVersion, pretendNotReallyWindows10, isBeforeWin10, isWin10 }: any): string {
+export function getOSInfo({ platform, platformVersion, pretendNotReallyWindows10 }: any): string {
   const os = platform ? platform.replace('darwin', 'macOS').replace('win32', 'Windows').replace('linux', 'Linux') : null;
   const osVersion = platformVersion && platformVersion.major ? `(${platformVersion.major}.${platformVersion.minor})` : '(unknown version)';
   let windowsInfo = '';

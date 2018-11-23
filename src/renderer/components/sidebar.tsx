@@ -1,10 +1,13 @@
 import React from 'react';
 import classNames from 'classnames';
 import isEqual from 'react-fast-compare';
-import { Classes, Icon, ITreeNode, Position, Tooltip, Tree } from '@blueprintjs/core';
+import { ITreeNode, Tree, Icon, Position, Tooltip, Intent } from '@blueprintjs/core';
+import { observer } from 'mobx-react';
 
 import { UnzippedFile } from '../unzip';
 import { MergedFilesLoadStatus, ProcessedLogFile, ProcessedLogFiles } from '../interfaces';
+import { levelsHave } from '../../utils/levelcounts';
+import { SleuthState } from '../state/sleuth';
 
 export interface SidebarProps {
   logFiles: ProcessedLogFiles;
@@ -12,12 +15,75 @@ export interface SidebarProps {
   selectedLogFileName: string;
   selectLogFile: (logFile: ProcessedLogFile | UnzippedFile | null, logType?: string) => void;
   mergedFilesStatus: MergedFilesLoadStatus;
+  state: SleuthState;
 }
 
 export interface SidebarState {
   nodes: Array<ITreeNode>;
 }
 
+const DEFAULT_NODES: Array<ITreeNode> = [
+  {
+    id: 'all-desktop',
+    hasCaret: false,
+    label: 'All Desktop Logs',
+    icon: 'compressed',
+    nodeData: { type: 'all' }
+  },
+  {
+    id: 0,
+    hasCaret: true,
+    icon: 'cog',
+    label: 'State & Settings',
+    isExpanded: true,
+    childNodes: [],
+  },
+  {
+    id: 1,
+    hasCaret: true,
+    icon: 'application',
+    label: 'Browser Process',
+    isExpanded: true,
+    childNodes: [],
+    nodeData: { type: 'browser' }
+  },
+  {
+    id: 2,
+    hasCaret: true,
+    icon: 'applications',
+    label: 'Renderer Process',
+    isExpanded: true,
+    childNodes: [],
+    nodeData: { type: 'renderer' }
+  },
+  {
+    id: 3,
+    hasCaret: true,
+    icon: 'applications',
+    label: 'BrowserView Process',
+    isExpanded: true,
+    childNodes: [],
+    nodeData: { type: 'preload' }
+  },
+  {
+    id: 4,
+    hasCaret: true,
+    icon: 'chat',
+    label: 'WebApp',
+    isExpanded: true,
+    childNodes: [],
+  },
+  {
+    id: 5,
+    hasCaret: true,
+    icon: 'phone',
+    label: 'Calls',
+    isExpanded: true,
+    childNodes: [],
+  }
+];
+
+@observer
 export class Sidebar extends React.Component<SidebarProps, SidebarState> {
   public static getDerivedStateFromProps(props: SidebarProps, state: SidebarState) {
     const { logFiles } = props;
@@ -45,13 +111,16 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
     }
   }
 
-  public static getNode(id: string, nodeData: any, isSelected: boolean): ITreeNode {
+  public static getNode(
+    id: string, nodeData: any, isSelected: boolean, options: Partial<ITreeNode> = {}
+  ): ITreeNode {
     return {
       id,
       label: id,
       isSelected,
       nodeData,
-      icon: 'document'
+      icon: 'document',
+      ...options
     };
   }
 
@@ -75,8 +144,29 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
   public static getLogFileNode(file: ProcessedLogFile, props: SidebarProps): ITreeNode {
     const { selectedLogFileName } = props;
     const isSelected = (selectedLogFileName === file.logFile.fileName);
+    const options: Partial<ITreeNode> = { secondaryLabel: this.getNodeHint(file) };
 
-    return Sidebar.getNode(file.logFile.fileName, { file }, isSelected);
+    return Sidebar.getNode(file.logFile.fileName, { file }, isSelected, options);
+  }
+
+  public static getNodeHint(file: ProcessedLogFile): JSX.Element | null {
+    const { levelCounts } = file;
+
+    if (!levelsHave('error', levelCounts)) return null;
+
+    let content = `This file contains ${levelCounts.error} errors`;
+
+    if (levelsHave('warn', levelCounts)) {
+      content += ` and ${levelCounts.warn} warnings.`;
+    } else {
+      content += `.`;
+    }
+
+    return (
+      <Tooltip content={content} position={Position.RIGHT} boundary='viewport'>
+        <Icon icon='error' intent={Intent.WARNING} />
+      </Tooltip>
+    );
   }
 
   constructor(props: SidebarProps) {
@@ -176,64 +266,3 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
     );
   }
 }
-
-const DEFAULT_NODES: Array<ITreeNode> = [
-  {
-    id: 'all-desktop',
-    hasCaret: false,
-    label: 'All Desktop Logs',
-    icon: 'compressed',
-    nodeData: { type: 'all' }
-  },
-  {
-    id: 0,
-    hasCaret: true,
-    icon: 'cog',
-    label: 'State & Settings',
-    isExpanded: true,
-    childNodes: [],
-  },
-  {
-    id: 1,
-    hasCaret: true,
-    icon: 'application',
-    label: 'Browser Process',
-    isExpanded: true,
-    childNodes: [],
-    nodeData: { type: 'browser' }
-  },
-  {
-    id: 2,
-    hasCaret: true,
-    icon: 'applications',
-    label: 'Renderer Process',
-    isExpanded: true,
-    childNodes: [],
-    nodeData: { type: 'renderer' }
-  },
-  {
-    id: 3,
-    hasCaret: true,
-    icon: 'applications',
-    label: 'BrowserView Process',
-    isExpanded: true,
-    childNodes: [],
-    nodeData: { type: 'preload' }
-  },
-  {
-    id: 4,
-    hasCaret: true,
-    icon: 'chat',
-    label: 'WebApp',
-    isExpanded: true,
-    childNodes: [],
-  },
-  {
-    id: 5,
-    hasCaret: true,
-    icon: 'phone',
-    label: 'Calls',
-    isExpanded: true,
-    childNodes: [],
-  }
-];

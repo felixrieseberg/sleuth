@@ -7,6 +7,7 @@ export class SleuthState {
   @observable public slackUserId?: string;
   @observable public isCooperSignedIn = false;
   @observable public selectedEntry?: LogEntry;
+  @observable public source?: string;
   @observable.ref public selectedLogFile?: ProcessedLogFile | MergedLogFile | UnzippedFile;
 
   @observable public levelFilter: LevelFilter = {
@@ -19,7 +20,7 @@ export class SleuthState {
   @observable public searchIndex: number = 0;
   @observable public search: string = '';
   @observable public isDarkMode: boolean = false;
-  @observable public dateRange: DateRange = { from: null, to: null };
+  @observable public dateRange: DateRange = { from: undefined, to: undefined };
   @observable public showOnlySearchResults: boolean = false;
   @observable public isDetailsVisible: boolean = false;
   @observable public dateTimeFormat: string = localStorage.getItem('dateTimeFormat') || defaults.dateTimeFormat;
@@ -28,6 +29,11 @@ export class SleuthState {
   @observable public webAppLogsWarningDismissed: boolean = false;
 
   @observable public opened: number = 0;
+
+  @action
+  public setSource(source: string) {
+    this.source = source;
+  }
 
   @action
   public toggleDarkMode() {

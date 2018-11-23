@@ -85,9 +85,9 @@ export class App extends React.Component<undefined, Partial<AppState>> {
    * it's neither, we'll do nothing.
    *
    * @param {string} url
-   * @returns {void}
+   * @returns {Promise<void>}
    */
-  public openFile(url: string): void {
+  public async openFile(url: string): Promise<void> {
     debug(`Received open-url for ${url}`);
     this.reset();
 
@@ -97,11 +97,10 @@ export class App extends React.Component<undefined, Partial<AppState>> {
     }
 
     // Let's look at the url a little closer
-    fs.stat(url).then((stats: fs.Stats) => {
-      if (stats.isDirectory()) {
-        return this.openDirectory(url);
-      }
-    });
+    const stats = await fs.stat(url);
+    if (stats.isDirectory()) {
+      return this.openDirectory(url);
+    }
   }
 
   /**
@@ -130,6 +129,7 @@ export class App extends React.Component<undefined, Partial<AppState>> {
       }
     }
 
+    sleuthState.setSource(url);
     this.setState({ unzippedFiles });
 
     console.groupEnd();
@@ -140,11 +140,14 @@ export class App extends React.Component<undefined, Partial<AppState>> {
    *
    * @param {string} url
    */
-  public openZip(url: string): void {
+  public async openZip(url: string): Promise<void> {
     const unzipper = new Unzipper(url);
-    unzipper.open()
-      .then(() => unzipper.unzip())
-      .then((unzippedFiles: UnzippedFiles) => this.setState({unzippedFiles}));
+    await unzipper.open();
+
+    const unzippedFiles = await unzipper.unzip();
+
+    sleuthState.setSource(url);
+    this.setState({ unzippedFiles });
   }
 
   public reset() {

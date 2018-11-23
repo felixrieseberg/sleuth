@@ -5,7 +5,8 @@
   "description": "Slack Log Viewer",
   "main": "./dist/src/main/index",
   "scripts": {
-    "lint": "tslint -c tslint.json -p tsconfig.json -e \"node_modules/**/*.ts\"",
+    "tsc": "tsc -p tsconfig.json",
+    "lint": "tslint -c tslint.json -p tsconfig.json",
     "package": "electron-forge package",
     "parcel:build": "node ./tools/parcel-build.js",
     "parcel:watch": "node ./tools/parcel-watch.js",

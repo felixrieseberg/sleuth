@@ -75,8 +75,9 @@ export interface MergedLogFiles {
 }
 
 export interface ProcessedLogFile {
-  logFile: UnzippedFile;
+  levelCounts: Record<string, number>;
   logEntries: Array<LogEntry>;
+  logFile: UnzippedFile;
   logType: LogType;
   type: 'ProcessedLogFile';
 }
@@ -95,13 +96,6 @@ export interface MergedLogFile {
   logEntries: Array<LogEntry>;
   logType: LogType;
   type: 'MergedLogFile';
-}
-
-export interface CombinedLogFiles {
-  logFiles: Array<ProcessedLogFile>;
-  logEntries: Array<LogEntry>;
-  logType: LogType;
-  type: 'CombinedLogFiles';
 }
 
 export interface SortedUnzippedFiles {

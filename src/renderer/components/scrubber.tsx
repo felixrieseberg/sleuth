@@ -11,11 +11,6 @@ export interface ScrubberState {
 }
 
 export class Scrubber extends React.Component<ScrubberProps, ScrubberState> {
-  private readonly refHandlers = {
-    scrubber: (ref: HTMLDivElement) => this.element = ref,
-  };
-  private element: HTMLDivElement;
-
   constructor(props: ScrubberProps) {
     super(props);
 
@@ -37,21 +32,21 @@ export class Scrubber extends React.Component<ScrubberProps, ScrubberState> {
 
     this.setState({
       startY: e.clientY,
-      startHeight: parseInt(document.defaultView.getComputedStyle(resizeTarget).height!, 10)
+      startHeight: parseInt(document.defaultView!.getComputedStyle(resizeTarget).height!, 10)
     });
 
-    document.documentElement.addEventListener('mousemove', this.mouseMoveHandler, false);
-    document.documentElement.addEventListener('mouseup', this.mouseUpHandler, false);
+    document.documentElement!.addEventListener('mousemove', this.mouseMoveHandler, false);
+    document.documentElement!.addEventListener('mouseup', this.mouseUpHandler, false);
   }
 
   public mouseUpHandler() {
-    document.documentElement.removeEventListener('mousemove', this.mouseMoveHandler, false);
-    document.documentElement.removeEventListener('mouseup', this.mouseUpHandler, false);
+    document.documentElement!.removeEventListener('mousemove', this.mouseMoveHandler, false);
+    document.documentElement!.removeEventListener('mouseup', this.mouseUpHandler, false);
   }
 
   public render() {
     return (
-      <div ref={this.refHandlers.scrubber} className='Scrubber' onMouseDown={this.mouseDownHandler} />
+      <div className='Scrubber' onMouseDown={this.mouseDownHandler} />
     );
   }
 }

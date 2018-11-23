@@ -4,7 +4,7 @@ import path from 'path';
 
 import { logPerformance } from './processor/performance';
 import { UnzippedFile, UnzippedFiles } from './unzip';
-import { LogEntry, LogType, MatchResult, MergedLogFile, ProcessedLogFile, SortedUnzippedFiles, ProcessorPerformanceInfo } from './interfaces';
+import { LogEntry, LogType, MatchResult, MergedLogFile, ProcessedLogFile, SortedUnzippedFiles } from './interfaces';
 
 const debug = require('debug')('sleuth:processor');
 
@@ -194,8 +194,8 @@ export async function processLogFile(
   if (progressCb) progressCb(`Processing file ${logFile.fileName}...`);
 
   const timeStart = performance.now();
-  const { entries, lines } = await readFile(logFile, logType, progressCb);
-  const result = { logFile, logEntries: entries, logType, type: 'ProcessedLogFile'};
+  const { entries, lines, levelCounts } = await readFile(logFile, logType, progressCb);
+  const result = { logFile, logEntries: entries, logType, type: 'ProcessedLogFile', levelCounts };
 
   logPerformance({
     name: logFile.fileName,
@@ -218,7 +218,9 @@ export async function processLogFile(
  * @param {string} sourceFile
  * @returns {LogEntry}
  */
-export function makeLogEntry(options: MatchResult, logType: string, line: number, sourceFile: string): LogEntry {
+export function makeLogEntry(
+  options: MatchResult, logType: string, line: number, sourceFile: string
+): LogEntry {
   options.message = options.message || '';
   options.timestamp = options.timestamp || '';
   options.level = options.level || '';
@@ -230,6 +232,7 @@ export function makeLogEntry(options: MatchResult, logType: string, line: number
 export interface ReadFileResult {
   entries: Array<LogEntry>;
   lines: number;
+  levelCounts: Record<string, number>;
 }
 
 /**
@@ -257,6 +260,8 @@ export function readFile(
     let current: LogEntry | null = null;
     let toParse = '';
 
+    const levelCounts = {};
+
     function readLine(line: string) {
       lines = lines + 1;
 
@@ -283,6 +288,11 @@ export function readFile(
             entries[lastIndex].repeated!.push(current.timestamp);
           } else {
             current.index = entries.length;
+
+            if (current.level) {
+              levelCounts[current.level] = (levelCounts[current.level] || 0)  + 1;
+            }
+
             entries.push(current);
           }
         }
@@ -309,7 +319,7 @@ export function readFile(
     }
 
     readInterface.on('line', readLine);
-    readInterface.on('close', () => resolve({ entries, lines }));
+    readInterface.on('close', () => resolve({ entries, lines, levelCounts }));
   });
 }
 

@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react';
 import React from 'react';
 import classNames from 'classnames';
-import { ipcRenderer, remote } from 'electron';
+import { remote } from 'electron';
 
 import { getFirstLogFile } from '../../utils/get-first-logfile';
 import { isMergedLogFile, isProcessedLogFile, isUnzippedFile } from '../../utils/is-logfile';
@@ -263,6 +263,7 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
         mergedFilesStatus={mergedFilesStatus}
         selectLogFile={this.selectLogFile}
         selectedLogFileName={selectedLogFileName}
+        state={this.props.state}
       />
     );
   }
