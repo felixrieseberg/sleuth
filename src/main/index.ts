@@ -40,7 +40,7 @@ if (require('electron-squirrel-startup')) {
     mainWindowState.manage(mainWindow);
 
     // and load the index.html of the app.
-    mainWindow.loadFile('./dist/index.html');
+    mainWindow.loadFile('./dist/static/index.html');
 
     // Open the DevTools.
     if (config.isDevMode) {

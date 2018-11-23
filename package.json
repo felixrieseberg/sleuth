@@ -3,7 +3,7 @@
   "productName": "Sleuth",
   "version": "1.2.0",
   "description": "Slack Log Viewer",
-  "main": "./dist/main/index",
+  "main": "./dist/src/main/index",
   "scripts": {
     "lint": "tslint -c tslint.json -p tsconfig.json -e \"node_modules/**/*.ts\"",
     "package": "electron-forge package",
@@ -11,6 +11,7 @@
     "parcel:watch": "node ./tools/parcel-watch.js",
     "publish": "electron-forge publish",
     "start": "rimraf ./dist && electron-forge start",
+    "dev": "electron .",
     "test": "npm run lint && jest --config=jest.json --coverage",
     "update-snapshots": "jest --config=jest.json --updateSnapshot"
   },
