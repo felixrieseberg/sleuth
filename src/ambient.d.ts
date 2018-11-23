@@ -3,7 +3,6 @@ declare module 'url';
 declare module 'yauzl';
 declare module 'react-json-tree';
 declare module 'react-throttle';
-declare module 'react-skylight';
 declare module 'react-linkify';
 declare module 'react-ladda';
 declare module 'react-keydown';

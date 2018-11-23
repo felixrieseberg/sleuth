@@ -51,7 +51,6 @@
     "react-keydown": "1.9.7",
     "react-ladda": "6.0.0",
     "react-linkify": "0.2.2",
-    "react-skylight": "0.5.1",
     "react-virtualized": "^9.20.1",
     "semver": "5.5.1",
     "tmp": "0.0.33",

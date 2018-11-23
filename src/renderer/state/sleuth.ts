@@ -1,7 +1,12 @@
 import { UnzippedFile } from '../unzip';
 import { LevelFilter, LogEntry, MergedLogFile, ProcessedLogFile, DateRange } from '../interfaces';
-import { observable, action } from 'mobx';
-import { defaults } from '../components/preferences';
+import { observable, action, autorun } from 'mobx';
+
+export const defaults = {
+  dateTimeFormat: 'HH:mm:ss (DD/MM)',
+  defaultEditor: 'code --goto {filepath}:{line}',
+  font: process.platform === 'darwin' ? 'BlinkMacSystemFont' : 'Segoe UI'
+};
 
 export class SleuthState {
   @observable public slackUserId?: string;
@@ -19,16 +24,38 @@ export class SleuthState {
 
   @observable public searchIndex: number = 0;
   @observable public search: string = '';
-  @observable public isDarkMode: boolean = false;
+
+  @observable public webAppLogsWarningDismissed: boolean = false;
+  @observable public opened: number = 0;
   @observable public dateRange: DateRange = { from: undefined, to: undefined };
   @observable public showOnlySearchResults: boolean = false;
   @observable public isDetailsVisible: boolean = false;
-  @observable public dateTimeFormat: string = localStorage.getItem('dateTimeFormat') || defaults.dateTimeFormat;
-  @observable public font: string = localStorage.getItem('font') || defaults.font;
-  @observable public defaultEditor: string = localStorage.getItem('defaultEditor') || defaults.defaultEditor;
-  @observable public webAppLogsWarningDismissed: boolean = false;
 
-  @observable public opened: number = 0;
+  // Settings
+  @observable public isDarkMode: boolean
+    = false;
+  @observable public dateTimeFormat: string
+    = this.retrieve<string>('dateTimeFormat', false) || defaults.dateTimeFormat;
+  @observable public font: string
+    = this.retrieve<string>('font', false) || defaults.font;
+  @observable public defaultEditor: string
+    = this.retrieve<string>('defaultEditor', false) || defaults.defaultEditor;
+
+  constructor() {
+    // Setup autoruns
+    autorun(() => this.save('dateTimeFormat', this.dateTimeFormat));
+    autorun(() => this.save('font', this.font));
+    autorun(() => this.save('defaultEditor', this.defaultEditor));
+    autorun(() => {
+      this.save('isDarkMode', this.isDarkMode);
+
+      if (this.isDarkMode) {
+        document.body.classList.add('bp3-dark');
+      } else {
+        document.body.classList.remove('bp3-dark');
+      }
+    });
+  }
 
   @action
   public setSource(source: string) {
@@ -38,12 +65,42 @@ export class SleuthState {
   @action
   public toggleDarkMode() {
     this.isDarkMode = !this.isDarkMode;
+  }
 
-    if (this.isDarkMode) {
-      document.body.classList.add('bp3-dark');
+  /**
+   * Save a key/value to localStorage.
+   *
+   * @param {string} key
+   * @param {(string | number | object)} [value]
+   */
+  private save(key: string, value?: string | number | object | null | boolean) {
+    if (value) {
+      const _value = typeof value === 'object'
+        ? JSON.stringify(value)
+        : value.toString();
+
+      localStorage.setItem(key, _value);
     } else {
-      document.body.classList.remove('bp3-dark');
+      localStorage.removeItem(key);
     }
+  }
+
+  /**
+   * Fetch data from localStorage.
+   *
+   * @template T
+   * @param {string} key
+   * @param {boolean} parse
+   * @returns {(T | string | null)}
+   */
+  private retrieve<T>(key: string, parse: boolean): T | string | null {
+    const value = localStorage.getItem(key);
+
+    if (parse) {
+      return JSON.parse(value || 'null') as T;
+    }
+
+    return value;
   }
 }
 
