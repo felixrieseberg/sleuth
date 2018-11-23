@@ -1,32 +1,17 @@
-import { ipcRenderer } from 'electron';
 import fs from 'fs-extra';
 import readline from 'readline';
 import path from 'path';
-import debounce from 'debounce';
 
 import { logPerformance } from './processor/performance';
 import { UnzippedFile, UnzippedFiles } from './unzip';
 import { LogEntry, LogType, MatchResult, MergedLogFile, ProcessedLogFile, SortedUnzippedFiles, ProcessorPerformanceInfo } from './interfaces';
 
 const debug = require('debug')('sleuth:processor');
-const debouncedProcStatus = debounce(ipcRenderer.send, 500);
 
 const DESKTOP_RGX = /^\[([\d\/\,\s\:]{22})\] ([A-Za-z]{0,20})\: (.*)$/g;
 const WEBAPP_A_RGX = /^(\w*): (.{3}-\d{1,2} \d{2}:\d{2}:\d{2}.\d{0,3}) (.*)$/;
 const WEBAPP_B_RGX = /^(\w*): (\d{4}\/\d{1,2}\/\d{1,2} \d{2}:\d{2}:\d{2}.\d{0,3}) (.*)$/;
 const WEBAPP_LITE_RGX = /^(\w{4,8}): (.*)$/;
-
-// It's okay in this file
-
-/**
- * Sends a status update via IPC. Using IPC allows us to possible use other
- * BrowserWindows, too.
- *
- * @param {*} status
- */
-export function sendProcStatus(status: any): void {
-  debouncedProcStatus('processing-status', status);
-}
 
 /**
  * Sort an array, but do it on a different thread
@@ -181,11 +166,14 @@ export function getTypesForFiles(logFiles: UnzippedFiles): SortedUnzippedFiles {
  * @param {UnzippedFiles} logFiles
  * @returns {Promise<ProcessedLogFiles>}
  */
-export function processLogFiles(logFiles: UnzippedFiles): Promise<Array<ProcessedLogFile>> {
+export function processLogFiles(
+  logFiles: UnzippedFiles,
+  progressCb?: (status: string) => void
+): Promise<Array<ProcessedLogFile>> {
   const promises: Array<any> = [];
 
   logFiles.forEach((logFile) => {
-    promises.push(processLogFile(logFile));
+    promises.push(processLogFile(logFile, progressCb));
   });
 
   return Promise.all(promises);
@@ -197,13 +185,16 @@ export function processLogFiles(logFiles: UnzippedFiles): Promise<Array<Processe
  * @param {UnzippedFile} logFile
  * @returns {Promise<ProcessedLogFile>}
  */
-export async function processLogFile(logFile: UnzippedFile): Promise<ProcessedLogFile> {
+export async function processLogFile(
+  logFile: UnzippedFile,
+  progressCb?: (status: string) => void
+): Promise<ProcessedLogFile> {
   const logType = getTypeForFile(logFile);
 
-  sendProcStatus(`Processing file ${logFile.fileName}...`);
+  if (progressCb) progressCb(`Processing file ${logFile.fileName}...`);
 
   const timeStart = performance.now();
-  const { entries, lines } = await readFile(logFile, logType);
+  const { entries, lines } = await readFile(logFile, logType, progressCb);
   const result = { logFile, logEntries: entries, logType, type: 'ProcessedLogFile'};
 
   logPerformance({
@@ -249,7 +240,9 @@ export interface ReadFileResult {
  * @returns {Promise<Array<LogEntry>>}
  */
 export function readFile(
-  logFile: UnzippedFile, logType?: LogType
+  logFile: UnzippedFile,
+  logType?: LogType,
+  progressCb?: (status: string) => void
 ): Promise<ReadFileResult> {
   return new Promise(async (resolve) => {
     const entries: Array<LogEntry> = [];
@@ -309,8 +302,8 @@ export function readFile(
       }
 
       // Update Status
-      if (lines > lastLogged + 999) {
-        sendProcStatus(`Processed ${lines} log lines in ${logFile.fileName}`);
+      if (progressCb && lines > lastLogged + 1999) {
+        progressCb(`Processed ${lines} log lines in ${logFile.fileName}`);
         lastLogged = lines;
       }
     }

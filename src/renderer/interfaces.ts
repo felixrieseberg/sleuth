@@ -21,6 +21,14 @@ export const ALL_LOG_TYPES = [
   LogType.ALL
 ];
 
+export const LOG_TYPES_TO_PROCESS = [
+  LogType.BROWSER,
+  LogType.RENDERER,
+  LogType.WEBAPP,
+  LogType.PRELOAD,
+  LogType.CALL
+];
+
 export interface ProcessorPerformanceInfo {
   name: string;
   type: LogType;

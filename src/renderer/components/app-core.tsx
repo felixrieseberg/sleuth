@@ -1,11 +1,11 @@
-import { getFirstLogFile } from '../../utils/get-first-logfile';
-import { isMergedLogFile, isProcessedLogFile, isUnzippedFile } from '../../utils/is-logfile';
 import { observer } from 'mobx-react';
-import { sleuthState, SleuthState } from '../state/sleuth';
 import React from 'react';
 import classNames from 'classnames';
-
 import { ipcRenderer, remote } from 'electron';
+
+import { getFirstLogFile } from '../../utils/get-first-logfile';
+import { isMergedLogFile, isProcessedLogFile, isUnzippedFile } from '../../utils/is-logfile';
+import { sleuthState, SleuthState } from '../state/sleuth';
 import { UnzippedFile, UnzippedFiles } from '../unzip';
 import { getTypesForFiles, mergeLogFiles, processLogFiles } from '../processor';
 import {
@@ -15,7 +15,8 @@ import {
   MergedLogFiles,
   ProcessedLogFile,
   ProcessedLogFiles,
-  LogType
+  LogType,
+  LOG_TYPES_TO_PROCESS
 } from '../interfaces';
 import { AppCoreHeader } from './app-core-header';
 import { Sidebar } from './sidebar';
@@ -65,10 +66,6 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
     this.setMergedFile = this.setMergedFile.bind(this);
     this.toggleSidebar = this.toggleSidebar.bind(this);
     this.selectLogFile = this.selectLogFile.bind(this);
-
-    ipcRenderer.on('processing-status', (_event: any, loadingMessage: string) => {
-      this.setState({ loadingMessage });
-    });
   }
 
   /**
@@ -76,10 +73,6 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
    */
   public componentDidMount() {
     this.processFiles();
-  }
-
-  public componentWillUnmount() {
-    ipcRenderer.removeAllListeners('processing-status');
   }
 
   /**
@@ -118,16 +111,16 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
 
     this.addFilesToState(sortedUnzippedFiles.state, 'state');
 
-    await processLogFiles(sortedUnzippedFiles.renderer)
-      .then((newFiles: Array<ProcessedLogFile>) => this.addFilesToState(newFiles, 'renderer'));
-    await processLogFiles(sortedUnzippedFiles.browser)
-      .then((newFiles: Array<ProcessedLogFile>) => this.addFilesToState(newFiles, 'browser'));
-    await processLogFiles(sortedUnzippedFiles.webapp)
-      .then((newFiles: Array<ProcessedLogFile>) => this.addFilesToState(newFiles, 'webapp'));
-    await processLogFiles(sortedUnzippedFiles.preload)
-      .then((newFiles: Array<ProcessedLogFile>) => this.addFilesToState(newFiles, 'preload'));
-    await processLogFiles(sortedUnzippedFiles.call)
-      .then((newFiles: Array<ProcessedLogFile>) => this.addFilesToState(newFiles, 'call'));
+    console.time('process-files');
+    for (const type of LOG_TYPES_TO_PROCESS) {
+      const preFiles = sortedUnzippedFiles[type];
+      const files = await processLogFiles(preFiles, (loadingMessage) => {
+        this.setState({ loadingMessage });
+      });
+
+      this.addFilesToState(files, type);
+    }
+    console.timeEnd('process-files');
 
     const { selectedLogFile, processedLogFiles } = this.state;
     if (!selectedLogFile && processedLogFiles) {
@@ -258,32 +251,60 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
     };
   }
 
-  public render() {
-    const { selectedLogFile } = this.props.state;
-    const { sidebarIsOpen, processedLogFiles, loadingMessage } = this.state;
-    const appCoreClassName = classNames('AppCore');
-    const logContentClassName = classNames({ SidebarIsOpen: sidebarIsOpen });
+  public renderSidebar() {
+    const { sidebarIsOpen, processedLogFiles } = this.state;
     const selectedLogFileName = this.getSelectedFileName();
-    const percentageLoaded = this.getPercentageLoaded();
-    const loading = <Loading percentage={percentageLoaded} message={loadingMessage} />;
-    const tableOrLoading = selectedLogFile ? <LogContent state={sleuthState} /> : loading;
     const mergedFilesStatus = this.getMergedFilesStatus();
 
     return (
-      <div className={appCoreClassName}>
-        <Sidebar
-          isOpen={!!sidebarIsOpen}
-          logFiles={processedLogFiles as ProcessedLogFiles}
-          mergedFilesStatus={mergedFilesStatus}
-          selectLogFile={this.selectLogFile}
-          selectedLogFileName={selectedLogFileName}
-        />
+      <Sidebar
+        isOpen={!!sidebarIsOpen}
+        logFiles={processedLogFiles as ProcessedLogFiles}
+        mergedFilesStatus={mergedFilesStatus}
+        selectLogFile={this.selectLogFile}
+        selectedLogFileName={selectedLogFileName}
+      />
+    );
+  }
 
-        <div id='content' className={logContentClassName}>
-          <AppCoreHeader state={sleuthState} menuToggle={this.toggleSidebar} />
-          {tableOrLoading}
+  public renderHeader() {
+    return (
+      <AppCoreHeader state={sleuthState} menuToggle={this.toggleSidebar} />
+    );
+  }
+
+  public renderLoading() {
+    const { loadingMessage } = this.state;
+    const percentageLoaded = this.getPercentageLoaded();
+
+    return (
+      <div className='AppCore'>
+        <div id='content'>
+          <Loading percentage={percentageLoaded} message={loadingMessage} />\
         </div>
       </div>
     );
+  }
+
+  public renderContent() {
+    const { sidebarIsOpen } = this.state;
+    const logContentClassName = classNames({ SidebarIsOpen: sidebarIsOpen });
+
+    return (
+      <div className='AppCore'>
+        {this.renderSidebar()}
+
+        <div id='content' className={logContentClassName}>
+          <AppCoreHeader state={sleuthState} menuToggle={this.toggleSidebar} />
+          <LogContent state={sleuthState} />
+        </div>
+      </div>
+    );
+  }
+
+  public render() {
+    return this.props.state.selectedLogFile
+      ? this.renderContent()
+      : this.renderLoading();
   }
 }

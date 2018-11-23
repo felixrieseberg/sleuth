@@ -1,4 +1,5 @@
 import React from 'react';
+import { ProgressBar } from '@blueprintjs/core';
 
 export interface LoadingProps {
   percentage?: number;
@@ -21,8 +22,8 @@ export class Loading extends React.Component<LoadingProps, LoadingState> {
 
     return (
       <div className='Loading'>
-          <progress value={percentage!.toString()} max='100' />
-          <p>{message}</p>
+        <ProgressBar animate={false} value={percentage! / 100} />
+        <p>{message}</p>
       </div>
     );
   }
