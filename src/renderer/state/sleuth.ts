@@ -5,7 +5,8 @@ import { observable, action, autorun } from 'mobx';
 export const defaults = {
   dateTimeFormat: 'HH:mm:ss (DD/MM)',
   defaultEditor: 'code --goto {filepath}:{line}',
-  font: process.platform === 'darwin' ? 'BlinkMacSystemFont' : 'Segoe UI'
+  font: process.platform === 'darwin' ? 'BlinkMacSystemFont' : 'Segoe UI',
+  isDarkMode: true
 };
 
 export class SleuthState {
@@ -32,14 +33,10 @@ export class SleuthState {
   @observable public isDetailsVisible: boolean = false;
 
   // Settings
-  @observable public isDarkMode: boolean
-    = false;
-  @observable public dateTimeFormat: string
-    = this.retrieve<string>('dateTimeFormat', false) || defaults.dateTimeFormat;
-  @observable public font: string
-    = this.retrieve<string>('font', false) || defaults.font;
-  @observable public defaultEditor: string
-    = this.retrieve<string>('defaultEditor', false) || defaults.defaultEditor;
+  @observable public isDarkMode: boolean = !!this.retrieve('isDarkMode', true);
+  @observable public dateTimeFormat: string = this.retrieve<string>('dateTimeFormat', false)!;
+  @observable public font: string = this.retrieve<string>('font', false)!;
+  @observable public defaultEditor: string = this.retrieve<string>('defaultEditor', false)!;
 
   constructor() {
     // Setup autoruns
@@ -93,11 +90,17 @@ export class SleuthState {
    * @param {boolean} parse
    * @returns {(T | string | null)}
    */
-  private retrieve<T>(key: string, parse: boolean): T | string | null {
+  private retrieve<T>(
+    key: string, parse: boolean
+  ): T | string | null {
     const value = localStorage.getItem(key);
 
     if (parse) {
       return JSON.parse(value || 'null') as T;
+    }
+
+    if (value === null && defaults[key]) {
+      return defaults[key];
     }
 
     return value;
