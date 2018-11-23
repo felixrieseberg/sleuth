@@ -1,11 +1,11 @@
-import { ProcessedLogFile } from '../../src/renderer/interfaces';
+import { ProcessedLogFile, LogType } from '../../src/renderer/interfaces';
 
 export const mockBrowserFile1: ProcessedLogFile = {
   logEntries: [
     {
       index: 0,
       level: 'info',
-      logType: 'browser',
+      logType: LogType.BROWSER,
       message: 'Hi!',
       momentValue: 1488837185497,
       timestamp: '2017-03-06T13:53:05.497',
@@ -14,7 +14,7 @@ export const mockBrowserFile1: ProcessedLogFile = {
     }, {
       index: 1,
       level: 'info',
-      logType: 'browser',
+      logType: LogType.BROWSER,
       message: 'Yo!',
       momentValue: 1488837201751,
       timestamp: '2017-03-06T13:53:21.751',
@@ -23,7 +23,7 @@ export const mockBrowserFile1: ProcessedLogFile = {
     }, {
       index: 2,
       level: 'info',
-      logType: 'browser',
+      logType: LogType.BROWSER,
       message: 'Hey!',
       momentValue: 1488837270030,
       timestamp: '2017-03-06T13:54:30.030',
@@ -36,8 +36,9 @@ export const mockBrowserFile1: ProcessedLogFile = {
     fullPath: '/mock/path/browser.log',
     size: 100
   },
-  logType: 'browser',
-  type: 'ProcessedLogFile'
+  logType: LogType.BROWSER,
+  type: 'ProcessedLogFile',
+  levelCounts: {}
 };
 
 // Slightly different timestamps
@@ -46,30 +47,30 @@ export const mockBrowserFile2: ProcessedLogFile = {
     {
       index: 0,
       level: 'info',
-      logType: 'browser',
+      logType: LogType.BROWSER,
       message: 'Hi!',
       momentValue: 1488837228089,
       timestamp: '2017-03-06T13:53:48.089',
       line: 0,
-      sourceFile: 'test-file'
+      sourceFile: 'test-file',
     }, {
       index: 1,
       level: 'info',
-      logType: 'browser',
+      logType: LogType.BROWSER,
       message: 'Yo!',
       momentValue: 1488837285150,
       timestamp: '2017-03-06T13:54:45.150',
       line: 1,
-      sourceFile: 'test-file'
+      sourceFile: 'test-file',
     }, {
       index: 2,
       level: 'info',
-      logType: 'browser',
+      logType: LogType.BROWSER,
       message: 'Hey!',
       momentValue: 1488837294254,
       timestamp: '2017-03-06T13:54:54.254',
       line: 2,
-      sourceFile: 'test-file'
+      sourceFile: 'test-file',
     }
   ],
   logFile: {
@@ -77,6 +78,7 @@ export const mockBrowserFile2: ProcessedLogFile = {
     fullPath: '/mock/path/browser1.log',
     size: 100
   },
-  logType: 'browser',
-  type: 'ProcessedLogFile'
+  logType: LogType.BROWSER,
+  type: 'ProcessedLogFile',
+  levelCounts: {}
 };

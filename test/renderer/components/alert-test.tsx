@@ -1,5 +1,5 @@
-import * as React from 'react';
-import * as renderer from 'react-test-renderer';
+import React from 'react';
+import renderer from 'react-test-renderer';
 import { Alert } from '../../../src/renderer/components/alert';
 import { shallow } from 'enzyme';
 

@@ -4,10 +4,18 @@ exports[`loading renders correctly 1`] = `
 <div
   className="Loading"
 >
-  <progress
-    max="100"
-    value="20"
-  />
+  <div
+    className="bp3-progress-bar bp3-no-animation"
+  >
+    <div
+      className="bp3-progress-meter"
+      style={
+        Object {
+          "width": "20%",
+        }
+      }
+    />
+  </div>
   <p>
     Hello
   </p>

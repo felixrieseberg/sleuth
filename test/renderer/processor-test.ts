@@ -12,8 +12,8 @@ import {
 } from '../../src/renderer/processor';
 import { mockBrowserFile1, mockBrowserFile2 } from '../__mocks__/processed-log-file';
 
-import * as dirtyJSON from 'jsonic';
-import * as path from 'path';
+import dirtyJSON from 'jsonic';
+import path from 'path';
 import { LogType } from '../../src/renderer/interfaces';
 
 describe('matchLineWebApp', () => {
@@ -54,17 +54,6 @@ describe('matchLineElectron', () => {
     expect(result!.timestamp).to.be.equal('02/22/17, 16:02:33:371');
     expect(result!.level).to.be.equal('info');
     expect(result!.message).to.be.equal('Store: UPDATE_SETTINGS');
-  });
-
-  it('should match an Electron (< 2.6) line', () => {
-    const line = '2016-10-19T19:19:56.485Z - info: LOAD_PERSISTENT : {';
-    const result = matchLineElectron(line);
-
-    expect(result).to.exist;
-    expect(result!.timestamp).to.be.equal('2016-10-19T19:19:56.485Z');
-    expect(result!.level).to.be.equal('info');
-    expect(result!.message).to.be.equal('LOAD_PERSISTENT');
-    expect(result!.toParseHead).to.be.equal('{');
   });
 });
 
@@ -245,7 +234,7 @@ describe('mergeLogFiles', () => {
   it('should merge two logfiles together', () => {
     const files = [ mockBrowserFile1, mockBrowserFile2 ];
 
-    return mergeLogFiles(files, 'browser').then((result) => {
+    return mergeLogFiles(files, LogType.BROWSER).then((result) => {
       expect(result).to.exist;
       expect(result.type).to.be.equal('MergedLogFile');
       expect(result.logEntries.length).to.be.equal(6);

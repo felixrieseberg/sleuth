@@ -1,6 +1,6 @@
-import * as React from 'react';
+import React from 'react';
 import { Welcome } from '../../../src/renderer/components/welcome';
-import * as renderer from 'react-test-renderer';
+import renderer from 'react-test-renderer';
 
 const mathBackup = global.Math;
 

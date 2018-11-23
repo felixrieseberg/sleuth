@@ -22,6 +22,13 @@ const WEBAPP_LITE_RGX = /^(\w{4,8}): (.*)$/;
  */
 export function sortWithWebWorker(data: Array<any>, sortFn: string): Promise<Array<LogEntry>> {
   return new Promise((resolve) => {
+    // For test cases only
+    if (!(window as any).Worker) {
+      const sortedData = data.sort(new Function(`return ${sortFn}`)());
+      resolve(sortedData);
+      return;
+    }
+
     const code = `onmessage = function (evt) {evt.data.sort(${sortFn}); postMessage(evt.data)}`;
     const worker = new Worker(URL.createObjectURL(new Blob([ code ])));
 

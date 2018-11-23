@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { Unzipper } from '../../src/renderer/unzip';
-import * as path from 'path';
+import path from 'path';
 
 describe('Unzipper', () => {
   it('should read a simple zip file', () => {

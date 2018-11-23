@@ -1,5 +1,5 @@
 import { fakeUnzippedFile } from '../__mocks__/unzipped-file';
-import { ProcessedLogFile, ProcessedLogFiles } from '../../src/renderer/interfaces';
+import { ProcessedLogFile, ProcessedLogFiles, LogType } from '../../src/renderer/interfaces';
 import { expect } from 'chai';
 import { getFirstLogFile } from '../../src/utils/get-first-logfile';
 
@@ -7,8 +7,9 @@ import { getFirstLogFile } from '../../src/utils/get-first-logfile';
 const fakeFile: ProcessedLogFile = {
   logEntries: [],
   logFile: fakeUnzippedFile,
-  logType: 'browser',
-  type: 'ProcessedLogFile'
+  logType: LogType.BROWSER,
+  type: 'ProcessedLogFile',
+  levelCounts: {}
 };
 
 const files: ProcessedLogFiles = {
@@ -30,35 +31,35 @@ describe('getFirstLogFile', () => {
   });
 
   it('should return the first logfile (browser if available)', () => {
-    fakeFile.logType = 'browser';
+    fakeFile.logType = LogType.BROWSER;
     files.browser = [fakeFile];
 
     expect(getFirstLogFile(files)).to.be.deep.equal(fakeFile);
   });
 
   it('should return the first logfile (renderer if available)', () => {
-    fakeFile.logType = 'renderer';
+    fakeFile.logType = LogType.RENDERER;
     files.renderer = [fakeFile];
 
     expect(getFirstLogFile(files)).to.be.deep.equal(fakeFile);
   });
 
   it('should return the first logfile (call if available)', () => {
-    fakeFile.logType = 'call';
+    fakeFile.logType = LogType.CALL;
     files.call = [fakeFile];
 
     expect(getFirstLogFile(files)).to.be.deep.equal(fakeFile);
   });
 
   it('should return the first logfile (webapp if available)', () => {
-    fakeFile.logType = 'webapp';
+    fakeFile.logType = LogType.WEBAPP;
     files.webapp = [fakeFile];
 
     expect(getFirstLogFile(files)).to.be.deep.equal(fakeFile);
   });
 
   it('should return the first logfile (preload if available)', () => {
-    fakeFile.logType = 'preload';
+    fakeFile.logType = LogType.PRELOAD;
     files.preload = [fakeFile];
 
     expect(getFirstLogFile(files)).to.be.deep.equal(fakeFile);
