@@ -7,6 +7,7 @@ export enum SORT_DIRECTION {
 }
 
 export interface RowClickEvent {
+  event: Event;
   index: number;
   rowData: any;
 }

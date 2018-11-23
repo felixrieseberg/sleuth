@@ -14,10 +14,6 @@
   padding: 2.2rem 2.2rem 0 0;
   user-select: none;
 
-  .fixedDataTableCellGroupLayout_cellGroup {
-    cursor: pointer;
-  }
-
   &.Single {
     .Meta {
       display: none;
@@ -41,26 +37,21 @@
     height: 18px;
     margin-top: -2px;
   }
-}
 
-.fixedDataTableLayout_main {
-  border: none;
-  outline: none;
+  .ReactVirtualized__Table__row {
+    border-bottom: 1px solid rgba(16, 22, 26, .05)
+  }
 
-  &:focus,
-  &:active {
-    border: none;
-    outline: none;
+  .ReactVirtualized__Table__row:hover {
+    background-color: @light-gray4;
   }
 
   .HighlightRow {
     background-color: @gray5;
-    transition: background 0.5s linear;
   }
 
   .ActiveRow {
     background-color: @gray5;
-    transition: background 0.5s linear;
     font-weight: 800;
   }
 
@@ -107,86 +98,21 @@
   .ScrollbarLayout_face:hover, .faceActive {
     opacity: 1;
   }
-
-  .fixedDataTableCellLayout_columnResizerContainer {
-    border-left: 1px solid rgba(50,50,50,.25);
-  }
-
-  .fixedDataTableCellLayout_main {
-    border: none;
-  }
-
-  .fixedDataTableLayout_header {
-    font-weight: 600;
-    color: @dark-gray1;
-    background-color: @light-gray1;
-    border: 1px solid #BABBBF;
-
-    .bp3-icon {
-      margin-bottom: 1px;
-    }
-
-    .fixedDataTableCellGroupLayout_cellGroup:hover {
-      background-color: initial;
-    }
-  }
-
-  .fixedDataTableCellGroupLayout_cellGroup:hover {
-    background-color: @neutral_white;
-  }
-
-  .fixedDataTableCellLayout_wrap1 {
-    width: calc(100% - 20px);
-    display: inline-block;
-    line-height: 25px;
-
-    a {
-      display: block;
-      color: inherit;
-    }
-  }
-
-  .fixedDataTableCellLayout_columnReorderContainer {
-    height: 27px!important;
-    width: 13px;
-    display: inline-block;
-    margin: 0;
-  }
-
-  .fixedDataTableCellLayout_columnReorderContainer:hover::after {
-    color: @black;
-  }
-
-  .fixedDataTableCellLayout_columnReorderContainer::after {
-    content: " \22EE";
-    top: 6px;
-    left: 4px;
-    position: absolute;
-  }
-
-  .public_fixedDataTableCell_hasReorderHandle {
-    .fixedDataTableCellLayout_wrap2,
-    .fixedDataTableCellLayout_wrap3 {
-      vertical-align: bottom;
-    }
-  }
 }
 
 .bp3-dark {
-  .fixedDataTableCellGroupLayout_cellGroup:hover {
-    background-color: @dark-gray4;
+  .ReactVirtualized__Table__row {
+    border-bottom: 1px solid rgba(137, 191, 226, 0.05)
   }
 
-  .fixedDataTableLayout_header {
-    color: @light-gray1;
-    background-color: @dark-gray5;
-    border: @gray1;
+  .ReactVirtualized__Table__row:hover {
+    background-color: @dark-gray4;
   }
 
   .ActiveRow, .HighlightRow  {
     background-color: @dark-gray5;
 
-    .fixedDataTableCellGroupLayout_cellGroup:hover {
+    .ReactVirtualized__Table__row:hover {
       background-color: @gray1;
     }
   }
