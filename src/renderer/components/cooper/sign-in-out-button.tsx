@@ -1,7 +1,8 @@
-import { SleuthState } from '../../state/sleuth';
 import React from 'react';
 import {observer} from 'mobx-react';
-import Ladda from 'react-ladda';
+import { Button } from '@blueprintjs/core';
+
+import { SleuthState } from '../../state/sleuth';
 import { cooperAuth } from '../../cooper/auth';
 
 export interface SignInOutButtonProps {
@@ -32,11 +33,16 @@ export class CooperSignInOutButton extends React.Component<SignInOutButtonProps,
   public render(): JSX.Element {
     const { isCooperSignedIn } = this.props.state;
     const { isLoading } = this.state;
-    const buttonOptions = { className: 'btn', loading: isLoading, onClick: this.onClick };
 
     return (
       <div>
-        <Ladda {...buttonOptions}>Sign {isCooperSignedIn ? 'Out' : 'In'}</Ladda>
+        <Button
+          loading={isLoading}
+          onClick={this.onClick}
+          icon='user'
+        >
+          Sign {isCooperSignedIn ? 'Out' : 'In'}
+        </Button>
       </div>
     );
   }

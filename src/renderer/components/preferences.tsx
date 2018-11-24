@@ -39,15 +39,6 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
     ipcRenderer.on('preferences-show', () => this.setState({ isOpen: true }));
   }
 
-  public renderCooperOptions() {
-    return (
-      <div>
-        <label htmlFor='cooper'>Cooper Service</label>
-        <CooperSignInOutButton state={sleuthState} />
-      </div>
-    );
-  }
-
   public render(): JSX.Element {
     const { dateTimeFormat, defaultEditor, font } = this.props.state;
 
@@ -117,6 +108,17 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
           {this.renderCooperOptions()}
         </div>
       </Overlay>
+    );
+  }
+
+  private renderCooperOptions() {
+    return (
+      <FormGroup
+        helperText='The log service allows Slack employees to leave comments and hints for log entries'
+        label='Sign into the Cooper Log Service'
+      >
+        <CooperSignInOutButton state={sleuthState} />
+      </FormGroup>
     );
   }
 
