@@ -25,6 +25,7 @@
   "dependencies": {
     "@blueprintjs/core": "^3.9.0",
     "@blueprintjs/datetime": "^3.4.0",
+    "@blueprintjs/select": "^3.3.0",
     "classnames": "2.2.6",
     "debounce": "^1.2.0",
     "debug": "4.0.1",

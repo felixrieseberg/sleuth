@@ -1,20 +1,23 @@
-import { observer } from 'mobx-react';
-import { sleuthState, SleuthState } from '../state/sleuth';
-import React from 'react';
-import moment from 'moment';
+import { Select } from '@blueprintjs/select';
 import { ipcRenderer } from 'electron';
-import { Overlay, Classes } from '@blueprintjs/core';
+import { observer } from 'mobx-react';
+import { Overlay, Classes, FormGroup, Button, MenuItem, Callout, ControlGroup, InputGroup } from '@blueprintjs/core';
+import { sleuthState, SleuthState } from '../state/sleuth';
+import classNames from 'classnames';
+import React from 'react';
+import autoBind from 'react-autobind';
 
 import { getSleuth } from '../sleuth';
 import { CooperSignInOutButton } from './cooper/sign-in-out-button';
-import classNames from 'classnames';
+import { renderFontItem, filterFont, WINDOWS_FONTS } from './preferences-font';
+import { filterDateTime, renderDateTimeItem, DATE_TIME_FORMATS } from './preferences-datetime';
+import { renderEditorItem, Editor, EDITORS, nameForCmd } from './preferences-editor';
 
 const packageInfo = require('../../../package.json');
-const exampleTime = 1493475035123;
 
-/**
- * Sleuth's defaults
- */
+const FontSelect = Select.ofType<string>();
+const DateTimeSelect = Select.ofType<string>();
+const EditorSelect = Select.ofType<Editor>();
 
 export interface PreferencesState {
   isCooperButtonLoading: boolean;
@@ -27,16 +30,6 @@ export interface PreferencesProps {
 
 @observer
 export class Preferences extends React.Component<PreferencesProps, Partial<PreferencesState>> {
-  private readonly dateTimePresets: Array<string> = [
-    'HH:mm:ss (DD/MM)',
-    'hh:mm:ss A (DD/MM)',
-    'HH:mm:ss.SSS (DD/MM)',
-    'hh:mm:ss.SSS A (DD/MM)',
-    'hh:mm A, MMM Do',
-    'dddd, MMMM Do YYYY, h:mm:ss a',
-    'ddd, hA'
-  ];
-
   private readonly fontPresets: Array<string> = [
     process.platform === 'darwin' ? 'BlinkMacSystemFont' : 'Helvetica',
     'Verdana',
@@ -48,33 +41,9 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
     super(props);
 
     this.state = {};
-    this.onDateFormatChange = this.onDateFormatChange.bind(this);
-    this.onEditorChange = this.onEditorChange.bind(this);
-    this.onFontChange = this.onFontChange.bind(this);
-    this.onClose = this.onClose.bind(this);
+    autoBind(this);
 
     ipcRenderer.on('preferences-show', () => this.setState({ isOpen: true }));
-  }
-
-  public renderEditorOptions() {
-    const options = {
-      'Visual Studio Code': `code --goto {filepath}:{line}`,
-      Sublime: `subl {filepath}:{line}`,
-      Atom: 'atom {filepath}:{line}',
-      Custom: ''
-    };
-
-    return Object.keys(options).map((key) => {
-      return <option key={key} value={options[key]}>{key}</option>;
-    });
-  }
-
-  public renderDateTimeOption(value: string) {
-    return <option key={value} value={value}>{moment(exampleTime).format(value)}</option>;
-  }
-
-  public renderFontOption(value: string) {
-    return <option key={value} value={value}>{value}</option>;
   }
 
   public renderCooperOptions() {
@@ -88,83 +57,73 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
 
   public render(): JSX.Element {
     const { dateTimeFormat, defaultEditor, font } = this.props.state;
-    const dateTimePresets = this.dateTimePresets.map(this.renderDateTimeOption);
-    const fontPresets = this.fontPresets.map(this.renderFontOption);
-    const editorPresets = this.renderEditorOptions();
-    const customDateTimePreset = this.isDateTimePreset(dateTimeFormat!) ? null :
-      <option key='custom' value={dateTimeFormat}>{moment(exampleTime).format(dateTimeFormat)}</option>;
-    const customFontPreset = this.isFontPreset(font!) ? null :
-      <option key='custom' value={font}>{font}</option>;
-    const fontStyle = { fontFamily: font };
-    const classes = classNames(Classes.CARD, Classes.ELEVATION_4, 'PreferencesTransition');
+
+    const classes = classNames(Classes.CARD, Classes.ELEVATION_4, 'Preferences');
 
     return (
-      <div>
-        <Overlay
-          isOpen={this.state.isOpen}
-          onClose={this.onClose}
-          hasBackdrop={true}
-        >
-          <div className={classes}>
-            <p>You're running Sleuth {packageInfo.version} {getSleuth()}</p>
-            <div className='Font'>
-              <div>
-                <label className='select small'>
-                  Font Family
-                  <select className='small' value={font} onChange={this.onFontChange}>
-                    {fontPresets}
-                    {customFontPreset}
-                  </select>
-                </label>
-              </div>
-              <div>
-                <label className='small' htmlFor='dfa'>Font Family (Raw Input)</label>
-                <input
-                  type='text'
-                  style={fontStyle}
-                  id='dfa'
-                  className='small'
-                  value={font}
-                  onChange={this.onFontChange}
-                />
-              </div>
-            </div>
-            <p>Changing the date format allows you to configure how exactly dates and times are displayed.</p>
-            <div className='DateTime'>
-              <div>
-                <label className='select small'>
-                  Date Format
-                  <select className='small' value={dateTimeFormat} onChange={this.onDateFormatChange}>
-                    {dateTimePresets}
-                    {customDateTimePreset}
-                  </select>
-                </label>
-              </div>
-              <div>
-                <label className='small' htmlFor='dfa'>Date Format (Advanced)</label>
-                <input type='text' id='dfa' className='small' value={dateTimeFormat} onChange={this.onDateFormatChange} />
-              </div>
-            </div>
-            <p>Changing the date format allows you to configure how exactly dates and times are displayed.</p>
-            <div className='DefaultEditor'>
-              <div>
-                <label className='select small'>
-                  Default Editor
-                  <select className='small' value={defaultEditor} onChange={this.onEditorChange}>
-                    {editorPresets}
-                  </select>
-                </label>
-              </div>
-              <div>
-                <label className='small' htmlFor='dfe'>Editor Command</label>
-                <input type='text' id='dfe' className='small' value={defaultEditor} onChange={this.onEditorChange} />
-              </div>
-            </div>
-            <p>You can open the source for each log entry using your favorite editor. Find the "Source" button in the log details to do so.</p>
-            {this.renderCooperOptions()}
-          </div>
-        </Overlay>
-      </div>
+      <Overlay
+        isOpen={this.state.isOpen}
+        onClose={this.onClose}
+        hasBackdrop={true}
+      >
+        <div className={classes}>
+          <h2>Preferences</h2>
+          <Callout>You're running Sleuth {packageInfo.version} {getSleuth()}</Callout>
+          <FormGroup
+            label='Font'
+            helperText='Choose a custom font to override how Sleuth renders various text elements'
+          >
+            <FontSelect
+              itemRenderer={renderFontItem}
+              itemPredicate={filterFont}
+              items={WINDOWS_FONTS}
+              noResults={<MenuItem disabled={true} text='No results.' />}
+              onItemSelect={this.onFontSelect}
+              popoverProps={{ minimal: true }}
+            >
+              <Button text={font} rightIcon='font' />
+            </FontSelect>
+          </FormGroup>
+          <FormGroup
+            label='Date Time Format'
+            helperText='Choose a custom format for dates to override how timestamps will be displayed'
+          >
+            <DateTimeSelect
+              itemRenderer={renderDateTimeItem}
+              itemPredicate={filterDateTime}
+              items={DATE_TIME_FORMATS}
+              noResults={<MenuItem disabled={true} text='No results.' />}
+              onItemSelect={this.onDateTimeSelect}
+              popoverProps={{ minimal: true }}
+            >
+              <Button text={dateTimeFormat} rightIcon='calendar' />
+            </DateTimeSelect>
+          </FormGroup>
+          <FormGroup
+            label='Editor'
+            helperText='Sleuth can open log source files in your favorite editor'
+          >
+            <ControlGroup>
+              <EditorSelect
+                filterable={false}
+                items={EDITORS}
+                itemRenderer={renderEditorItem}
+                noResults={<MenuItem disabled={true} text='No results.' />}
+                onItemSelect={this.onEditorSelect}
+                popoverProps={{ minimal: true }}
+              >
+                <Button text={nameForCmd(defaultEditor)} rightIcon='code' />
+              </EditorSelect>
+              <InputGroup
+                placeholder='Custom shell command'
+                value={defaultEditor}
+                onChange={this.onEditorCmdChange}
+              />
+            </ControlGroup>
+          </FormGroup>
+          {this.renderCooperOptions()}
+        </div>
+      </Overlay>
     );
   }
 
@@ -172,36 +131,21 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
     this.setState({ isOpen: false });
   }
 
-  /**
-   * Changes the local preference given an DOM input target
-   * and a preference key
-   *
-   * @param {*} target
-   * @param {string} key
-   */
-  private onValueChange(target: any, key: string) {
-    if (target && (target.value || target.value === '')) {
-      this.props.state[key] = target.value;
+  private onEditorSelect(editor: Editor) {
+    this.props.state.defaultEditor = editor.cmd;
+  }
+
+  private onEditorCmdChange({ target }: React.FormEvent<HTMLInputElement>) {
+    if (target && (target as any).value) {
+      this.props.state.defaultEditor = (target as any).value;
     }
   }
 
-  private onDateFormatChange({ target }: any) {
-    this.onValueChange(target, 'dateTimeFormat');
+  private onFontSelect(font: string) {
+    this.props.state.font = font;
   }
 
-  private onEditorChange({ target }: any) {
-    this.onValueChange(target, 'defaultEditor');
-  }
-
-  private onFontChange({ target }: any) {
-    this.onValueChange(target, 'font');
-  }
-
-  private isDateTimePreset(value: string) {
-    return !!(this.dateTimePresets.find((v) => v === value));
-  }
-
-  private isFontPreset(value: string) {
-    return !!(this.fontPresets.find((v) => v === value));
+  private onDateTimeSelect(format: string) {
+    this.props.state.dateTimeFormat = format;
   }
 }

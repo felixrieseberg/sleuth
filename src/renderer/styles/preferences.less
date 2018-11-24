@@ -1,55 +1,36 @@
-.DateTime,
-.DefaultEditor,
-.Font {
-  display: flex;
-
-  > div {
-    flex: 1 1 0
-  }
-
-  > div:nth-child(1) {
-    margin-right: 1rem;
-  }
-
-  > div:nth-child(2) {
-    margin-left: 1rem;
-  }
-
-}
-
-.PreferencesTransition {
+.Preferences {
   top: 0;
   left: calc(50% - 350px);
   margin: 10vh 0;
-  width: 700px
-}
+  width: 700px;
 
-.PreferencesTransition.bp3-overlay-appear,
-.PreferencesTransition.bp3-overlay-enter {
-  transform: translateY(-50vh) rotate(-10deg)
-}
+  &.bp3-overlay-appear,
+  &.bp3-overlay-enter {
+    transform: translateY(-50vh) rotate(-10deg)
+  }
 
-.PreferencesTransition.bp3-overlay-appear-active,
-.PreferencesTransition.bp3-overlay-enter-active {
-  transform: translateY(0) rotate(0deg);
-  transition-property: -webkit-transform;
-  transition-property: transform;
-  transition-property: transform, -webkit-transform;
-  transition-duration: .3s;
-  transition-timing-function: cubic-bezier(.54, 1.12, .38, 1.11);
-  transition-delay: 0
-}
+  &.bp3-overlay-appear-active,
+  &.bp3-overlay-enter-active {
+    transform: translateY(0) rotate(0deg);
+    transition-property: -webkit-transform;
+    transition-property: transform;
+    transition-property: transform, -webkit-transform;
+    transition-duration: .3s;
+    transition-timing-function: cubic-bezier(.54, 1.12, .38, 1.11);
+    transition-delay: 0
+  }
 
-.PreferencesTransition.bp3-overlay-exit {
-  transform: translateY(0) rotate(0deg)
-}
+  &.bp3-overlay-exit {
+    transform: translateY(0) rotate(0deg)
+  }
 
-.PreferencesTransition.bp3-overlay-exit-active {
-  transform: translateY(150vh) rotate(-20deg);
-  transition-property: -webkit-transform;
-  transition-property: transform;
-  transition-property: transform, -webkit-transform;
-  transition-duration: .5s;
-  transition-timing-function: cubic-bezier(.4, 1, .75, .9);
-  transition-delay: 0
+  &.bp3-overlay-exit-active {
+    transform: translateY(150vh) rotate(-20deg);
+    transition-property: -webkit-transform;
+    transition-property: transform;
+    transition-property: transform, -webkit-transform;
+    transition-duration: .5s;
+    transition-timing-function: cubic-bezier(.4, 1, .75, .9);
+    transition-delay: 0
+  }
 }
