@@ -5,7 +5,7 @@ import { observable, action, autorun } from 'mobx';
 export const defaults = {
   dateTimeFormat: 'HH:mm:ss (DD/MM)',
   defaultEditor: 'code --goto {filepath}:{line}',
-  font: process.platform === 'darwin' ? 'BlinkMacSystemFont' : 'Segoe UI',
+  font: process.platform === 'darwin' ? 'San Francisco' : 'Segoe UI',
   isDarkMode: true
 };
 

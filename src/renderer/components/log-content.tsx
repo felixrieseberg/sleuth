@@ -8,6 +8,7 @@ import React from 'react';
 
 import { LogLineDetails } from './log-line-details/details';
 import { Scrubber } from './scrubber';
+import { getFontForCSS } from './preferences-font';
 
 export interface LogContentProps {
   state: SleuthState;
@@ -54,7 +55,7 @@ export class LogContent extends React.Component<LogContentProps, Partial<LogCont
 
     if (isLog) {
       return (
-        <div className='LogContent' style={{ fontFamily: font }}>
+        <div className='LogContent' style={{ fontFamily: getFontForCSS(font) }}>
           <div id='LogTableContainer' style={tableStyle}>
             <LogTable
               state={sleuthState}

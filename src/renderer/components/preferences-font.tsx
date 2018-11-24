@@ -357,9 +357,9 @@ export const FONTS = process.platform === 'darwin'
   ? MACOS_FONTS
   : WINDOWS_FONTS;
 
-export const renderFontItem: ItemRenderer<string> = (font, { handleClick, modifiers, query }) => {
+export const renderFontItem: ItemRenderer<string> = (font, { handleClick, modifiers }) => {
   if (!modifiers.matchesPredicate) {
-      return null;
+    return null;
   }
 
   return (
@@ -369,11 +369,31 @@ export const renderFontItem: ItemRenderer<string> = (font, { handleClick, modifi
       key={font}
       onClick={handleClick}
       text={font}
-      style={{ fontFamily: font }}
+      style={{ fontFamily: getFontForCSS(font) }}
     />
   );
 };
 
+/**
+ * Given a query and a font, return whether or not the font
+ * matches the query.
+ *
+ * @param {string} query
+ * @param {string} font
+ * @returns {string}
+ */
 export const filterFont: ItemPredicate<string> = (query, font) => {
   return font.toLowerCase().includes(query.toLowerCase());
 };
+
+/**
+ * Returns a font usable for CSS, given its name.
+ *
+ * @param {string} font
+ * @returns {string}
+ */
+export function getFontForCSS(font: string): string {
+  if (font === 'San Francisco') return 'BlinkMacSystemFont';
+
+  return font;
+}

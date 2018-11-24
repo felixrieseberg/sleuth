@@ -30,13 +30,6 @@ export interface PreferencesProps {
 
 @observer
 export class Preferences extends React.Component<PreferencesProps, Partial<PreferencesState>> {
-  private readonly fontPresets: Array<string> = [
-    process.platform === 'darwin' ? 'BlinkMacSystemFont' : 'Helvetica',
-    'Verdana',
-    'Arial',
-    process.platform === 'darwin' ? 'Menlo' : 'Consolas'
-  ];
-
   constructor(props: PreferencesProps) {
     super(props);
 
