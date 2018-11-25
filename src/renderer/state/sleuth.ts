@@ -31,6 +31,7 @@ export class SleuthState {
   @observable public dateRange: DateRange = { from: undefined, to: undefined };
   @observable public showOnlySearchResults: boolean = false;
   @observable public isDetailsVisible: boolean = false;
+  @observable public isSidebarOpen: boolean = true;
 
   // Settings
   @observable public isDarkMode: boolean = !!this.retrieve('isDarkMode', true);
@@ -62,6 +63,11 @@ export class SleuthState {
   @action
   public toggleDarkMode() {
     this.isDarkMode = !this.isDarkMode;
+  }
+
+  @action
+  public toggleSidebar() {
+    this.isSidebarOpen = !this.isSidebarOpen;
   }
 
   /**

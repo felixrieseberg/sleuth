@@ -2,10 +2,14 @@
 @import "./colors.less";
 
 .Sidebar {
-  width: 300px;
   background: @light-gray1;
   overflow-x: scroll;
   flex-shrink: 0;
+  width: 0;
+
+  &.Open {
+    width: 300px;
+  }
 
   .StillLoading {
     opacity: .5;

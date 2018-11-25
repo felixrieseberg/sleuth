@@ -32,7 +32,6 @@ export interface CoreAppProps {
 }
 
 export interface CoreAppState {
-  sidebarIsOpen: boolean;
   processedLogFiles: ProcessedLogFiles;
   selectedLogFile?: ProcessedLogFile | MergedLogFile | UnzippedFile;
   mergedLogFiles?: MergedLogFiles;
@@ -49,7 +48,6 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
     super(props);
 
     this.state = {
-      sidebarIsOpen: true,
       processedLogFiles: {
         browser: [],
         renderer: [],
@@ -64,7 +62,6 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
     };
 
     this.setMergedFile = this.setMergedFile.bind(this);
-    this.toggleSidebar = this.toggleSidebar.bind(this);
     this.selectLogFile = this.selectLogFile.bind(this);
   }
 
@@ -168,13 +165,6 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
   }
 
   /**
-   * Toggle the sidebar.
-   */
-  public toggleSidebar() {
-    this.setState({ sidebarIsOpen: !this.state.sidebarIsOpen });
-  }
-
-  /**
    * Select a log file. This is a more complex operation than one might think -
    * mostly because we might need to create a merged file on-the-fly.
    *
@@ -252,13 +242,12 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
   }
 
   public renderSidebar() {
-    const { sidebarIsOpen, processedLogFiles } = this.state;
+    const { processedLogFiles } = this.state;
     const selectedLogFileName = this.getSelectedFileName();
     const mergedFilesStatus = this.getMergedFilesStatus();
 
     return (
       <Sidebar
-        isOpen={!!sidebarIsOpen}
         logFiles={processedLogFiles as ProcessedLogFiles}
         mergedFilesStatus={mergedFilesStatus}
         selectLogFile={this.selectLogFile}
@@ -270,7 +259,7 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
 
   public renderHeader() {
     return (
-      <AppCoreHeader state={sleuthState} menuToggle={this.toggleSidebar} />
+      <AppCoreHeader state={sleuthState} />
     );
   }
 
@@ -288,15 +277,15 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
   }
 
   public renderContent() {
-    const { sidebarIsOpen } = this.state;
-    const logContentClassName = classNames({ SidebarIsOpen: sidebarIsOpen });
+    const { isSidebarOpen } = this.props.state;
+    const logContentClassName = classNames({ isSidebarOpen });
 
     return (
       <div className='AppCore'>
         {this.renderSidebar()}
 
         <div id='content' className={logContentClassName}>
-          <AppCoreHeader state={sleuthState} menuToggle={this.toggleSidebar} />
+          <AppCoreHeader state={sleuthState} />
           <LogContent state={sleuthState} />
         </div>
       </div>

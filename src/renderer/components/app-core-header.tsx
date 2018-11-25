@@ -7,7 +7,6 @@ import { Alignment, Button, ButtonGroup, Navbar, NavbarGroup } from '@blueprintj
 import { Filter } from './app-core-header-filter';
 
 export interface AppCoreHeaderProps {
-  menuToggle: () => void;
   state: SleuthState;
 }
 
@@ -20,6 +19,7 @@ export class AppCoreHeader extends React.Component<AppCoreHeaderProps, AppCoreHe
 
     this.refresh = this.refresh.bind(this);
     this.toggleDarkMode = this.toggleDarkMode.bind(this);
+    this.toggleSidebar = this.toggleSidebar.bind(this);
   }
 
   public refresh() {
@@ -30,13 +30,21 @@ export class AppCoreHeader extends React.Component<AppCoreHeaderProps, AppCoreHe
     this.props.state.toggleDarkMode();
   }
 
+  public toggleSidebar() {
+    this.props.state.toggleSidebar();
+  }
+
   public render() {
+    const { isSidebarOpen, isDarkMode } = this.props.state;
+    const sidebarIcon = isSidebarOpen ? 'menu-closed' : 'menu-open';
+
     return (
       <Navbar className='AppHeader'>
         <NavbarGroup align={Alignment.LEFT}>
           <ButtonGroup>
             <Button onClick={this.refresh} icon='home' />
-            <Button active={this.props.state.isDarkMode} onClick={this.toggleDarkMode} icon='moon' />
+            <Button active={!isSidebarOpen} onClick={this.toggleSidebar} icon={sidebarIcon} />
+            <Button active={isDarkMode} onClick={this.toggleDarkMode} icon='moon' />
           </ButtonGroup>
         </NavbarGroup>
         <Filter state={sleuthState} />

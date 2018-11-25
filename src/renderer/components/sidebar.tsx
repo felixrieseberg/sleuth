@@ -11,7 +11,6 @@ import { SleuthState } from '../state/sleuth';
 
 export interface SidebarProps {
   logFiles: ProcessedLogFiles;
-  isOpen: boolean;
   selectedLogFileName: string;
   selectLogFile: (logFile: ProcessedLogFile | UnzippedFile | null, logType?: string) => void;
   mergedFilesStatus: MergedFilesLoadStatus;
@@ -251,8 +250,8 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
   }
 
   public render(): JSX.Element {
-    const { isOpen } = this.props;
-    const className = classNames('Sidebar', { isOpen });
+    const { isSidebarOpen } = this.props.state;
+    const className = classNames('Sidebar', { Open: isSidebarOpen });
 
     return (
       <div className={className}>
