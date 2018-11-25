@@ -7,15 +7,19 @@ exports[`Welcome welcome renders correctly 1`] = `
   <i />
   <div>
     <h1
-      className="Emoji"
+      className="Title"
     >
-      :sleuth:
+      <span
+        className="Emoji"
+      >
+        :sleuth:
+      </span>
+      <span>
+        Sleuth
+      </span>
     </h1>
-    <h2>
-      Hey there!
-    </h2>
     <h4>
-      Just drop a logs file or folder here.
+      Drop a logs zip file or folder anywhere on this window to open it.
     </h4>
   </div>
   <div />

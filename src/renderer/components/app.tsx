@@ -23,7 +23,7 @@ export class App extends React.Component<{}, Partial<AppState>> {
   public readonly menu: AppMenu = new AppMenu();
   public readonly sleuthState: SleuthState;
 
-  constructor(props: undefined) {
+  constructor(props: {}) {
     super(props);
 
     this.state = {
