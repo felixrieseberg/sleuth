@@ -23,6 +23,7 @@ export class Loading extends React.Component<LoadingProps, LoadingState> {
     return (
       <div className='Loading'>
         <ProgressBar animate={false} value={percentage! / 100} />
+        <br />
         <p>{message}</p>
       </div>
     );
