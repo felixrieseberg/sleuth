@@ -12,6 +12,7 @@
     "max-line-length": [true, 150],
     "no-angle-bracket-type-assertion": true,
     "no-consecutive-blank-lines": [true, 2],
+    "no-console": false,
     "no-trailing-whitespace": true,
     "no-default-export": true,
     "no-duplicate-variable": true,
@@ -75,5 +76,11 @@
   "rulesDirectory": [
      "node_modules/tslint-microsoft-contrib",
      "node_modules/tslint-no-unused-expression-chai/rules"
-  ]
+  ],
+  "linterOptions": {
+    "exclude": [
+      "**/*.js",
+      "node_modules"
+    ]
+  }
 }

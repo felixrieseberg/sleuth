@@ -1,32 +1,32 @@
-import * as React from 'react';
-import * as fs from 'fs-extra';
-import * as path from 'path';
-import * as ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+import React from 'react';
+import path from 'path';
+import { ControlGroup, Button, InputGroup } from '@blueprintjs/core';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+import { observer } from 'mobx-react';
 
-import { remote } from 'electron';
 import { getSleuth } from '../sleuth';
 import { getUpdateAvailable, defaultUrls } from '../update-check';
-
-const debug = require('debug')('sleuth:welcome');
+import { deleteSuggestion } from '../suggestions';
+import { SleuthState } from '../state/sleuth';
 
 export interface WelcomeState {
   sleuth: string;
-  suggestions: Array<string>;
   isUpdateAvailable: boolean | string;
 }
 
 export interface WelcomeProps {
   sleuth?: string;
-  openFile: (filePath: string) => void;
+  state: SleuthState;
 }
 
+@observer
 export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>> {
   constructor(props: WelcomeProps) {
     super(props);
 
     this.state = {
       sleuth: props.sleuth || getSleuth(),
-      isUpdateAvailable: false
+      isUpdateAvailable: false,
     };
 
     getUpdateAvailable().then((isUpdateAvailable: boolean | string) => {
@@ -34,28 +34,9 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
     });
   }
 
-  public componentDidMount() {
-    this.getItemsInDownloadFolder();
-  }
-
-  public getItemsInDownloadFolder(): void {
-    const dir = remote.app.getPath('downloads');
-
-    fs.readdir(dir)
-      .then((contents) => {
-        const suggestions: Array<string> = [];
-
-        contents.forEach((file) => {
-          if (file.startsWith('logs') || file.startsWith('slack-logs')) {
-            suggestions.push(path.join(dir, file));
-          }
-        });
-
-        this.setState({ suggestions });
-      })
-      .catch((error) => {
-        debug(error);
-      });
+  public async deleteSuggestion(filePath: string) {
+    await deleteSuggestion(filePath);
+    await this.props.state.getSuggestions();
   }
 
   public renderUpdateAvailable() {
@@ -78,32 +59,69 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
     }
   }
 
-  public render() {
-    const { suggestions, sleuth } = this.state;
-    const { openFile } = this.props;
-    let suggestion = null;
+  public renderSuggestions(): JSX.Element | null {
+    const { openFile } = this.props.state;
+    const suggestions = this.props.state.suggestions || {};
+    const elements = Object.keys(suggestions)
+      .map((filePath) => {
+        const stats = suggestions[filePath];
+        const basename = path.basename(filePath);
+        const deleteElement = (
+          <Button
+            icon='trash'
+            minimal={true}
+            onClick={() => this.deleteSuggestion(filePath)}
+          />
+        );
 
-    if (suggestions && suggestions.length > 0) {
-      suggestion = (
+        return (
+          <ControlGroup className='Suggestion' fill={true} key={basename}>
+            <Button
+              className='OpenButton'
+              alignText='left'
+              onClick={() => openFile(filePath)}
+              icon='document'
+            >
+              {basename}
+            </Button>
+            <InputGroup
+              leftIcon='time'
+              defaultValue={`${stats.age} old`}
+              readOnly={true}
+              rightElement={deleteElement}
+            />
+          </ControlGroup>
+        );
+      });
+
+    if (elements.length > 0) {
+      return (
         <div className='Suggestions'>
           <h5>From your Downloads folder, may we suggest:</h5>
-          {suggestions.map((file) => <a key={file} className='small' onClick={() => openFile(file)}>{path.basename(file)}</a>)}
+          <ul>{elements}</ul>
         </div>
       );
-    } else {
-      suggestion = (<div />);
     }
+
+    return <div />;
+  }
+
+  public render() {
+    const { sleuth } = this.state;
+    const suggestions = this.renderSuggestions();
 
     return (
       <div className='Welcome'>
         <i />
         <div>
-          <h1 className='Emoji'>{sleuth}</h1>
-          <h2>Hey there!</h2>
-          <h4>Just drop a logs file or folder here.</h4>
+          <h1 className='Title'>
+            <span className='Emoji'>{sleuth}</span>
+            <span>Sleuth</span>
+          </h1>
+          <h4>Drop a logs zip file or folder anywhere on this window to open it.</h4>
           {this.renderUpdateAvailable()}
         </div>
-        {suggestion}
+        {suggestions}
       </div>
     );
   }

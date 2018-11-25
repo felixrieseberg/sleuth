@@ -1,11 +1,9 @@
 import { app, BrowserWindow } from 'electron';
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
-import * as windowStateKeeper from 'electron-window-state';
 
 import { config } from '../config';
 import { IpcManager } from './ipc';
 import { secureApp } from './security';
-import { allowLoadGpuFile } from './compile';
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -16,8 +14,8 @@ if (require('electron-squirrel-startup')) {
   // No-op, we're done here
 } else {
   const createWindow = async () => {
+    const windowStateKeeper = require('electron-window-state');
     require('electron-context-menu')();
-
 
     const mainWindowState = windowStateKeeper({
       defaultWidth: 1200,
@@ -32,7 +30,7 @@ if (require('electron-squirrel-startup')) {
       height: mainWindowState.height,
       show: !!config.isDevMode,
       minHeight: 500,
-      minWidth: 1000,
+      minWidth: 1170,
       titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : undefined,
       webPreferences: {
         webviewTag: false
@@ -42,7 +40,7 @@ if (require('electron-squirrel-startup')) {
     mainWindowState.manage(mainWindow);
 
     // and load the index.html of the app.
-    mainWindow.loadFile('src/static/index.jade');
+    mainWindow.loadFile('./dist/static/index.html');
 
     // Open the DevTools.
     if (config.isDevMode) {
@@ -83,7 +81,6 @@ if (require('electron-squirrel-startup')) {
   // Some APIs can only be used after this event occurs.
   app.on('ready', () => {
     secureApp();
-    allowLoadGpuFile();
     createWindow();
   });
 

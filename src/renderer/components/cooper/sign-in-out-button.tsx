@@ -1,10 +1,9 @@
-import { SleuthState } from '../../state/sleuth';
-import * as React from 'react';
+import React from 'react';
 import {observer} from 'mobx-react';
-import * as Ladda from 'react-ladda';
-import { cooperAuth } from '../../cooper/auth';
+import { Button } from '@blueprintjs/core';
 
-const LaddaButton = Ladda.default;
+import { SleuthState } from '../../state/sleuth';
+import { CooperAuth } from '../../cooper/auth';
 
 export interface SignInOutButtonProps {
   state: SleuthState;
@@ -16,16 +15,19 @@ export interface SignInOutButtonState {
 
 @observer
 export class CooperSignInOutButton extends React.Component<SignInOutButtonProps, Partial<SignInOutButtonState>> {
+  public readonly cooperAuth: CooperAuth;
+
   constructor(props: SignInOutButtonProps) {
     super(props);
 
     this.state = { isLoading: false };
     this.onClick = this.onClick.bind(this);
+    this.cooperAuth = new CooperAuth(props.state);
   }
 
   public onClick(e: React.MouseEvent<HTMLButtonElement>) {
     const isSignIn = (e.target as HTMLButtonElement).textContent === 'Sign In';
-    const method = isSignIn ? cooperAuth.signIn : cooperAuth.signOut;
+    const method = isSignIn ? this.cooperAuth.signIn : this.cooperAuth.signOut;
 
     this.setState({ isLoading: true });
     method().then(() => this.setState({ isLoading: false }));
@@ -34,11 +36,16 @@ export class CooperSignInOutButton extends React.Component<SignInOutButtonProps,
   public render(): JSX.Element {
     const { isCooperSignedIn } = this.props.state;
     const { isLoading } = this.state;
-    const buttonOptions = { className: 'btn', loading: isLoading, onClick: this.onClick };
 
     return (
       <div>
-        <LaddaButton {...buttonOptions}>Sign {isCooperSignedIn ? 'Out' : 'In'}</LaddaButton>
+        <Button
+          loading={isLoading}
+          onClick={this.onClick}
+          icon='user'
+        >
+          Sign {isCooperSignedIn ? 'Out' : 'In'}
+        </Button>
       </div>
     );
   }

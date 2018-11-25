@@ -1,8 +1,8 @@
-import { MergedLogFile } from '../../src/renderer/interfaces';
+import { MergedLogFile, LogType } from '../../src/renderer/interfaces';
 
 export const fakeMergedFile: MergedLogFile = {
   logEntries: [],
   logFiles: [],
-  logType: 'browser',
+  logType: LogType.BROWSER,
   type: 'MergedLogFile'
 };

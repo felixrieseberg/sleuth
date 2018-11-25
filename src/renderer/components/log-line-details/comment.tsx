@@ -1,18 +1,18 @@
+import { observer } from 'mobx-react';
+import React from 'react';
+import { format } from 'date-fns';
+import Markdown from 'markdown-it';
+import emoji from 'markdown-it-emoji';
+import highlight from 'markdown-it-highlightjs';
+import { Button, Card } from '@blueprintjs/core';
+
 import { cooperComments } from '../../cooper/comments';
 import { SleuthState } from '../../state/sleuth';
-import { observer } from 'mobx-react';
-import * as React from 'react';
-import * as moment from 'moment';
-import * as Ladda from 'react-ladda';
-import * as Markdown from 'markdown-it';
-import * as emoji from 'markdown-it-emoji';
-import * as highlight from 'markdown-it-highlightjs';
 
 const markdown = new Markdown({ linkify: true })
   .use(highlight)
   .use(emoji);
 
-const LaddaButton = Ladda.default;
 const debug = require('debug')('sleuth:comment');
 
 export interface CommentProps {
@@ -86,7 +86,7 @@ export class Comment extends React.Component<CommentProps, Partial<CommentState>
 
   public renderEdit() {
     const { isPosting, editValue } = this.state;
-    const buttonOptions = { className: 'btn', loading: isPosting, onClick: this.submitEdit };
+    const buttonOptions = { loading: isPosting, onClick: this.submitEdit };
 
     return (
       <form className='EditComment' onSubmit={this.submitEdit}>
@@ -95,9 +95,9 @@ export class Comment extends React.Component<CommentProps, Partial<CommentState>
           onChange={this.handleChange}
           value={editValue}
         />
-        <LaddaButton type='submit' {...buttonOptions}>
+        <Button type='submit' {...buttonOptions}>
           {editValue ? 'Save' : 'Delete'}
-        </LaddaButton>
+        </Button>
       </form>
     );
   }
@@ -129,13 +129,13 @@ export class Comment extends React.Component<CommentProps, Partial<CommentState>
   public render(): JSX.Element {
     const { name, comment, avatar, timestamp } = this.props;
     const { isEditing } = this.state;
-    const time = moment(timestamp).format('MMMM Do YYYY');
+    const time = format(timestamp, ('MMMM Do YYYY');
     const avatarStyle = { backgroundImage: `url(${avatar})` };
     const editBtn = this.renderEditButton();
 
     if (!isEditing) {
       return (
-        <div className='Comment'>
+        <Card className='Comment'>
           <div className='Avatar' style={avatarStyle} />
           <div className='Text'>
             <div>
@@ -145,7 +145,7 @@ export class Comment extends React.Component<CommentProps, Partial<CommentState>
             <div dangerouslySetInnerHTML={this.renderMarkdown(comment)} />
             {editBtn}
           </div>
-        </div>
+        </Card>
       );
     } else {
       return this.renderEdit();

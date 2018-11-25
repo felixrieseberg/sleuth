@@ -1,10 +1,10 @@
+/* tslint:disable */
+
 const options = {
-  make_targets: {
-    win32: [ 'squirrel' ],
-    darwin: [ 'zip' ],
-    linux: [ 'deb', 'rpm' ]
+  hooks: {
+    generateAssets: require('./tools/generateAssets')
   },
-  electronPackagerConfig: {
+  packagerConfig: {
     icon: './src/static/sleuth-icon',
     asar: true,
     osxSign: {
@@ -16,17 +16,41 @@ const options = {
       CompanyName: 'Felix Rieseberg'
     }
   },
-  electronWinstallerConfig: {
-    name: 'Sleuth',
-    packageName: 'Sleuth',
-    productName: 'Sleuth'
-  },
-  electronInstallerDebian: {},
-  electronInstallerRedhat: {},
-  windowsStoreConfig: {
-    packageName: 'Sleuth',
-    name: 'Sleuth'
-  }
+  makers: [
+    {
+      name: "@electron-forge/maker-squirrel",
+      platforms: ["win32"],
+      config: {
+        name: 'Sleuth',
+        packageName: 'Sleuth',
+        productName: 'Sleuth'
+      }
+    },
+    {
+      name: "@electron-forge/maker-zip",
+      platforms: ["darwin"]
+    },
+    {
+      name: "@electron-forge/maker-deb",
+      platforms: ["linux"]
+    },
+    {
+      name: "@electron-forge/maker-rpm",
+      platforms: ["linux"]
+    }
+  ],
+  publishers: [
+    {
+      name: '@electron-forge/publisher-github',
+      config: {
+        repository: {
+          owner: 'electron',
+          name: 'fiddle'
+        },
+        prerelease: true
+      }
+    }
+  ]
 };
 
 if (process.env.SLEUTH_CERTIFICATE_FILE && process.env.SLEUTH_CERTIFICATE_PASSWORD) {

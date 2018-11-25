@@ -1,12 +1,46 @@
 import { UnzippedFile } from './unzip';
-
-export type LogType = 'browser' | 'renderer' | 'call' | 'webapp' | 'preload' | 'all';
+import fs from 'fs-extra';
 
 export type LogFile = UnzippedFile | MergedLogFile | ProcessedLogFile;
 
+export const enum LogType {
+  BROWSER = 'browser',
+  RENDERER = 'renderer',
+  CALL = 'call',
+  WEBAPP = 'webapp',
+  PRELOAD = 'preload',
+  ALL = 'all',
+  UNKNOWN = ''
+}
+
+export const ALL_LOG_TYPES = [
+  LogType.BROWSER,
+  LogType.RENDERER,
+  LogType.CALL,
+  LogType.WEBAPP,
+  LogType.PRELOAD,
+  LogType.ALL
+];
+
+export const LOG_TYPES_TO_PROCESS = [
+  LogType.BROWSER,
+  LogType.RENDERER,
+  LogType.WEBAPP,
+  LogType.PRELOAD,
+  LogType.CALL
+];
+
+export interface ProcessorPerformanceInfo {
+  name: string;
+  type: LogType;
+  lines: number;
+  entries: number;
+  processingTime: number;
+}
+
 export interface DateRange {
-  from: Date | null;
-  to: Date | null;
+  from?: Date;
+  to?: Date;
 }
 
 export interface LogEntry {
@@ -42,8 +76,9 @@ export interface MergedLogFiles {
 }
 
 export interface ProcessedLogFile {
-  logFile: UnzippedFile;
+  levelCounts: Record<string, number>;
   logEntries: Array<LogEntry>;
+  logFile: UnzippedFile;
   logType: LogType;
   type: 'ProcessedLogFile';
 }
@@ -62,13 +97,6 @@ export interface MergedLogFile {
   logEntries: Array<LogEntry>;
   logType: LogType;
   type: 'MergedLogFile';
-}
-
-export interface CombinedLogFiles {
-  logFiles: Array<ProcessedLogFile>;
-  logEntries: Array<LogEntry>;
-  logType: LogType;
-  type: 'CombinedLogFiles';
 }
 
 export interface SortedUnzippedFiles {
@@ -96,9 +124,10 @@ export interface LevelFilter {
   warn: boolean;
 }
 
-export interface UserPreferences {
-  dateTimeFormat: string;
-  defaultEditor: string;
-  font: string;
+export interface Suggestion extends fs.Stats {
+  age: string;
 }
 
+export type Suggestions = Record<string, Suggestion>;
+
+export type SelectLogFileFn = (logFile: ProcessedLogFile | UnzippedFile | null, logType?: string) => void;

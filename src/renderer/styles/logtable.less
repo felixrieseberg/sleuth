@@ -1,16 +1,18 @@
-@import "../../static/plastic/plastic_colors.less";
+@import "../../../node_modules/@blueprintjs/core/lib/less/variables.less";
+
+#LogTableContainer {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
 
 .LogTable {
-  padding-top: 100px;
-  height: 100%;
-  padding: 6.2rem 0 0 0;
-  height: 100%;
-  font-size: 1rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  padding: 2.2rem 2.2rem 0 0;
   user-select: none;
-
-  .fixedDataTableCellGroupLayout_cellGroup {
-    cursor: pointer;
-  }
 
   &.Single {
     .Meta {
@@ -19,16 +21,12 @@
   }
 
   .Sizer {
-    height: 100%;
     padding-left: 2rem;
-
-    .HasWarning {
-      height: calc(~"100% - 76px");
-    }
+    flex-grow: 1;
   }
 
   .HasData {
-    color: @dark_purple;
+    //color: @dark_purple;
   }
 
   .Meta {
@@ -39,133 +37,45 @@
     height: 18px;
     margin-top: -2px;
   }
-}
 
-.fixedDataTableLayout_main {
-  border: none;
-  outline: none;
+  .ReactVirtualized__Table__row {
+    border-bottom: 1px solid rgba(16, 22, 26, .05)
+  }
 
-  &:focus,
-  &:active {
-    border: none;
-    outline: none;
+  .ReactVirtualized__Table__row:hover {
+    background-color: @light-gray4;
   }
 
   .HighlightRow {
-    background-color: @mention_yellow;
-    transition: background 0.5s linear;
+    background-color: @gray5;
   }
 
   .ActiveRow {
-    background-color: @mention_yellow;
-    transition: background 0.5s linear;
+    background-color: @gray5;
     font-weight: 800;
   }
 
   .ActiveRow, .HighlightRow  {
     .fixedDataTableCellGroupLayout_cellGroup:hover {
-      background-color: @highlight_yellow;
+      background-color: @gray3;
     }
   }
+}
 
-  &::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+.bp3-dark {
+  .ReactVirtualized__Table__row {
+    border-bottom: 1px solid rgba(137, 191, 226, 0.05)
   }
 
-  &::-webkit-scrollbar-thumb {
-    background-color: rgba(50,50,50,.25);
-    border: 2px solid transparent;
-    border-radius: 10px;
-    background-clip: padding-box;
-
-    &:hover {
-      background-color: rgba(50,50,50,.5);
-    }
+  .ReactVirtualized__Table__row:hover {
+    background-color: @dark-gray4;
   }
 
-  &::-webkit-scrollbar-button {
-      width: 0;
-      height: 0;
-      display: none;
-  }
+  .ActiveRow, .HighlightRow  {
+    background-color: @dark-gray5;
 
-  &::-webkit-scrollbar-corner {
-      background-color: transparent;
-  }
-
-  .ScrollbarLayout_face {
-    background-color: @slate_blue_grey;
-    border-radius: 10px;
-    margin-right: 2px;
-    opacity: .4;
-    transition: opacity .5s linear;
-  }
-
-  .ScrollbarLayout_face:hover, .faceActive {
-    opacity: 1;
-  }
-
-  .fixedDataTableCellLayout_columnResizerContainer {
-    border-left: 1px solid rgba(50,50,50,.25);
-  }
-
-  .fixedDataTableRowLayout_body {
-    font-size: 1rem;
-  }
-
-  .fixedDataTableCellLayout_main {
-    border: none;
-  }
-
-  .fixedDataTableLayout_header {
-    font-weight: 700;
-    background-color: #efefef;
-    border-bottom-color: #BABBBF;
-    border-top: 1px solid #BABBBF;
-    border-left: 1px solid #BABBBF;
-
-    .fixedDataTableCellGroupLayout_cellGroup:hover {
-      background-color: initial;
-    }
-  }
-
-  .fixedDataTableCellGroupLayout_cellGroup:hover {
-    background-color: @neutral_white;
-  }
-
-  .fixedDataTableCellLayout_wrap1 {
-    width: calc(100% - 20px);
-    display: inline-block;
-
-    a {
-      display: block;
-    }
-  }
-
-  .fixedDataTableCellLayout_columnReorderContainer {
-    height: 26px!important;
-    width: 13px;
-    display: inline-block;
-    margin: 0;
-  }
-
-  .fixedDataTableCellLayout_columnReorderContainer:hover::after {
-    color: black;
-  }
-
-  .fixedDataTableCellLayout_columnReorderContainer::after {
-    content: " \22EE";
-    top: 3px;
-    position: absolute;
-  }
-
-  .public_fixedDataTableCell_hasReorderHandle {
-    background-color: #efefef;
-
-    .fixedDataTableCellLayout_wrap2,
-    .fixedDataTableCellLayout_wrap3 {
-      vertical-align: bottom;
+    .ReactVirtualized__Table__row:hover {
+      background-color: @gray1;
     }
   }
 }

@@ -1,5 +1,4 @@
-import * as React from 'react';
-import * as moment from 'moment';
+import React from 'react';
 import { getLanguageNames } from '../../utils/iso639';
 
 export function getSettingsInfo(data: any): Array<JSX.Element> {
@@ -21,9 +20,13 @@ export function getMinWebInfo({ workspaceIdleTimeout }: any): string {
     return `No workspace idle timeout could be found.`;
   }
 
+  if (workspaceIdleTimeout === 'never') {
+    return `Workspaces are never considered idle.`;
+  }
+
   const intIdleTimeout = parseInt(workspaceIdleTimeout, 10);
-  const humanIdle = moment.duration(intIdleTimeout, 'milliseconds').humanize();
-  return `Workspaces are considered idle after ${humanIdle}.`;
+  const humanIdle = intIdleTimeout / 60 / 60 / 1000;
+  return `Workspaces are considered idle after ${humanIdle} hours.`;
 }
 
 export function getHWInfo({ isAeroGlassEnabled, platform, useHwAcceleration }: any): string {
@@ -76,7 +79,7 @@ export function getLocaleInfo({ locale, spellcheckerLanguage }: any): string {
   let localeInfo = '';
 
   if (locale) {
-    const { name, label } = getLanguageNames(locale);
+    const { label } = getLanguageNames(locale);
     localeInfo += `The user's locale is ${label} (${locale}). `;
   } else {
     localeInfo += 'We could not determine a locale setting. ';
@@ -108,7 +111,7 @@ export function getVersionInfo({ appVersion, versionName }: any): string {
   return appVersion ? `${appVersion} (${versionName || 'no name'})` : '';
 }
 
-export function getOSInfo({ platform, platformVersion, pretendNotReallyWindows10, isBeforeWin10, isWin10 }: any): string {
+export function getOSInfo({ platform, platformVersion, pretendNotReallyWindows10 }: any): string {
   const os = platform ? platform.replace('darwin', 'macOS').replace('win32', 'Windows').replace('linux', 'Linux') : null;
   const osVersion = platformVersion && platformVersion.major ? `(${platformVersion.major}.${platformVersion.minor})` : '(unknown version)';
   let windowsInfo = '';

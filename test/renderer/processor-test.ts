@@ -4,7 +4,6 @@ import {
   getTypeForFile,
   getTypesForFiles,
   makeLogEntry,
-  matchLine,
   matchLineElectron,
   matchLineWebApp,
   mergeLogFiles,
@@ -13,8 +12,9 @@ import {
 } from '../../src/renderer/processor';
 import { mockBrowserFile1, mockBrowserFile2 } from '../__mocks__/processed-log-file';
 
-import * as dirtyJSON from 'jsonic';
-import * as path from 'path';
+import dirtyJSON from 'jsonic';
+import path from 'path';
+import { LogType } from '../../src/renderer/interfaces';
 
 describe('matchLineWebApp', () => {
   it('should match a classic webapp line', () => {
@@ -55,39 +55,6 @@ describe('matchLineElectron', () => {
     expect(result!.level).to.be.equal('info');
     expect(result!.message).to.be.equal('Store: UPDATE_SETTINGS');
   });
-
-  it('should match an Electron (< 2.6) line', () => {
-    const line = '2016-10-19T19:19:56.485Z - info: LOAD_PERSISTENT : {';
-    const result = matchLineElectron(line);
-
-    expect(result).to.exist;
-    expect(result!.timestamp).to.be.equal('2016-10-19T19:19:56.485Z');
-    expect(result!.level).to.be.equal('info');
-    expect(result!.message).to.be.equal('LOAD_PERSISTENT');
-    expect(result!.toParseHead).to.be.equal('{');
-  });
-});
-
-describe('matchLine', () => {
-  it('should match an Electron line', () => {
-    const line = '[02/22/17, 16:02:33:371] info: Store: UPDATE_SETTINGS';
-    const result = matchLine(line, 'browser');
-
-    expect(result).to.exist;
-    expect(result!.timestamp).to.be.equal('02/22/17, 16:02:33:371');
-    expect(result!.level).to.be.equal('info');
-    expect(result!.message).to.be.equal('Store: UPDATE_SETTINGS');
-  });
-
-  it('should match a webapp line', () => {
-    const line = 'info: 2017/2/22 16:02:37.178 didStartLoading TSSSB.timeout_tim set for ms:60000';
-    const result = matchLine(line, 'webapp');
-
-    expect(result).to.exist;
-    expect(result!.timestamp).to.be.equal('2017/2/22 16:02:37.178');
-    expect(result!.level).to.be.equal('info');
-    expect(result!.message).to.be.equal('didStartLoading TSSSB.timeout_tim set for ms:60000');
-  });
 });
 
 describe('readFile', () => {
@@ -98,19 +65,19 @@ describe('readFile', () => {
       size: 1713
     };
 
-    return readFile(file, 'browser').then((result) => {
-      expect(result).to.exist;
-      expect(result.length).to.be.equal(12);
-      expect(result[0]).to.exist;
-      expect(result[0].timestamp).to.be.equal('02/22/17, 16:02:32:675');
-      expect(result[0].level).to.be.equal('info');
-      expect(result[0].momentValue).to.be.equal(1487808152675);
-      expect(result[0].logType).to.be.equal('browser');
-      expect(result[0].index).to.be.equal(0);
+    return readFile(file, LogType.BROWSER).then(({ entries }) => {
+      expect(entries).to.exist;
+      expect(entries.length).to.be.equal(12);
+      expect(entries[0]).to.exist;
+      expect(entries[0].timestamp).to.be.equal('02/22/17, 16:02:32:675');
+      expect(entries[0].level).to.be.equal('info');
+      expect(entries[0].momentValue).to.be.equal(1487808152675);
+      expect(entries[0].logType).to.be.equal(LogType.BROWSER);
+      expect(entries[0].index).to.be.equal(0);
 
-      expect(result[4].meta).to.exist;
+      expect(entries[4].meta).to.exist;
 
-      const parsedMeta = dirtyJSON(result[4].meta);
+      const parsedMeta = dirtyJSON(entries[4].meta);
 
       expect(parsedMeta).to.exist;
       expect(parsedMeta.isDevMode).to.be.true;
@@ -124,14 +91,14 @@ describe('readFile', () => {
       size: 1713
     };
 
-    return readFile(file, 'webapp').then((result) => {
-      expect(result).to.exist;
-      expect(result.length).to.be.equal(6);
-      expect(result[3]).to.exist;
-      expect(result[3].timestamp).to.be.equal('2017/2/22 16:02:37.178');
-      expect(result[3].message).to.be.equal('didStartLoading called TSSSB.timeout_tim set for ms:60000');
-      expect(result[3].logType).to.be.equal('webapp');
-      expect(result[3].index).to.be.equal(3);
+    return readFile(file, LogType.WEBAPP).then(({ entries }) => {
+      expect(entries).to.exist;
+      expect(entries.length).to.be.equal(6);
+      expect(entries[3]).to.exist;
+      expect(entries[3].timestamp).to.be.equal('2017/2/22 16:02:37.178');
+      expect(entries[3].message).to.be.equal('didStartLoading called TSSSB.timeout_tim set for ms:60000');
+      expect(entries[3].logType).to.be.equal(LogType.WEBAPP);
+      expect(entries[3].index).to.be.equal(3);
     });
   });
 });
@@ -267,7 +234,7 @@ describe('mergeLogFiles', () => {
   it('should merge two logfiles together', () => {
     const files = [ mockBrowserFile1, mockBrowserFile2 ];
 
-    return mergeLogFiles(files, 'browser').then((result) => {
+    return mergeLogFiles(files, LogType.BROWSER).then((result) => {
       expect(result).to.exist;
       expect(result.type).to.be.equal('MergedLogFile');
       expect(result.logEntries.length).to.be.equal(6);

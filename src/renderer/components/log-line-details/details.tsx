@@ -1,8 +1,9 @@
 import { observer } from 'mobx-react';
-import { sleuthState, SleuthState } from '../../state/sleuth';
-import * as React from 'react';
-import * as classNames from 'classnames';
-import * as moment from 'moment';
+import { SleuthState } from '../../state/sleuth';
+import React from 'react';
+import classNames from 'classnames';
+import { format } from 'date-fns';
+import { Card, Button, ButtonGroup, Tag, Elevation } from '@blueprintjs/core';
 
 import { LogEntry } from '../../interfaces';
 import { LogLineData } from './data';
@@ -20,6 +21,7 @@ export interface LogLineDetailsState {}
 export class LogLineDetails extends React.Component<LogLineDetailsProps, LogLineDetailsState> {
   constructor(props: LogLineDetailsProps) {
     super(props);
+
     this.toggle = this.toggle.bind(this);
     this.openSource = this.openSource.bind(this);
 
@@ -72,19 +74,26 @@ export class LogLineDetails extends React.Component<LogLineDetailsProps, LogLine
   public renderLogEntry(logEntry: LogEntry): JSX.Element | null {
     const { level, logType, message, timestamp } = logEntry;
     const type = `${logType.charAt(0).toUpperCase() + logType.slice(1)} Process`;
-    const datetime = logEntry.momentValue ? moment(logEntry.momentValue).format('dddd, MMMM Do YYYY, h:mm:ss a') : timestamp;
+    const datetime = logEntry.momentValue
+      ? format(logEntry.momentValue, 'dddd, MMMM Do YYYY, h:mm:ss a')
+      : timestamp;
 
     return (
       <div className='Details-LogEntry'>
         <div className='MetaInfo'>
-          <div className='Details-Moment'>{datetime}</div>
+          <div className='Details-Moment'>
+            <Tag large={true} icon='calendar'>{datetime}</Tag>
+          </div>
           <div className='Details-LogType'>
-              Level <span className='level'>{level}</span> Type <span className='type'>{type}</span>
-              <span> <a className='source' onClick={this.openSource}>Open Source</a></span>
-              <span> <a className='close' onClick={this.toggle}>Close</a></span>
+            <Tag large={true} icon='box'>{level}</Tag>
+            <Tag large={true} icon='applications'>{type}</Tag>
+            <ButtonGroup>
+              <Button icon='document-open' onClick={this.openSource} text='Open Source' />
+              <Button icon='cross' onClick={this.toggle} text='Close' />
+            </ButtonGroup>
           </div>
         </div>
-        <div className='Message'>{message}</div>
+        <Card className='Message Monospace' elevation={Elevation.THREE}>{message}</Card>
       </div>
     );
   }
@@ -101,9 +110,8 @@ export class LogLineDetails extends React.Component<LogLineDetailsProps, LogLine
     return (
       <div className={className}>
         {logEntryInfo}
-        <LogLineData raw={selectedEntry ? selectedEntry.meta : ''} />
-        <LogLineComments state={sleuthState} />
-        <div className='Background'><div /></div>
+        <LogLineData state={this.props.state} raw={selectedEntry ? selectedEntry.meta : ''} />
+        <LogLineComments state={this.props.state} />
       </div>
     );
   }

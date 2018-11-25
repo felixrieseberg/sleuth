@@ -1,6 +1,6 @@
-import * as React from 'react';
+import React from 'react';
 import { Welcome } from '../../../src/renderer/components/welcome';
-import * as renderer from 'react-test-renderer';
+import renderer from 'react-test-renderer';
 
 const mathBackup = global.Math;
 
@@ -18,7 +18,7 @@ describe('Welcome', () => {
   it('welcome renders correctly', () => {
     const tree = renderer.create(
       // tslint:disable-next-line:no-empty
-      <Welcome sleuth=':sleuth:' openFile={() => {}} />
+      <Welcome sleuth=':sleuth:' state={{} as any} />
     ).toJSON();
 
     expect(tree).toMatchSnapshot();

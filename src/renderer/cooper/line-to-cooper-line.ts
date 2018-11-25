@@ -28,8 +28,13 @@ const filters: Array<Replacer> = [
   },
   {
     name: 'ms',
-    rgx: /( |^)(\d{1,20}ms)( |$)/g,
+    rgx: /( |^)(\d{1,20}(?: )?ms)( |$)/g,
     replacer: ' {time period} '
+  },
+  {
+    name: 'number',
+    rgx: /( |^)(\d*,?\d*)( |$)/g,
+    replacer: ' {number} '
   },
   {
     name: 'id',

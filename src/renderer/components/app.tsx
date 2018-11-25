@@ -1,11 +1,10 @@
-import { resetState, sleuthState } from '../state/sleuth';
-import { UserPreferences } from '../interfaces';
+import { SleuthState } from '../state/sleuth';
 import { shouldIgnoreFile } from '../../utils/should-ignore-file';
-import * as React from 'react';
+import React from 'react';
 import { ipcRenderer, remote } from 'electron';
-import * as classNames from 'classnames';
-import * as fs from 'fs-extra';
-import * as path from 'path';
+import classNames from 'classnames';
+import fs from 'fs-extra';
+import path from 'path';
 
 import { UnzippedFile, UnzippedFiles, Unzipper } from '../unzip';
 import { Welcome } from './welcome';
@@ -18,13 +17,13 @@ const debug = require('debug')('sleuth:app');
 
 export interface AppState {
   unzippedFiles: UnzippedFiles;
-  userPreferences: UserPreferences;
 }
 
-export class App extends React.Component<undefined, Partial<AppState>> {
+export class App extends React.Component<{}, Partial<AppState>> {
   public readonly menu: AppMenu = new AppMenu();
+  public readonly sleuthState: SleuthState;
 
-  constructor(props: undefined) {
+  constructor(props: {}) {
     super(props);
 
     this.state = {
@@ -34,15 +33,18 @@ export class App extends React.Component<undefined, Partial<AppState>> {
     localStorage.debug = 'sleuth*';
 
     this.openFile = this.openFile.bind(this);
+    this.reset = this.reset.bind(this);
+
+    this.sleuthState = new SleuthState(this.openFile, this.reset);
   }
 
   /**
    * Should this component update?
    *
-   * @param {undefined} _nextProps
+   * @param {{}} _nextProps
    * @param {AppState} nextState
    */
-  public shouldComponentUpdate(_nextProps: undefined, nextState: AppState) {
+  public shouldComponentUpdate(_nextProps: {}, nextState: AppState) {
     const currentFiles = this.state.unzippedFiles || [];
     const nextFiles = nextState.unzippedFiles || [];
 
@@ -85,9 +87,9 @@ export class App extends React.Component<undefined, Partial<AppState>> {
    * it's neither, we'll do nothing.
    *
    * @param {string} url
-   * @returns {void}
+   * @returns {Promise<void>}
    */
-  public openFile(url: string): void {
+  public async openFile(url: string): Promise<void> {
     debug(`Received open-url for ${url}`);
     this.reset();
 
@@ -97,45 +99,42 @@ export class App extends React.Component<undefined, Partial<AppState>> {
     }
 
     // Let's look at the url a little closer
-    fs.stat(url).then((stats: fs.Stats) => {
-      if (stats.isDirectory()) {
-        return this.openDirectory(url);
-      }
-    });
+    const stats = await fs.stat(url);
+    if (stats.isDirectory()) {
+      return this.openDirectory(url);
+    }
   }
 
   /**
    * Takes a folder url as a string and opens it.
    *
    * @param {string} url
+   * @returns {Promise<void>}
    */
-  public openDirectory(url: string): void {
+  public async openDirectory(url: string): Promise<void> {
     debug(`Now opening directory ${url}`);
     this.reset();
 
-    fs.readdir(url)
-      .then((dir) => {
-        const unzippedFiles: UnzippedFiles = [];
-        const promises: Array<Promise<any>> = [];
+    const dir = await fs.readdir(url);
+    const unzippedFiles: UnzippedFiles = [];
 
-        dir.forEach((fileName) => {
-          if (shouldIgnoreFile(fileName)) return;
+    console.groupCollapsed(`Open directory`);
 
-          const fullPath = path.join(url, fileName);
-          debug(`Checking out file ${fileName}`);
+    for (const fileName of dir) {
+      if (!shouldIgnoreFile(fileName)) {
+        const fullPath = path.join(url, fileName);
+        const stats = fs.statSync(fullPath);
+        const file: UnzippedFile = { fileName, fullPath, size: stats.size };
 
-          const promise = fs.stat(fullPath)
-            .then((stats: fs.Stats) => {
-              const file: UnzippedFile = { fileName, fullPath, size: stats.size };
-              debug('Found file, adding to result.', file);
-              unzippedFiles.push(file);
-            });
+        debug('Found file, adding to result.', file);
+        unzippedFiles.push(file);
+      }
+    }
 
-          promises.push(promise);
-        });
+    this.sleuthState.setSource(url);
+    this.setState({ unzippedFiles });
 
-        Promise.all(promises).then(() => this.setState({ unzippedFiles }));
-      });
+    console.groupEnd();
   }
 
   /**
@@ -143,21 +142,24 @@ export class App extends React.Component<undefined, Partial<AppState>> {
    *
    * @param {string} url
    */
-  public openZip(url: string): void {
+  public async openZip(url: string): Promise<void> {
     const unzipper = new Unzipper(url);
-    unzipper.open()
-      .then(() => unzipper.unzip())
-      .then((unzippedFiles: UnzippedFiles) => this.setState({unzippedFiles}));
+    await unzipper.open();
+
+    const unzippedFiles = await unzipper.unzip();
+
+    this.sleuthState.setSource(url);
+    this.setState({ unzippedFiles });
   }
 
   public reset() {
     this.setState({ unzippedFiles: [] });
 
-    if (sleuthState.opened > 0) {
-      resetState();
+    if (this.sleuthState.opened > 0) {
+      this.sleuthState.reset();
     }
 
-    sleuthState.opened = sleuthState.opened + 1;
+    this.sleuthState.opened = this.sleuthState.opened + 1;
   }
 
   /**
@@ -169,15 +171,13 @@ export class App extends React.Component<undefined, Partial<AppState>> {
     const { unzippedFiles } = this.state;
     const className = classNames('App', { Darwin: process.platform === 'darwin' });
     const titleBar = process.platform === 'darwin' ? <MacTitlebar /> : '';
-    let content: JSX.Element | null = <Welcome openFile={this.openFile} />;
-
-    if (unzippedFiles && unzippedFiles.length > 0) {
-      content = <CoreApplication state={sleuthState} unzippedFiles={unzippedFiles} />;
-    }
+    const content = unzippedFiles && unzippedFiles.length
+      ? <CoreApplication state={this.sleuthState} unzippedFiles={unzippedFiles} />
+      : <Welcome state={this.sleuthState} />;
 
     return (
       <div className={className}>
-        <Preferences state={sleuthState} />
+        <Preferences state={this.sleuthState} />
         {titleBar}
         {content}
       </div>

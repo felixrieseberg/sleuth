@@ -1,6 +1,6 @@
-import * as React from 'react';
+import React from 'react';
 import { Loading } from '../../../src/renderer/components/loading';
-import * as renderer from 'react-test-renderer';
+import renderer from 'react-test-renderer';
 
 it('loading renders correctly', () => {
   const tree = renderer.create(

@@ -1,91 +1,26 @@
+@import "../../../node_modules/@blueprintjs/core/lib/less/variables.less";
 @import "./colors.less";
 
 .Sidebar {
-  #site_nav {
-    &::-webkit-scrollbar {
-      width: 10px;
-      height: 10px;
-    }
+  background: @light-gray1;
+  overflow-y: auto;
+  flex-shrink: 0;
+  width: 0;
 
-    &::-webkit-scrollbar-thumb {
-      background-color: rgba(50,50,50,.5);
-      border: 2px solid transparent;
-      border-radius: 10px;
-      background-clip: padding-box;
-
-      &:hover {
-        background-color: rgba(50,50,50,.8);
-      }
-    }
-
-    &::-webkit-scrollbar-button {
-        width: 0;
-        height: 0;
-        display: none;
-    }
-
-    &::-webkit-scrollbar-corner {
-        background-color: transparent;
-    }
-  }
-
-  .MenuTitle {
-    color: #fff;
-    text-decoration: none;
-    display: block;
-    font-size: 1rem;
-    font-weight: 700;
+  &.Open {
+    width: 300px;
   }
 
   .StillLoading {
     opacity: .5;
   }
-
-  nav#site_nav ul a {
-    padding: .25rem 0 .25rem .25rem;
-  }
-
-  .MenuTitle-Browser .ts_icon {
-    color: @browser_color;
-  }
-
-  .MenuTitle-Renderer .ts_icon {
-    color: @renderer_color;
-  }
-
-  .MenuTitle-Webapp .ts_icon {
-    color: @webapp_color;
-  }
-
-  .MenuTitle-Preload .ts_icon {
-    color: @preload_color;
-  }
-
-  .MenuTitle-Call .ts_icon {
-    color: @call_color;
-  }
-
-  .ts_icon {
-    margin-right: .75rem;
-  }
-
-  a > i.ts_icon_file.LogFile {
-    color: white;
-  }
-
-  a:hover {
-    background-color: rgba(255, 255, 255, .1);
-    border-radius: 5px;
-    padding-left: 5px;
-  }
-
-  a.Selected {
-    background-color: rgba(255, 255, 255, .2);
-    border-radius: 5px;
-    padding-left: 5px;
-  }
 }
 
-.Darwin nav#site_nav {
+.Darwin .Sidebar {
   padding-top: 25px;
+}
+
+.bp3-dark .Sidebar {
+  background-color: @dark-gray2;
+  box-shadow: inset -9px 0px 15px 9px #00000020;
 }

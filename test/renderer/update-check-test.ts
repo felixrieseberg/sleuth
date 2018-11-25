@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { getUpdateAvailable } from '../../src/renderer/update-check';
-import * as http from 'http';
+import http from 'http';
 
 let server: http.Server | undefined;
 let toServe: string = '';

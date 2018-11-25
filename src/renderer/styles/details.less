@@ -1,64 +1,19 @@
-@import "../../static/plastic/plastic_colors.less";
+@import "../../../node_modules/@blueprintjs/core/lib/less/variables.less";
 
 .Details {
-  background: white;
+  background: @light-gray4;
   border-top: 1px solid @neutral_grey;
   overflow: auto;
-  font-size: 1rem;
   flex-grow: 1;
-  z-index: 1000;
+  flex-shrink: 1;
 
   .ConvertedTable {
     margin: .5rem 1.5rem 1rem
   }
 
-  &::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background-color: rgba(50,50,50,.25);
-    border: 2px solid transparent;
-    border-radius: 10px;
-    background-clip: padding-box;
-
-    &:hover {
-      background-color: rgba(50,50,50,.5);
-    }
-  }
-
-  &::-webkit-scrollbar-track {
-    background: white;
-  }
-
-  ul {
-    font-family: 'Inconsolata', monospace;
-    font-size: 1rem;
-  }
-
   .LogLineData {
     p, span {
       user-select: initial;
-    }
-  }
-
-  .Background {
-    width: 100%;
-    padding-top: 34.613%;
-    position: relative;
-
-    div {
-      position: absolute;
-      opacity: .4;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: url(../../static/bg.png);
-      background-position: top;
-      background-size: cover;
-      background-repeat: no-repeat;
     }
   }
 
@@ -81,10 +36,10 @@
 }
 
 .Scrubber {
-  z-index: 1000;
   cursor: ns-resize;
   height: 10px;
   flex-shrink: 0;
+  flex-grow: 0;
   background-color: #ececec;
   width: 100%;
   border-bottom: 1px solid #dadada;
@@ -92,12 +47,15 @@
 }
 
 .Details-LogEntry {
-  font-size: 1rem;
   margin: .5rem 1.5rem 1rem;
   resize: horizontal;
 
   .Details-LogType {
     user-select: none;
+
+    > * {
+      margin-left: .5rem;
+    }
   }
 
   .MetaInfo {
@@ -108,17 +66,28 @@
   }
 
   .Message {
+    background: @gray5;
     font-size: 15px;
     line-height: 18px;
     margin-bottom: 0.625rem;
-    color: rgb(61, 60, 64);
     margin-top: 10px;
-    background-color: rgba(255, 247, 235, 0.470588);
-    border-top: 1px solid rgba(0, 0, 0, 0.0901961);
-    border-right: 1px solid rgba(0, 0, 0, 0.0980392);
-    border-left: 1px solid rgba(0, 0, 0, 0.0980392);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.117647);
-    border-radius: 6px;
     padding: 12px 25px 12px 12px;
+  }
+}
+
+.bp3-dark {
+  .Details {
+    border-top: @gray1;
+    background: @dark-gray5;
+  }
+
+  .Message {
+    background: @dark-gray1;
+  }
+
+  .Scrubber {
+    background-color: @dark-gray1;
+    border-bottom: 1px solid @dark-gray4;
+    border-top: 1px solid @dark-gray4;
   }
 }

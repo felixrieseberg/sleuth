@@ -1,14 +1,16 @@
-import * as React from 'react';
-import * as dirtyJSON from 'jsonic';
-import JSONTree from 'react-json-tree';
-import * as fs from 'fs-extra';
+import React from 'react';
+import fs from 'fs-extra';
 import { shell } from 'electron';
+import { Card, Elevation } from '@blueprintjs/core';
 
 import { MergedLogFile, ProcessedLogFile } from '../interfaces';
 import { SleuthState } from '../state/sleuth';
 import { getSettingsInfo } from '../analytics/settings-analytics';
 import { getNotifWarningsInfo } from '../analytics/notification-warning-analytics';
 import { UnzippedFile } from '../unzip';
+import { JSONView } from './json-view';
+import { parseJSON } from '../../utils/parse-json';
+import { getFontForCSS } from './preferences-font';
 
 const debug = require('debug')('sleuth:statetable');
 
@@ -30,19 +32,6 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
     this.state = {};
   }
 
-  public isStateFile(file?: ProcessedLogFile | MergedLogFile | UnzippedFile): file is UnzippedFile {
-    const _file = file as UnzippedFile;
-    return !!_file.fullPath;
-  }
-
-  public isHtmlFile(file: UnzippedFile) {
-    return file.fullPath.endsWith('.html');
-  }
-
-  public isNotifsFile(file: UnzippedFile) {
-    return file.fullPath.endsWith('notification-warnings.json');
-  }
-
   public componentDidMount() {
     const { selectedLogFile } = this.props.state;
 
@@ -59,7 +48,39 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
     }
   }
 
-  public getFileType(): StateFileType {
+  public render(): JSX.Element {
+    const { data, path } = this.state;
+    const { font } = this.props.state;
+
+    if (!data && !path) {
+      return <div />;
+    }
+
+    const info = this.renderInfo();
+    const onIFrameLoad = function(this: HTMLIFrameElement) {
+      if (this) {
+        const { document: idoc } = this.contentWindow!;
+        this.height = `${idoc.body.scrollHeight}px`;
+      }
+    };
+
+    const content = (!data && path)
+      ? <iframe sandbox='' onLoad={onIFrameLoad} src={path} />
+      : <JSONView data={data} state={this.props.state} />;
+
+    return (
+      <div className='StateTable' style={{ fontFamily: getFontForCSS(font) }}>
+        <div className='StateTable-Content'>
+          {info}
+          <Card>
+            {content}
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  private getFileType(): StateFileType {
     const { selectedLogFile } = this.props.state;
 
     if (!this.isStateFile(selectedLogFile)) throw new Error('StateTable: No file');
@@ -78,7 +99,7 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
     return type as StateFileType;
   }
 
-  public parse(file: UnzippedFile) {
+  private async parse(file: UnzippedFile) {
     if (!file) {
       return;
     }
@@ -90,59 +111,20 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
       return;
     }
 
-    fs.readFile(file.fullPath, 'utf8')
-      .then((rawData) => {
-        let data;
-
-        try {
-          data = JSON.parse(rawData);
-        } catch (error) {
-          try {
-            data = dirtyJSON(rawData);
-          } catch (error) {
-            data = null;
-          }
-        }
-
-        this.setState({ data, path: undefined });
-      })
-      .catch((error) => {
-        debug(error);
-      });
+    try {
+      const raw = await fs.readFile(file.fullPath, 'utf8');
+      this.setState({ data: parseJSON(raw), path: undefined });
+    } catch (error) {
+      debug(error);
+    }
   }
 
-  /**
-   * A super-cool Base16 theme using Slack's 2016 colors.
-   *
-   * @returns {Object}
-   */
-  public getTheme() {
-    return {
-      base00: '#2C2D30',
-      base01: '#555459',
-      base02: '#8B898F',
-      base03: '#88919B',
-      base04: '#9e9ea6',
-      base05: '#F9F9F9',
-      base06: '#F9F9F9',
-      base07: '#F9F9F9',
-      base08: '#e32072',
-      base09: '#F96A38',
-      base0A: '#FFA940',
-      base0B: '#257337',
-      base0C: '#3971ED',
-      base0D: '#3971ED',
-      base0E: '#71105F',
-      base0F: '#4d6dc3'
-    };
-  }
-
-  public getSearchLink(text: string, query: string): JSX.Element {
+  private getSearchLink(text: string, query: string): JSX.Element {
     const href = `https://mc.tinyspeck.com/god/search.php?q=${encodeURIComponent(query)}`;
     return (<a onClick={() => shell.openExternal(href)}>{text}</a>);
   }
 
-  public renderWindowFrameInfo(): JSX.Element | null {
+  private renderWindowFrameInfo(): JSX.Element | null {
     const data = this.state.data || {};
     const windowSettings = data.windowSettings || {};
     const { size, position, isMaximized } = windowSettings;
@@ -152,22 +134,22 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
     const maximizedInfo = isMaximized ? <span>and maximized.</span> : <span>and not maximized</span>;
 
     return (
-        <div className='StateTable-Info'>
+        <Card className='StateTable-Info'>
           This user's window is {sizeInfo}{posInfo}{maximizedInfo}.
-        </div>
+        </Card>
       );
   }
 
-  public renderSettingsInfo(): JSX.Element | null {
+  private renderSettingsInfo(): JSX.Element | null {
 
     return (
-        <div className='StateTable-Info'>
+        <Card className='StateTable-Info' elevation={Elevation.ONE}>
           {...getSettingsInfo(this.state.data || {})}
-        </div>
+        </Card>
       );
   }
 
-  public renderTeamsInfo(): JSX.Element | null {
+  private renderTeamsInfo(): JSX.Element | null {
     const { data } = this.state;
     const teams = data ? Object.keys(data).map((k) => data[k]) : null;
 
@@ -186,31 +168,31 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
     });
 
     return (
-        <div className='StateTable-Info'>
+        <Card className='StateTable-Info' elevation={Elevation.TWO}>
           This user has {teams.length} teams: <ul>{teamLinks}</ul>.
-        </div>
+        </Card>
       );
   }
 
-  public renderNotifsInfo(): JSX.Element | null {
+  private renderNotifsInfo(): JSX.Element | null {
     const { data } = this.state;
 
     if (!Array.isArray(data) || data.length === 0) {
       return (
-        <div className='StateTable-Warning-Info'>
+        <Card className='StateTable-Info'>
           No notification warnings were found!
-        </div>
+        </Card>
       );
     }
 
     return (
-      <div className='StateTable-Warning-Info'>
+      <Card className='StateTable-Info'>
         {...getNotifWarningsInfo(data || {})}
-      </div>
+      </Card>
     );
   }
 
-  public renderInfo(): JSX.Element | null {
+  private renderInfo(): JSX.Element | null {
     const type = this.getFileType();
 
     if (type === 'teams') {
@@ -226,33 +208,16 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
     return null;
   }
 
-  public render(): JSX.Element {
-    const { data, path } = this.state;
+  private isStateFile(file?: ProcessedLogFile | MergedLogFile | UnzippedFile): file is UnzippedFile {
+    const _file = file as UnzippedFile;
+    return !!_file.fullPath;
+  }
 
-    if (!data && !path) {
-      return <div />;
-    }
+  private isHtmlFile(file: UnzippedFile) {
+    return file.fullPath.endsWith('.html');
+  }
 
-    const theme = this.getTheme();
-    const info = this.renderInfo();
-    const onIFrameLoad = function(this: HTMLIFrameElement) {
-      if (this) {
-        const { document: idoc } = this.contentWindow!;
-        this.height = `${idoc.body.scrollHeight}px`;
-      }
-    };
-
-    const content = (!data && path)
-      ? <iframe sandbox='' onLoad={onIFrameLoad} src={path} />
-      : <JSONTree data={data} theme={theme} />;
-
-    return (
-      <div className='StateTable' style={{ fontFamily: this.props.state.font }}>
-        <div className='StateTable-Content'>
-          {info}
-          {content}
-        </div>
-      </div>
-    );
+  private isNotifsFile(file: UnzippedFile) {
+    return file.fullPath.endsWith('notification-warnings.json');
   }
 }
