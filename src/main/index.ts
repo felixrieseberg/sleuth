@@ -30,7 +30,7 @@ if (require('electron-squirrel-startup')) {
       height: mainWindowState.height,
       show: !!config.isDevMode,
       minHeight: 500,
-      minWidth: 1000,
+      minWidth: 1170,
       titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : undefined,
       webPreferences: {
         webviewTag: false

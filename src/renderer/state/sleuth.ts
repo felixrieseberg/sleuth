@@ -53,6 +53,13 @@ export class SleuthState {
         document.body.classList.remove('bp3-dark');
       }
     });
+    autorun(() => {
+      if (this.isSidebarOpen) {
+        document.body.classList.add('SidebarOpen');
+      } else {
+        document.body.classList.remove('SidebarOpen');
+      }
+    });
   }
 
   @action

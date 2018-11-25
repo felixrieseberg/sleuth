@@ -1,7 +1,18 @@
 import { observer } from 'mobx-react';
 import React from 'react';
 import debounce from 'debounce';
-import { Alignment, Button, Classes, NavbarDivider, NavbarGroup, ButtonGroup, InputGroup } from '@blueprintjs/core';
+import {
+  Alignment,
+  Button,
+  Classes,
+  NavbarDivider,
+  NavbarGroup,
+  ButtonGroup,
+  InputGroup,
+  Popover,
+  Menu,
+  Position
+} from '@blueprintjs/core';
 import { DateRangeInput } from '@blueprintjs/datetime';
 
 import { SleuthState } from '../state/sleuth';
@@ -22,6 +33,7 @@ export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
     this.toggleSearchResultVisibility = this.toggleSearchResultVisibility.bind(this);
     this.onSearchChange = debounce(this.onSearchChange.bind(this), 700);
     this.onDateRangeChange = this.onDateRangeChange.bind(this);
+    this.renderFilter = this.renderFilter.bind(this);
   }
 
   public onSearchChange(value: string) {
@@ -51,10 +63,51 @@ export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
     this.props.state.showOnlySearchResults = !this.props.state.showOnlySearchResults;
   }
 
+  public renderFilter() {
+    const { error, warn, info, debug } = this.props.state.levelFilter!;
+
+    const menu = (
+      <Menu>
+        <Menu.Item
+          active={warn}
+          onClick={() => this.onFilterToggle('warn')}
+          icon='warning-sign'
+          shouldDismissPopover={false}
+          text='Warning'
+        />
+        <Menu.Item
+          active={info}
+          onClick={() => this.onFilterToggle('info')}
+          icon='info-sign'
+          shouldDismissPopover={false}
+          text='Info'
+        />
+        <Menu.Item
+          active={error}
+          onClick={() => this.onFilterToggle('error')}
+          icon='error'
+          shouldDismissPopover={false}
+          text='Error'
+        />
+        <Menu.Item
+          active={debug}
+          onClick={() => this.onFilterToggle('debug')}
+          icon='code'
+          shouldDismissPopover={false}
+          text='Debug'
+        />
+      </Menu>
+    );
+
+    return (
+      <Popover content={menu} position={Position.BOTTOM}>
+        <Button icon='filter-list' text='Filter'/>
+      </Popover>
+    );
+  }
 
   public render() {
     const { showOnlySearchResults, dateRange } = this.props.state;
-    const { error, warn, info, debug } = this.props.state.levelFilter!;
 
     const showOnlySearchResultsButton = (
       <Button
@@ -66,33 +119,32 @@ export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
     );
 
     return (
-      <NavbarGroup align={Alignment.RIGHT}>
-        <ButtonGroup>
-          <Button active={error} onClick={() => this.onFilterToggle('error')} icon='error' text='Error' />
-          <Button active={warn} onClick={() => this.onFilterToggle('warn')} icon='warning-sign' text='Warning' />
-          <Button active={info} onClick={() => this.onFilterToggle('info')} icon='info-sign' text='Info' />
-          <Button active={debug} onClick={() => this.onFilterToggle('debug')} icon='code' text='Debug' />
-        </ButtonGroup>
-        <NavbarDivider />
-        <DateRangeInput
-          formatDate={(date) => date.toLocaleString()}
-          onChange={this.onDateRangeChange}
-          parseDate={(str) => new Date(str)}
-          value={[ dateRange.from, dateRange.to ]}
-        />
-        <NavbarDivider />
-        <InputGroup
-          leftIcon='search'
-          placeholder='Search'
-          rightElement={showOnlySearchResultsButton}
-          onChange={(e: React.FormEvent) => this.onSearchChange((e.target as any).value)}
-        />
-        <NavbarDivider />
-        <ButtonGroup>
-          <Button icon='arrow-left' onClick={() => this.onSearchIndexChange(-1)} />
-          <Button icon='arrow-right' onClick={() => this.onSearchIndexChange(1)} />
-        </ButtonGroup>
-      </NavbarGroup>
+      <>
+        <NavbarGroup className='FilterGroup'>
+          {this.renderFilter()}
+        </NavbarGroup>
+        <NavbarGroup className='SearchGroup'>
+          <NavbarDivider />
+          <DateRangeInput
+            formatDate={(date) => date.toLocaleString()}
+            onChange={this.onDateRangeChange}
+            parseDate={(str) => new Date(str)}
+            value={[ dateRange.from, dateRange.to ]}
+          />
+          <NavbarDivider />
+          <InputGroup
+            leftIcon='search'
+            placeholder='Search'
+            rightElement={showOnlySearchResultsButton}
+            onChange={(e: React.FormEvent) => this.onSearchChange((e.target as any).value)}
+          />
+          <NavbarDivider />
+          <ButtonGroup>
+            <Button icon='arrow-left' onClick={() => this.onSearchIndexChange(-1)} />
+            <Button icon='arrow-right' onClick={() => this.onSearchIndexChange(1)} />
+          </ButtonGroup>
+        </NavbarGroup>
+      </>
     );
   }
 }
