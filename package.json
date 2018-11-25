@@ -8,6 +8,7 @@
     "tsc": "tsc -p tsconfig.json",
     "lint": "tslint -c tslint.json -p tsconfig.json",
     "package": "electron-forge package",
+    "make": "electron-forge make",
     "parcel:build": "node ./tools/parcel-build.js",
     "parcel:watch": "node ./tools/parcel-watch.js",
     "publish": "electron-forge publish",
