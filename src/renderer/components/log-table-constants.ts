@@ -53,19 +53,3 @@ export interface SortFilterListOptions {
   showOnlySearchResults?: boolean;
   dateRange?: DateRange;
 }
-
-export const COLUMN_TITLES = {
-  index: '#',
-  line: 'Line',
-  timestamp: 'Timestamp',
-  level: 'Level',
-  message: 'Message'
-};
-
-export const COLUMN_WIDTHS = {
-  index: 70,
-  level: 70,
-  timestamp: 220,
-  line: 70,
-  message: 300
-};

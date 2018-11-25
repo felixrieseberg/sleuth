@@ -20,7 +20,6 @@ const DateTimeSelect = Select.ofType<string>();
 const EditorSelect = Select.ofType<Editor>();
 
 export interface PreferencesState {
-  isCooperButtonLoading: boolean;
   isOpen: boolean;
 }
 

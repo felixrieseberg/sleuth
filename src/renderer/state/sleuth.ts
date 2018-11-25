@@ -45,7 +45,10 @@ export class SleuthState {
   @observable public defaultEditor: string = this.retrieve<string>('defaultEditor', false)!;
 
 
-  constructor(public readonly openFile: (file: string) => void) {
+  constructor(
+    public readonly openFile: (file: string) => void,
+    public readonly resetApp: () => void
+  ) {
     this.getSuggestions();
 
     // Setup autoruns
@@ -69,6 +72,7 @@ export class SleuthState {
       }
     });
 
+    this.reset = this.reset.bind(this);
     this.toggleDarkMode = this.toggleDarkMode.bind(this);
     this.toggleSidebar = this.toggleSidebar.bind(this);
     this.toggleSpotlight = this.toggleSpotlight.bind(this);
@@ -102,7 +106,7 @@ export class SleuthState {
   }
 
   @action
-  public reset() {
+  public reset(goBackToHome: boolean = false) {
     this.selectedEntry = undefined;
     this.selectedLogFile = undefined;
     this.levelFilter.debug = false;
@@ -114,6 +118,10 @@ export class SleuthState {
     this.isSpotlightOpen = false;
     this.isDetailsVisible = false;
     this.dateRange = { from: undefined, to: undefined };
+
+    if (goBackToHome) {
+      this.resetApp();
+    }
   }
 
   /**

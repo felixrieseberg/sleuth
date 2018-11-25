@@ -73,6 +73,12 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
     this.processFiles();
   }
 
+  public render() {
+    return this.props.state.selectedLogFile
+      ? this.renderContent()
+      : this.renderLoading();
+  }
+
   /**
    * Take an array of processed files (for logs) or unzipped files (for state files)
    * and add them to the state of this component.
@@ -80,7 +86,7 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
    * @param {(Array<ProcessedLogFile|UnzippedFile>)} files
    * @param {string} logType
    */
-  public addFilesToState(files: Array<ProcessedLogFile|UnzippedFile>, logType: string) {
+  private addFilesToState(files: Array<ProcessedLogFile|UnzippedFile>, logType: string) {
     const { processedLogFiles } = this.state;
     const newProcessedLogFiles: ProcessedLogFiles = { ...processedLogFiles as ProcessedLogFiles };
     newProcessedLogFiles[logType] = newProcessedLogFiles[logType].concat(files);
@@ -93,7 +99,7 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
   /**
    * Process files - most of the work happens over in ../processor.ts.
    */
-  public async processFiles() {
+  private async processFiles() {
     const { unzippedFiles } = this.props;
 
     const sortedUnzippedFiles = getTypesForFiles(unzippedFiles);
@@ -138,7 +144,7 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
    *
    * @param {MergedLogFile} mergedFile
    */
-  public setMergedFile(mergedFile: MergedLogFile) {
+  private setMergedFile(mergedFile: MergedLogFile) {
     const { mergedLogFiles } = this.state;
     const newMergedLogFiles = { ...mergedLogFiles as MergedLogFiles };
 
@@ -150,7 +156,7 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
   /**
    * Kick off merging of all the log files
    */
-  public async processMergeFiles() {
+  private async processMergeFiles() {
     const { processedLogFiles } = this.state;
 
     if (processedLogFiles) {
@@ -172,7 +178,7 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
    * @param {ProcessedLogFile} logFile
    * @param {string} [logType]
    */
-  public selectLogFile(logFile: ProcessedLogFile | UnzippedFile | null, logType?: string): void {
+  private selectLogFile(logFile: ProcessedLogFile | UnzippedFile | null, logType?: string): void {
     if (!logFile && logType) {
       const { mergedLogFiles } = this.state;
 
@@ -194,7 +200,7 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
    *
    * @returns {string}
    */
-  public getSelectedFileName(): string {
+  private getSelectedFileName(): string {
     const { selectedLogFile } = this.props.state;
 
     if (isProcessedLogFile(selectedLogFile)) {
@@ -213,7 +219,7 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
    *
    * @returns {number} Percentage loaded
    */
-  public getPercentageLoaded(): number {
+  private getPercentageLoaded(): number {
     const { unzippedFiles } = this.props;
     const processedLogFiles = this.state.processedLogFiles || {};
     const alreadyLoaded = Object.keys(processedLogFiles)
@@ -227,9 +233,9 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
   /**
    * Real quick: Are we loaded yet?
    *
-   * @returns
+   * @returns {MergedFilesLoadStatus}
    */
-  public getMergedFilesStatus(): MergedFilesLoadStatus {
+  private getMergedFilesStatus(): MergedFilesLoadStatus {
     const { mergedLogFiles } = this.state;
 
     return {
@@ -242,7 +248,12 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
     };
   }
 
-  public renderSidebarSpotlight() {
+  /**
+   * Renders both the sidebar as well as the Spotlight-like omnibar.
+   *
+   * @returns {JSX.Element}
+   */
+  private renderSidebarSpotlight(): JSX.Element {
     const { processedLogFiles } = this.state;
     const selectedLogFileName = this.getSelectedFileName();
     const mergedFilesStatus = this.getMergedFilesStatus();
@@ -265,13 +276,12 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
     );
   }
 
-  public renderHeader() {
-    return (
-      <AppCoreHeader state={this.props.state} />
-    );
-  }
-
-  public renderLoading() {
+  /**
+   * Render the loading indicator.
+   *
+   * @returns {JSX.Element}
+   */
+  private renderLoading() {
     const { loadingMessage } = this.state;
     const percentageLoaded = this.getPercentageLoaded();
 
@@ -284,7 +294,12 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
     );
   }
 
-  public renderContent() {
+  /**
+   * Render the actual content (when loaded).
+   *
+   * @returns {JSX.Element}
+   */
+  private renderContent(): JSX.Element {
     const { isSidebarOpen } = this.props.state;
     const logContentClassName = classNames({ isSidebarOpen });
 
@@ -298,11 +313,5 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
         </div>
       </div>
     );
-  }
-
-  public render() {
-    return this.props.state.selectedLogFile
-      ? this.renderContent()
-      : this.renderLoading();
   }
 }

@@ -1,5 +1,4 @@
 import { SleuthState } from '../state/sleuth';
-import { UserPreferences } from '../interfaces';
 import { shouldIgnoreFile } from '../../utils/should-ignore-file';
 import React from 'react';
 import { ipcRenderer, remote } from 'electron';
@@ -13,16 +12,14 @@ import { CoreApplication } from './app-core';
 import { MacTitlebar } from './mac-titlebar';
 import { Preferences } from './preferences';
 import { AppMenu } from '../menu';
-import { Spotlight } from './spotlight';
 
 const debug = require('debug')('sleuth:app');
 
 export interface AppState {
   unzippedFiles: UnzippedFiles;
-  userPreferences: UserPreferences;
 }
 
-export class App extends React.Component<undefined, Partial<AppState>> {
+export class App extends React.Component<{}, Partial<AppState>> {
   public readonly menu: AppMenu = new AppMenu();
   public readonly sleuthState: SleuthState;
 
@@ -38,16 +35,16 @@ export class App extends React.Component<undefined, Partial<AppState>> {
     this.openFile = this.openFile.bind(this);
     this.reset = this.reset.bind(this);
 
-    this.sleuthState = new SleuthState(this.openFile);
+    this.sleuthState = new SleuthState(this.openFile, this.reset);
   }
 
   /**
    * Should this component update?
    *
-   * @param {undefined} _nextProps
+   * @param {{}} _nextProps
    * @param {AppState} nextState
    */
-  public shouldComponentUpdate(_nextProps: undefined, nextState: AppState) {
+  public shouldComponentUpdate(_nextProps: {}, nextState: AppState) {
     const currentFiles = this.state.unzippedFiles || [];
     const nextFiles = nextState.unzippedFiles || [];
 
@@ -174,11 +171,9 @@ export class App extends React.Component<undefined, Partial<AppState>> {
     const { unzippedFiles } = this.state;
     const className = classNames('App', { Darwin: process.platform === 'darwin' });
     const titleBar = process.platform === 'darwin' ? <MacTitlebar /> : '';
-    let content: JSX.Element | null = <Welcome state={this.sleuthState} />;
-
-    if (unzippedFiles && unzippedFiles.length > 0) {
-      content = <CoreApplication state={this.sleuthState} unzippedFiles={unzippedFiles} />;
-    }
+    const content = unzippedFiles && unzippedFiles.length
+      ? <CoreApplication state={this.sleuthState} unzippedFiles={unzippedFiles} />
+      : <Welcome state={this.sleuthState} />;
 
     return (
       <div className={className}>

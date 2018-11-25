@@ -2,7 +2,6 @@ import { observer } from 'mobx-react';
 import React from 'react';
 import debounce from 'debounce';
 import {
-  Alignment,
   Button,
   Classes,
   NavbarDivider,

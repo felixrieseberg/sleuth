@@ -1,7 +1,6 @@
 import { observer } from 'mobx-react';
 import { SleuthState } from '../state/sleuth';
 import React from 'react';
-import { remote } from 'electron';
 import { Alignment, Button, ButtonGroup, Navbar, NavbarGroup } from '@blueprintjs/core';
 
 import { Filter } from './app-core-header-filter';
@@ -14,16 +13,6 @@ export interface AppCoreHeaderState {}
 
 @observer
 export class AppCoreHeader extends React.Component<AppCoreHeaderProps, AppCoreHeaderState> {
-  constructor(props: AppCoreHeaderProps) {
-    super(props);
-
-    this.refresh = this.refresh.bind(this);
-  }
-
-  public refresh() {
-    remote.getCurrentWindow().reload();
-  }
-
   public render() {
     const {
       isSidebarOpen,
@@ -31,7 +20,8 @@ export class AppCoreHeader extends React.Component<AppCoreHeaderProps, AppCoreHe
       isSpotlightOpen,
       toggleDarkMode,
       toggleSidebar,
-      toggleSpotlight
+      toggleSpotlight,
+      reset
     } = this.props.state;
     const sidebarIcon = isSidebarOpen ? 'menu-closed' : 'menu-open';
 
@@ -39,7 +29,7 @@ export class AppCoreHeader extends React.Component<AppCoreHeaderProps, AppCoreHe
       <Navbar className='AppHeader'>
         <NavbarGroup align={Alignment.LEFT}>
           <ButtonGroup>
-            <Button onClick={this.refresh} icon='home' />
+            <Button onClick={() => reset(true)} icon='home' />
             <Button active={!isSidebarOpen} onClick={toggleSidebar} icon={sidebarIcon} />
             <Button active={isDarkMode} onClick={toggleDarkMode} icon='moon' />
             <Button active={isSpotlightOpen} onClick={toggleSpotlight} icon='geosearch' />

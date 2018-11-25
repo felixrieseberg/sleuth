@@ -9,15 +9,12 @@ import { Icon } from '@blueprintjs/core';
 
 import { LevelFilter, LogEntry, DateRange } from '../interfaces';
 import { didFilterChange } from '../../utils/did-filter-change';
-import { Alert } from './alert';
 import { isReduxAction } from '../../utils/is-redux-action';
 import {
   LogTableProps,
   LogTableState,
-  COLUMN_WIDTHS,
   SORT_DIRECTION,
   SortFilterListOptions,
-  COLUMN_TITLES,
   RowClickEvent
 } from './log-table-constants';
 
@@ -41,9 +38,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
       sortBy: 'index',
       sortDirection: SORT_DIRECTION.DESC,
       searchList: [],
-      ignoreSearchIndex: false,
-      columnWidths: COLUMN_WIDTHS,
-      columnOrder: Object.keys(COLUMN_TITLES)
+      ignoreSearchIndex: false
     };
 
     autoBind(this);
@@ -58,7 +53,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    */
   public shouldComponentUpdate(nextProps: LogTableProps, nextState: LogTableState): boolean {
     const { dateTimeFormat, levelFilter, logFile, searchIndex, dateRange } = this.props;
-    const { sortBy, sortDirection, sortedList, searchList, selectedIndex, columnWidths, columnOrder } = this.state;
+    const { sortBy, sortDirection, sortedList, searchList, selectedIndex } = this.state;
 
     // Selected row changed
     if (selectedIndex !== nextState.selectedIndex) return true;
@@ -69,12 +64,6 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     // Sort direction changed
     const newSort = (nextState.sortBy !== sortBy || nextState.sortDirection !== sortDirection);
     if (newSort) return true;
-
-    // Column widths changed
-    if (columnWidths !== nextState.columnWidths) return true;
-
-    // Column order changed
-    if (columnOrder !== nextState.columnOrder) return true;
 
     // File changed - and update is in order
     const nextFile = nextProps.logFile;
@@ -166,11 +155,32 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
   }
 
   /**
+   * The main render method
+   *
+   * @returns {(JSX.Element | null)}
+   * @memberof LogTable
+   */
+  public render(): JSX.Element | null {
+    const { logFile } = this.props;
+
+    const typeClassName = logFile.type === 'MergedLogFile' ? 'Merged' : 'Single';
+    const className = classNames('LogTable', 'bp3-text-muted', typeClassName);
+
+    return (
+      <div className={className}>
+        <div className='Sizer'>
+          <AutoSizer>{(options: any) => this.renderTable(options)}</AutoSizer>
+        </div>
+      </div>
+    );
+  }
+
+  /**
    * Handles a single click onto a row
    *
    * @param {RowClickEvent} { index }
    */
-  public onRowClick({ index }: RowClickEvent) {
+  private onRowClick({ index }: RowClickEvent) {
     const selectedEntry = this.state.sortedList![index] || null;
 
     this.props.state.selectedEntry = selectedEntry;
@@ -189,7 +199,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    * @param {string} sortBy
    * @param {string} sortDirection
    */
-  public onSortChange(
+  private onSortChange(
     { sortBy, sortDirection }: { sortBy: string, sortDirection: SORT_DIRECTION }
   ) {
     const currentState = this.state;
@@ -205,7 +215,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    *
    * @param {number} change
    */
-  public changeSelection(change: number) {
+  private changeSelection(change: number) {
     const { selectedIndex } = this.state;
 
     if (selectedIndex || selectedIndex === 0) {
@@ -238,7 +248,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    *
    * @returns {boolean}
    */
-  public shouldFilter(filter?: LevelFilter): boolean {
+  private shouldFilter(filter?: LevelFilter): boolean {
     filter = filter || this.props.levelFilter;
 
     if (!filter) return false;
@@ -255,7 +265,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    * @param {Array<LogEntry>} list
    * @returns Array<LogEntry>
    */
-  public doSearchFilter(search: string, list: Array<LogEntry>): Array<LogEntry> {
+  private doSearchFilter(search: string, list: Array<LogEntry>): Array<LogEntry> {
     let searchRegex = new RegExp(search || '', 'i');
 
     function doSearch(a: LogEntry) { return (!search || searchRegex.test(a.message)); }
@@ -283,7 +293,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    * @param {Array<LogEntry>} list
    * @returns Array<number>
    */
-  public doSearchIndex(search: string, list: Array<LogEntry>): Array<number> {
+  private doSearchIndex(search: string, list: Array<LogEntry>): Array<number> {
     let searchRegex = new RegExp(search || '', 'i');
     const foundIndices: Array<number> = [];
 
@@ -311,7 +321,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     return foundIndices;
   }
 
-  public doRangeFilter({ from, to }: DateRange, list: Array<LogEntry>): Array<LogEntry> {
+  private doRangeFilter({ from, to }: DateRange, list: Array<LogEntry>): Array<LogEntry> {
     if (!from || !to) return list;
 
     const fromTs = from.getTime();
@@ -326,7 +336,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
   /**
    * Sorts the list
    */
-  public sortFilterList(options: SortFilterListOptions = {}): Array<LogEntry> {
+  private sortFilterList(options: SortFilterListOptions = {}): Array<LogEntry> {
     const logFile = options.logFile || this.props.logFile;
     const filter = options.filter || this.props.levelFilter;
     const search = options.search !== undefined ? options.search : this.props.search;
@@ -391,27 +401,12 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
   }
 
   /**
-   * Checks if we're looking at a web app log and returns a warning, so that users know
-   * the app didn't all over
-   *
-   * @returns {(JSX.Element | null)}
-   */
-  public renderWebAppWarning(): JSX.Element | null {
-    const { logFile } = this.props;
-
-    const text = `The web app logs are difficult to parse for a computer - proceed with caution. Combined view is disabled. Click to dismiss.`;
-    return logFile.logType === 'webapp'
-      ? <Alert state={this.props.state} text={text} level='warning' />
-      : null;
-  }
-
-  /**
    * Renders the "message" cell
    *
    * @param {any} { cellData, columnData, dataKey, rowData, rowIndex }
    * @returns {(JSX.Element | string)}
    */
-  public messageCellRenderer({ rowData: entry }: TableCellProps): JSX.Element | string {
+  private messageCellRenderer({ rowData: entry }: TableCellProps): JSX.Element | string {
     if (entry && entry.meta) {
       const icon = isReduxAction(entry.message)
         ? <Icon icon='diagram-tree' />
@@ -435,7 +430,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    * @param {any} { cellData, columnData, dataKey, rowData, rowIndex }
    * @returns {JSX.Element}
    */
-  public timestampCellRenderer({ rowData: entry }: TableCellProps): JSX.Element | string {
+  private timestampCellRenderer({ rowData: entry }: TableCellProps): JSX.Element | string {
     const { dateTimeFormat } = this.props;
     const timestamp = entry.momentValue
       ? format(entry.momentValue, dateTimeFormat)
@@ -464,7 +459,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    * @returns
    * @memberof LogTable
    */
-  public rowGetter({ index }: { index: number }): LogEntry {
+  private rowGetter({ index }: { index: number }): LogEntry {
     return this.state.sortedList![index];
   }
 
@@ -475,7 +470,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    * @param {Array<LogEntry>} sortedList
    * @returns {JSX.Element}
    */
-  public renderTable(options: any): JSX.Element {
+  private renderTable(options: any): JSX.Element {
     const { sortedList, selectedIndex, searchList, ignoreSearchIndex, scrollToSelection } = this.state;
     const { searchIndex } = this.props;
 
@@ -529,29 +524,6 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
           flexGrow={2}
         />
       </Table>
-    );
-  }
-
-  /**
-   * The main render method
-   *
-   * @returns {(JSX.Element | null)}
-   * @memberof LogTable
-   */
-  public render(): JSX.Element | null {
-    const { logFile } = this.props;
-
-    const typeClassName = logFile.type === 'MergedLogFile' ? 'Merged' : 'Single';
-    const className = classNames('LogTable', 'bp3-text-muted', typeClassName);
-    const warning = this.renderWebAppWarning();
-
-    return (
-      <div className={className}>
-        {warning}
-        <div className={classNames('Sizer', { HasWarning: !!warning })}>
-          <AutoSizer>{(options: any) => this.renderTable(options)}</AutoSizer>
-        </div>
-      </div>
     );
   }
 

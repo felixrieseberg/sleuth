@@ -8,7 +8,8 @@ import { MenuItem } from '@blueprintjs/core';
 import { SleuthState } from '../state/sleuth';
 import { ProcessedLogFiles, SelectLogFileFn, ProcessedLogFile } from '../interfaces';
 import { UnzippedFile } from '../unzip';
-import { isProcessedFile } from '../../utils/is-processed-file';
+import { isProcessedLogFile } from '../../utils/is-logfile';
+import { highlightText } from '../../utils/highlight-text';
 
 interface SpotlightItem { text: string; label?: string; click: () => void; }
 const SleuthOmnibar = Omnibar.ofType<SpotlightItem>();
@@ -23,7 +24,7 @@ export const renderItem: ItemRenderer<SpotlightItem>
       <MenuItem
         active={modifiers.active}
         disabled={modifiers.disabled}
-        text={text}
+        text={highlightText(text, query)}
         key={text}
         onClick={handleClick}
         label={label || ''}
@@ -96,7 +97,7 @@ export class Spotlight extends React.Component<SpotlightProps, Partial<Spotlight
     Object.keys(logFiles).forEach((key) => {
       const keyFiles: Array<ProcessedLogFile | UnzippedFile> = logFiles[key];
       keyFiles.forEach((logFile) => {
-        if (isProcessedFile(logFile)) {
+        if (isProcessedLogFile(logFile)) {
           logFileSuggestions.push({
             text: logFile.logFile.fileName,
             label: `${logFile.logEntries.length} entries`,

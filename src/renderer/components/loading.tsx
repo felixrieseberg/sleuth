@@ -6,26 +6,24 @@ export interface LoadingProps {
   message?: string;
 }
 
-export interface LoadingState {}
+/**
+ * Sleuth's loading indicator. Used only during processing.
+ *
+ * @param {LoadingProps} props
+ * @returns {JSX.Element}
+ */
+export const Loading = (props: LoadingProps) => {
+  const { percentage, message } = props;
 
-export class Loading extends React.Component<LoadingProps, LoadingState> {
-  constructor(props: LoadingProps) {
-    super(props);
+  if (percentage === 100) {
+    return <div />;
   }
 
-  public render(): JSX.Element {
-    const { percentage, message } = this.props;
-
-    if (percentage === 100) {
-      return <div />;
-    }
-
-    return (
-      <div className='Loading'>
-        <ProgressBar animate={false} value={percentage! / 100} />
-        <br />
-        <p>{message}</p>
-      </div>
-    );
-  }
-}
+  return (
+    <div className='Loading'>
+      <ProgressBar animate={false} value={percentage! / 100} />
+      <br />
+      <p>{message}</p>
+    </div>
+  );
+};

@@ -17,7 +17,7 @@ export const DATE_TIME_FORMATS = [
 
 export const renderDateTimeItem: ItemRenderer<string> = (input, { handleClick, modifiers }) => {
   if (!modifiers.matchesPredicate) {
-      return null;
+    return null;
   }
 
   return (

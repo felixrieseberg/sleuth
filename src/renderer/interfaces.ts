@@ -124,12 +124,6 @@ export interface LevelFilter {
   warn: boolean;
 }
 
-export interface UserPreferences {
-  dateTimeFormat: string;
-  defaultEditor: string;
-  font: string;
-}
-
 export interface Suggestion extends fs.Stats {
   age: string;
 }

@@ -6,8 +6,9 @@ import { observer } from 'mobx-react';
 
 import { UnzippedFile } from '../unzip';
 import { MergedFilesLoadStatus, ProcessedLogFile, ProcessedLogFiles, SelectLogFileFn } from '../interfaces';
-import { levelsHave } from '../../utils/levelcounts';
+import { levelsHave } from '../../utils/level-counts';
 import { SleuthState } from '../state/sleuth';
+import { isProcessedLogFile } from '../../utils/is-logfile';
 
 export interface SidebarProps {
   logFiles: ProcessedLogFiles;
@@ -95,21 +96,19 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
     nodes[5].childNodes = logFiles.webapp.map((file) => Sidebar.getFileNode(file, props));
     nodes[6].childNodes = logFiles.call.map((file) => Sidebar.getFileNode(file, props));
 
-    return {
-      nodes
-    };
+    return { nodes };
   }
 
-  public static getFileNode(file: ProcessedLogFile | UnzippedFile, props: SidebarProps): ITreeNode {
-    if ((file as ProcessedLogFile).type === 'ProcessedLogFile') {
-      // It's a log file
-      return Sidebar.getLogFileNode(file as ProcessedLogFile, props);
-    } else {
-      // it's a state file
-      return Sidebar.getStateFileNode(file as UnzippedFile, props);
-    }
-  }
-
+  /**
+   * Returns a generic tree node, given all the parameters.
+   *
+   * @static
+   * @param {string} id
+   * @param {*} nodeData
+   * @param {boolean} isSelected
+   * @param {Partial<ITreeNode>} [options={}]
+   * @returns {ITreeNode}
+   */
   public static getNode(
     id: string, nodeData: any, isSelected: boolean, options: Partial<ITreeNode> = {}
   ): ITreeNode {
@@ -123,6 +122,28 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
     };
   }
 
+  /**
+   * Get a single tree node for a file.
+   *
+   * @static
+   * @param {(ProcessedLogFile | UnzippedFile)} file
+   * @param {SidebarProps} props
+   * @returns {ITreeNode}
+   */
+  public static getFileNode(file: ProcessedLogFile | UnzippedFile, props: SidebarProps): ITreeNode {
+    return isProcessedLogFile(file)
+      ? Sidebar.getLogFileNode(file as ProcessedLogFile, props)
+      : Sidebar.getStateFileNode(file as UnzippedFile, props);
+  }
+
+  /**
+   * Returns a single tree node for an UnzippedFile (which are state files).
+   *
+   * @static
+   * @param {UnzippedFile} file
+   * @param {SidebarProps} props
+   * @returns {ITreeNode}
+   */
   public static getStateFileNode(file: UnzippedFile, props: SidebarProps): ITreeNode {
     const {  selectedLogFileName } = props;
     const isSelected = (selectedLogFileName === file.fileName);
@@ -140,6 +161,14 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
     return Sidebar.getNode(label, { file }, isSelected);
   }
 
+  /**
+   * Returns a single tree node for a ProcessedLogFile (all log files, not state files).
+   *
+   * @static
+   * @param {ProcessedLogFile} file
+   * @param {SidebarProps} props
+   * @returns {ITreeNode}
+   */
   public static getLogFileNode(file: ProcessedLogFile, props: SidebarProps): ITreeNode {
     const { selectedLogFileName } = props;
     const isSelected = (selectedLogFileName === file.logFile.fileName);
@@ -148,6 +177,14 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
     return Sidebar.getNode(file.logFile.fileName, { file }, isSelected, options);
   }
 
+  /**
+   * Renders the little warning hint to the right of the file - if the
+   * file contains any errors.
+   *
+   * @static
+   * @param {ProcessedLogFile} file
+   * @returns {(JSX.Element | null)}
+   */
   public static getNodeHint(file: ProcessedLogFile): JSX.Element | null {
     const { levelCounts } = file;
 
@@ -185,32 +222,30 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
     return isEqual(this.state, nextState) || isEqual(this.props, nextProps);
   }
 
-  public getLogFileNames(logFiles: ProcessedLogFiles) {
-    const getNames = (ob: Array<ProcessedLogFile>) => {
-      return ob.map((l) => l && l.logFile && l.logFile.fileName ? l.logFile.fileName : null)
-        .filter((e) => e);
-    };
+  public render(): JSX.Element {
+    const { isSidebarOpen } = this.props.state;
+    const className = classNames('Sidebar', { Open: isSidebarOpen });
 
-    if (!logFiles) {
-      return {
-        browser: [],
-        renderer: [],
-        webapp: [],
-        preload: [],
-        call: []
-      };
-    }
-
-    return {
-      browser: getNames(logFiles.browser),
-      renderer: getNames(logFiles.renderer),
-      webapp: getNames(logFiles.webapp),
-      preload: getNames(logFiles.preload),
-      call: getNames(logFiles.call)
-    };
+    return (
+      <div className={className}>
+        <Tree
+          contents={this.state.nodes}
+          onNodeClick={this.handleNodeClick}
+          onNodeCollapse={this.handleNodeCollapse}
+          onNodeExpand={this.handleNodeExpand}
+        />
+      </div>
+    );
   }
 
-  public forEachNode(nodes: Array<ITreeNode>, callback: (node: ITreeNode) => void) {
+  /**
+   * Do an operation for all nodes in the tree.
+   *
+   * @private
+   * @param {Array<ITreeNode>} nodes
+   * @param {(node: ITreeNode) => void} callback
+   */
+  private forEachNode(nodes: Array<ITreeNode>, callback: (node: ITreeNode) => void) {
     for (const node of nodes) {
       callback(node);
 
@@ -220,7 +255,15 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
     }
   }
 
-  public handleNodeClick(node: ITreeNode, _nodePath: Array<number>, _e: React.MouseEvent<HTMLElement>) {
+  /**
+   * Handle a click on a single tree node.
+   *
+   * @private
+   * @param {ITreeNode} node
+   * @param {Array<number>} _nodePath
+   * @param {React.MouseEvent<HTMLElement>} _e
+   */
+  private handleNodeClick(node: ITreeNode, _nodePath: Array<number>, _e: React.MouseEvent<HTMLElement>) {
     const nodeData: any = node.nodeData;
 
     if (nodeData && nodeData.file) {
@@ -239,29 +282,25 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
     }
   }
 
-  public handleNodeCollapse(nodeData: ITreeNode) {
+  /**
+   * Handle the collapsing of a node (aka a folder).
+   *
+   * @private
+   * @param {ITreeNode} nodeData
+   */
+  private handleNodeCollapse(nodeData: ITreeNode) {
     nodeData.isExpanded = false;
     this.setState(this.state);
   }
 
-  public handleNodeExpand(nodeData: ITreeNode) {
+  /**
+   * Handle the expansion of a node (aka a folder).
+   *
+   * @private
+   * @param {ITreeNode} nodeData
+   */
+  private handleNodeExpand(nodeData: ITreeNode) {
     nodeData.isExpanded = true;
     this.setState(this.state);
-  }
-
-  public render(): JSX.Element {
-    const { isSidebarOpen } = this.props.state;
-    const className = classNames('Sidebar', { Open: isSidebarOpen });
-
-    return (
-      <div className={className}>
-        <Tree
-          contents={this.state.nodes}
-          onNodeClick={this.handleNodeClick}
-          onNodeCollapse={this.handleNodeCollapse}
-          onNodeExpand={this.handleNodeExpand}
-        />
-      </div>
-    );
   }
 }
