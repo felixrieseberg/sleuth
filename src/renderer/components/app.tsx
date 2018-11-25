@@ -169,7 +169,7 @@ export class App extends React.Component<undefined, Partial<AppState>> {
     const { unzippedFiles } = this.state;
     const className = classNames('App', { Darwin: process.platform === 'darwin' });
     const titleBar = process.platform === 'darwin' ? <MacTitlebar /> : '';
-    let content: JSX.Element | null = <Welcome openFile={this.openFile} />;
+    let content: JSX.Element | null = <Welcome state={sleuthState} openFile={this.openFile} />;
 
     if (unzippedFiles && unzippedFiles.length > 0) {
       content = <CoreApplication state={sleuthState} unzippedFiles={unzippedFiles} />;

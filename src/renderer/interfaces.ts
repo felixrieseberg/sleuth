@@ -1,4 +1,5 @@
 import { UnzippedFile } from './unzip';
+import fs from 'fs-extra';
 
 export type LogFile = UnzippedFile | MergedLogFile | ProcessedLogFile;
 
@@ -129,3 +130,4 @@ export interface UserPreferences {
   font: string;
 }
 
+export type Suggestions = Record<string, fs.Stats>;

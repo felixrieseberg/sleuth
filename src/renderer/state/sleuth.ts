@@ -1,6 +1,7 @@
 import { UnzippedFile } from '../unzip';
-import { LevelFilter, LogEntry, MergedLogFile, ProcessedLogFile, DateRange } from '../interfaces';
+import { LevelFilter, LogEntry, MergedLogFile, ProcessedLogFile, DateRange, Suggestions } from '../interfaces';
 import { observable, action, autorun } from 'mobx';
+import { getItemsInDownloadFolder } from '../suggestions';
 
 export const defaults = {
   dateTimeFormat: 'HH:mm:ss (DD/MM)',
@@ -23,6 +24,7 @@ export class SleuthState {
     warn: false
   };
 
+  @observable public suggestions: Suggestions = {};
   @observable public searchIndex: number = 0;
   @observable public search: string = '';
 
@@ -40,6 +42,8 @@ export class SleuthState {
   @observable public defaultEditor: string = this.retrieve<string>('defaultEditor', false)!;
 
   constructor() {
+    this.getSuggestions();
+
     // Setup autoruns
     autorun(() => this.save('dateTimeFormat', this.dateTimeFormat));
     autorun(() => this.save('font', this.font));
@@ -75,6 +79,11 @@ export class SleuthState {
   @action
   public toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;
+  }
+
+  @action
+  public async getSuggestions() {
+    this.suggestions = await getItemsInDownloadFolder();
   }
 
   /**
