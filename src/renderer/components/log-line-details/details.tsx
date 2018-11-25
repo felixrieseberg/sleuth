@@ -2,7 +2,7 @@ import { observer } from 'mobx-react';
 import { sleuthState, SleuthState } from '../../state/sleuth';
 import React from 'react';
 import classNames from 'classnames';
-import moment from 'moment';
+import { format } from 'date-fns';
 import { Card, Button, ButtonGroup, Tag, Elevation } from '@blueprintjs/core';
 
 import { LogEntry } from '../../interfaces';
@@ -74,7 +74,9 @@ export class LogLineDetails extends React.Component<LogLineDetailsProps, LogLine
   public renderLogEntry(logEntry: LogEntry): JSX.Element | null {
     const { level, logType, message, timestamp } = logEntry;
     const type = `${logType.charAt(0).toUpperCase() + logType.slice(1)} Process`;
-    const datetime = logEntry.momentValue ? moment(logEntry.momentValue).format('dddd, MMMM Do YYYY, h:mm:ss a') : timestamp;
+    const datetime = logEntry.momentValue
+      ? format(logEntry.momentValue, 'dddd, MMMM Do YYYY, h:mm:ss a')
+      : timestamp;
 
     return (
       <div className='Details-LogEntry'>

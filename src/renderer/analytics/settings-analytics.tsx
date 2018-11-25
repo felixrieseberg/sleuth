@@ -1,5 +1,5 @@
 import React from 'react';
-import moment from 'moment';
+import { distanceInWords } from 'date-fns';
 import { getLanguageNames } from '../../utils/iso639';
 
 export function getSettingsInfo(data: any): Array<JSX.Element> {
@@ -21,9 +21,13 @@ export function getMinWebInfo({ workspaceIdleTimeout }: any): string {
     return `No workspace idle timeout could be found.`;
   }
 
+  if (workspaceIdleTimeout === 'never') {
+    return `Workspaces are never considered idle.`;
+  }
+
   const intIdleTimeout = parseInt(workspaceIdleTimeout, 10);
-  const humanIdle = moment.duration(intIdleTimeout, 'milliseconds').humanize();
-  return `Workspaces are considered idle after ${humanIdle}.`;
+  const humanIdle = intIdleTimeout / 60 / 60 / 1000;
+  return `Workspaces are considered idle after ${humanIdle} hours.`;
 }
 
 export function getHWInfo({ isAeroGlassEnabled, platform, useHwAcceleration }: any): string {

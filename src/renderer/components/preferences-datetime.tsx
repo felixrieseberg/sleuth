@@ -1,7 +1,7 @@
 import { MenuItem } from '@blueprintjs/core';
 import { ItemRenderer, ItemPredicate } from '@blueprintjs/select';
 import React from 'react';
-import moment from 'moment';
+import { format } from 'date-fns';
 
 export const EXAMPLE_TIME = 1493475035123;
 
@@ -15,7 +15,7 @@ export const DATE_TIME_FORMATS = [
   'ddd, hA'
 ];
 
-export const renderDateTimeItem: ItemRenderer<string> = (format, { handleClick, modifiers }) => {
+export const renderDateTimeItem: ItemRenderer<string> = (input, { handleClick, modifiers }) => {
   if (!modifiers.matchesPredicate) {
       return null;
   }
@@ -24,14 +24,14 @@ export const renderDateTimeItem: ItemRenderer<string> = (format, { handleClick, 
     <MenuItem
       active={modifiers.active}
       disabled={modifiers.disabled}
-      key={format}
+      key={input}
       onClick={handleClick}
       text={format}
-      label={moment(EXAMPLE_TIME).format(format)}
+      label={format(EXAMPLE_TIME, input)}
     />
   );
 };
 
-export const filterDateTime: ItemPredicate<string> = (query, format) => {
-  return format.toLowerCase().includes(query.toLowerCase());
+export const filterDateTime: ItemPredicate<string> = (query, input) => {
+  return input.toLowerCase().includes(query.toLowerCase());
 };

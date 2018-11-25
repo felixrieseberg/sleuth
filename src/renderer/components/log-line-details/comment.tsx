@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react';
 import React from 'react';
-import moment from 'moment';
+import { format } from 'date-fns';
 import Markdown from 'markdown-it';
 import emoji from 'markdown-it-emoji';
 import highlight from 'markdown-it-highlightjs';
@@ -129,7 +129,7 @@ export class Comment extends React.Component<CommentProps, Partial<CommentState>
   public render(): JSX.Element {
     const { name, comment, avatar, timestamp } = this.props;
     const { isEditing } = this.state;
-    const time = moment(timestamp).format('MMMM Do YYYY');
+    const time = format(timestamp, ('MMMM Do YYYY');
     const avatarStyle = { backgroundImage: `url(${avatar})` };
     const editBtn = this.renderEditButton();
 

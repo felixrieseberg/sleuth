@@ -1,7 +1,7 @@
 import debounce from 'debounce';
 import React from 'react';
 import classNames from 'classnames';
-import moment from 'moment';
+import { format } from 'date-fns';
 import { default as keydown, Keys } from 'react-keydown';
 import autoBind from 'react-autobind';
 import { Table, AutoSizer, Column, TableCellProps } from 'react-virtualized';
@@ -436,7 +436,9 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    */
   public timestampCellRenderer({ rowData: entry }: TableCellProps): JSX.Element | string {
     const { dateTimeFormat } = this.props;
-    const timestamp = entry.momentValue ? moment(entry.momentValue).format(dateTimeFormat) : entry.timestamp;
+    const timestamp = entry.momentValue
+      ? format(entry.momentValue, dateTimeFormat)
+      : entry.timestamp;
     let prefix = <i className='Meta ts_icon ts_icon_question'/>;
 
     if (entry.logType === 'browser') {
