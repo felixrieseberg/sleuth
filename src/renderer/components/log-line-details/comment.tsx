@@ -1,12 +1,13 @@
-import { cooperComments } from '../../cooper/comments';
-import { SleuthState } from '../../state/sleuth';
 import { observer } from 'mobx-react';
 import React from 'react';
 import moment from 'moment';
-import Ladda from 'react-ladda';
 import Markdown from 'markdown-it';
 import emoji from 'markdown-it-emoji';
 import highlight from 'markdown-it-highlightjs';
+import { Button, Card } from '@blueprintjs/core';
+
+import { cooperComments } from '../../cooper/comments';
+import { SleuthState } from '../../state/sleuth';
 
 const markdown = new Markdown({ linkify: true })
   .use(highlight)
@@ -85,7 +86,7 @@ export class Comment extends React.Component<CommentProps, Partial<CommentState>
 
   public renderEdit() {
     const { isPosting, editValue } = this.state;
-    const buttonOptions = { className: 'btn', loading: isPosting, onClick: this.submitEdit };
+    const buttonOptions = { loading: isPosting, onClick: this.submitEdit };
 
     return (
       <form className='EditComment' onSubmit={this.submitEdit}>
@@ -94,9 +95,9 @@ export class Comment extends React.Component<CommentProps, Partial<CommentState>
           onChange={this.handleChange}
           value={editValue}
         />
-        <Ladda type='submit' {...buttonOptions}>
+        <Button type='submit' {...buttonOptions}>
           {editValue ? 'Save' : 'Delete'}
-        </Ladda>
+        </Button>
       </form>
     );
   }
@@ -134,7 +135,7 @@ export class Comment extends React.Component<CommentProps, Partial<CommentState>
 
     if (!isEditing) {
       return (
-        <div className='Comment'>
+        <Card className='Comment'>
           <div className='Avatar' style={avatarStyle} />
           <div className='Text'>
             <div>
@@ -144,7 +145,7 @@ export class Comment extends React.Component<CommentProps, Partial<CommentState>
             <div dangerouslySetInnerHTML={this.renderMarkdown(comment)} />
             {editBtn}
           </div>
-        </div>
+        </Card>
       );
     } else {
       return this.renderEdit();

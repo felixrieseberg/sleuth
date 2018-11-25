@@ -1,9 +1,10 @@
-import { SleuthState } from '../../state/sleuth';
 import { observer } from 'mobx-react';
 import React from 'react';
-import Ladda from 'react-ladda';
 import { remote } from 'electron';
+import { Card, FormGroup, Button, EditableText } from '@blueprintjs/core';
+
 import { cooperComments } from '../../cooper/comments';
+import { SleuthState } from '../../state/sleuth';
 
 const debug = require('debug')('sleuth:cooper');
 
@@ -33,11 +34,11 @@ export class PostComment extends React.Component<PostCommentProps, Partial<PostC
     this.onClick = this.onClick.bind(this);
   }
 
-  public handleChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
-    this.setState({ value: (e.target as HTMLTextAreaElement).value });
+  public handleChange(value: string) {
+    this.setState({ value });
   }
 
-  public onClick(e: React.FormEvent<HTMLFormElement>) {
+  public onClick(e: React.MouseEvent<HTMLButtonElement>) {
     const { line , lineId } = this.props;
     const { value } = this.state;
     const { selectedEntry } = this.props.state;
@@ -73,20 +74,27 @@ export class PostComment extends React.Component<PostCommentProps, Partial<PostC
   }
 
   public render() {
-    const { isPosting, value } = this.state;
-    const buttonOptions = { className: 'btn', loading: isPosting, onClick: this.onClick };
-
     return (
-      <form className='PostComment' onSubmit={this.onClick}>
-        <h4>Report Your Findings</h4>
-        <textarea
-          id='textarea'
-          onChange={this.handleChange}
-          value={value}
-          placeholder='Got some interesting information about this log line to share?'
-        />
-        <Ladda type='submit' {...buttonOptions}>Post</Ladda>
-      </form>
+      <Card className='PostComments'>
+        <FormGroup>
+          <h2>Report Your Findings</h2>
+          <EditableText
+            multiline={true}
+            placeholder='Got some interesting information about this log line to share?'
+            minLines={5}
+            value={this.state.value}
+            onChange={this.handleChange}
+          />
+          <Button
+            intent='primary'
+            icon='comment'
+            loading={this.state.isPosting}
+            onClick={this.onClick}
+          >
+            Post
+          </Button>
+        </FormGroup>
+      </Card>
     );
   }
 }

@@ -1,11 +1,14 @@
+import React from 'react';
+import autobind from 'react-autobind';
+import { observer } from 'mobx-react';
+import { FormGroup, InputGroup, Button, ControlGroup, Classes } from '@blueprintjs/core';
+
+import { cooperComments, IAuthor, IComment, IGetCommentResponse } from '../../cooper/comments';
+import { PostComment } from './post';
+import { Comment } from './comment';
 import { CooperSignInOutButton } from '../cooper/sign-in-out-button';
 import { lineToCooperLine } from '../../cooper/line-to-cooper-line';
 import { SleuthState, sleuthState } from '../../state/sleuth';
-import React from 'react';
-import { cooperComments, IAuthor, IComment, IGetCommentResponse } from '../../cooper/comments';
-import { observer } from 'mobx-react';
-import { PostComment } from './post';
-import { Comment } from './comment';
 
 const debug = require('debug')('sleuth:cooper');
 
@@ -18,27 +21,26 @@ export interface LogLineCommentsState {
   authors: Array<IAuthor>;
   line: string;
   lineId: string;
+  searchLine: string;
 }
 
 @observer
 export class LogLineComments extends React.Component<LogLineCommentsProps, Partial<LogLineCommentsState>> {
-  private lineChangeElement: HTMLInputElement;
-  private readonly refHandlers = {
-    lineChangeElement: (ref: HTMLInputElement) => this.lineChangeElement = ref,
-  };
-
   constructor(props: LogLineCommentsProps) {
     super(props);
+
+    const line = props.state.selectedEntry
+      ? lineToCooperLine.convert(props.state.selectedEntry.message)
+      : '';
 
     this.state = {
       comments: [],
       authors: [],
-      line: props.state.selectedEntry ? lineToCooperLine.convert(props.state.selectedEntry.message) : ''
+      line,
+      searchLine: line
     };
 
-    this.renderComment = this.renderComment.bind(this);
-    this.refresh = this.refresh.bind(this);
-    this.updateSearch = this.updateSearch.bind(this);
+    autobind(this);
 
     if (props.state.selectedEntry) {
       this.fetchComments(this.state.line, props.state.isCooperSignedIn, props.state.selectedEntry.logType);
@@ -54,22 +56,13 @@ export class LogLineComments extends React.Component<LogLineCommentsProps, Parti
 
     if (nextProps.state.selectedEntry && nextProps.state.selectedEntry.message || newSignInStatus && nextProps.state.selectedEntry) {
       const line = lineToCooperLine.convert(nextProps.state.selectedEntry.message);
-      this.setState({ line });
+      this.setState({ line, searchLine: line });
       this.fetchComments(line, nextProps.state.isCooperSignedIn, nextProps.state.selectedEntry.logType);
-
-      if (this.lineChangeElement) {
-        this.lineChangeElement.value = line;
-      }
     }
   }
 
   public updateSearch() {
-    const newLine = this.lineChangeElement ? this.lineChangeElement.value : null;
-
-    if (newLine) {
-      this.setState({ line: newLine });
-      this.fetchComments(newLine);
-    }
+    this.fetchComments(this.state.searchLine);
   }
 
   public async fetchComments(line?: string, isSignedIn?: boolean, log?: string) {
@@ -120,7 +113,7 @@ export class LogLineComments extends React.Component<LogLineCommentsProps, Parti
 
   public render() {
     const { isCooperSignedIn } = this.props.state;
-    const { comments, line, lineId } = this.state;
+    const { comments, line, lineId, searchLine } = this.state;
     const renderedComments = comments!.map(this.renderComment);
 
     if (!line) return null;
@@ -128,17 +121,51 @@ export class LogLineComments extends React.Component<LogLineCommentsProps, Parti
 
     return (
       <div className='Comments'>
-        <h4>Log Intelligence</h4>
+        <h2>Log Intelligence</h2>
         <div className='IntelligenceComment'>
-          <label htmlFor='small_input'>To fetch comments, we generalize the log line. This one was understood as:</label>
-          <div className='InputButton'>
-            <input defaultValue={line} ref={this.refHandlers.lineChangeElement} type='text' id='small_input' className='small' />
-            <button className='btn btn_small' type='button' onClick={this.updateSearch}>Change Search</button>
-          </div>
+          <FormGroup
+            label='We generalize the log line. Searched for comments for:'
+          >
+            <ControlGroup
+              fill={true}
+              vertical={false}
+            >
+              <InputGroup
+                onChange={this.onChangeSearchLine}
+                value={searchLine}
+              />
+              <Button
+                className={Classes.FIXED}
+                icon='path-search'
+                type='button'
+                onClick={this.updateSearch}
+              >
+                Change Search
+              </Button>
+            </ControlGroup>
+          </FormGroup>
         </div>
         {renderedComments}
-        <PostComment lineId={lineId} line={line} didPost={this.refresh} state={sleuthState} />
+        <PostComment
+          lineId={lineId}
+          line={line}
+          didPost={this.refresh}
+          state={sleuthState}
+        />
       </div>
     );
+  }
+
+  /**
+   * Handles the user changing the search line. Does not actually
+   * submit a search, the user needs to hit the search button for that.
+   *
+   * @private
+   * @param {React.FormEvent<HTMLInputElement>} event
+   */
+  private onChangeSearchLine(event: React.FormEvent<HTMLInputElement>) {
+    if (event.currentTarget && event.currentTarget.value) {
+      this.setState({ searchLine: event.currentTarget.value });
+    }
   }
 }
