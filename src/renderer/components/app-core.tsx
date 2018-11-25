@@ -5,7 +5,7 @@ import { remote } from 'electron';
 
 import { getFirstLogFile } from '../../utils/get-first-logfile';
 import { isMergedLogFile, isProcessedLogFile, isUnzippedFile } from '../../utils/is-logfile';
-import { sleuthState, SleuthState } from '../state/sleuth';
+import { SleuthState } from '../state/sleuth';
 import { UnzippedFile, UnzippedFiles } from '../unzip';
 import { getTypesForFiles, mergeLogFiles, processLogFiles } from '../processor';
 import {
@@ -259,7 +259,7 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
 
   public renderHeader() {
     return (
-      <AppCoreHeader state={sleuthState} />
+      <AppCoreHeader state={this.props.state} />
     );
   }
 
@@ -285,8 +285,8 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
         {this.renderSidebar()}
 
         <div id='content' className={logContentClassName}>
-          <AppCoreHeader state={sleuthState} />
-          <LogContent state={sleuthState} />
+          <AppCoreHeader state={this.props.state} />
+          <LogContent state={this.props.state} />
         </div>
       </div>
     );

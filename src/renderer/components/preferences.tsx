@@ -2,7 +2,7 @@ import { Select } from '@blueprintjs/select';
 import { ipcRenderer } from 'electron';
 import { observer } from 'mobx-react';
 import { Overlay, Classes, FormGroup, Button, MenuItem, Callout, ControlGroup, InputGroup } from '@blueprintjs/core';
-import { sleuthState, SleuthState } from '../state/sleuth';
+import { SleuthState } from '../state/sleuth';
 import classNames from 'classnames';
 import React from 'react';
 import autoBind from 'react-autobind';
@@ -117,7 +117,7 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
         helperText='The log service allows Slack employees to leave comments and hints for log entries'
         label='Sign into the Cooper Log Service'
       >
-        <CooperSignInOutButton state={sleuthState} />
+        <CooperSignInOutButton state={this.props.state} />
       </FormGroup>
     );
   }

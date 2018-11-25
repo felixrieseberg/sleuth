@@ -3,7 +3,7 @@ import {observer} from 'mobx-react';
 import { Button } from '@blueprintjs/core';
 
 import { SleuthState } from '../../state/sleuth';
-import { cooperAuth } from '../../cooper/auth';
+import { CooperAuth } from '../../cooper/auth';
 
 export interface SignInOutButtonProps {
   state: SleuthState;
@@ -15,11 +15,14 @@ export interface SignInOutButtonState {
 
 @observer
 export class CooperSignInOutButton extends React.Component<SignInOutButtonProps, Partial<SignInOutButtonState>> {
+  public readonly cooperAuth: CooperAuth;
+
   constructor(props: SignInOutButtonProps) {
     super(props);
 
     this.state = { isLoading: false };
     this.onClick = this.onClick.bind(this);
+    this.cooperAuth = new CooperAuth(props.state);
   }
 
   public onClick(e: React.MouseEvent<HTMLButtonElement>) {

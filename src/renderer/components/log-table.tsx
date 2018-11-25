@@ -8,7 +8,6 @@ import { Table, AutoSizer, Column, TableCellProps } from 'react-virtualized';
 import { Icon } from '@blueprintjs/core';
 
 import { LevelFilter, LogEntry, DateRange } from '../interfaces';
-import { sleuthState } from '../state/sleuth';
 import { didFilterChange } from '../../utils/did-filter-change';
 import { Alert } from './alert';
 import { isReduxAction } from '../../utils/is-redux-action';
@@ -401,7 +400,9 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     const { logFile } = this.props;
 
     const text = `The web app logs are difficult to parse for a computer - proceed with caution. Combined view is disabled. Click to dismiss.`;
-    return logFile.logType === 'webapp' ? <Alert state={sleuthState} text={text} level='warning' /> : null;
+    return logFile.logType === 'webapp'
+      ? <Alert state={this.props.state} text={text} level='warning' />
+      : null;
   }
 
   /**

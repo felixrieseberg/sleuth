@@ -1,4 +1,4 @@
-import { resetState, sleuthState } from '../state/sleuth';
+import { SleuthState } from '../state/sleuth';
 import { UserPreferences } from '../interfaces';
 import { shouldIgnoreFile } from '../../utils/should-ignore-file';
 import React from 'react';
@@ -13,6 +13,7 @@ import { CoreApplication } from './app-core';
 import { MacTitlebar } from './mac-titlebar';
 import { Preferences } from './preferences';
 import { AppMenu } from '../menu';
+import { Spotlight } from './spotlight';
 
 const debug = require('debug')('sleuth:app');
 
@@ -23,6 +24,7 @@ export interface AppState {
 
 export class App extends React.Component<undefined, Partial<AppState>> {
   public readonly menu: AppMenu = new AppMenu();
+  public readonly sleuthState: SleuthState;
 
   constructor(props: undefined) {
     super(props);
@@ -34,6 +36,9 @@ export class App extends React.Component<undefined, Partial<AppState>> {
     localStorage.debug = 'sleuth*';
 
     this.openFile = this.openFile.bind(this);
+    this.reset = this.reset.bind(this);
+
+    this.sleuthState = new SleuthState(this.openFile);
   }
 
   /**
@@ -129,7 +134,7 @@ export class App extends React.Component<undefined, Partial<AppState>> {
       }
     }
 
-    sleuthState.setSource(url);
+    this.sleuthState.setSource(url);
     this.setState({ unzippedFiles });
 
     console.groupEnd();
@@ -146,18 +151,18 @@ export class App extends React.Component<undefined, Partial<AppState>> {
 
     const unzippedFiles = await unzipper.unzip();
 
-    sleuthState.setSource(url);
+    this.sleuthState.setSource(url);
     this.setState({ unzippedFiles });
   }
 
   public reset() {
     this.setState({ unzippedFiles: [] });
 
-    if (sleuthState.opened > 0) {
-      resetState();
+    if (this.sleuthState.opened > 0) {
+      this.sleuthState.reset();
     }
 
-    sleuthState.opened = sleuthState.opened + 1;
+    this.sleuthState.opened = this.sleuthState.opened + 1;
   }
 
   /**
@@ -167,19 +172,21 @@ export class App extends React.Component<undefined, Partial<AppState>> {
    */
   public render(): JSX.Element {
     const { unzippedFiles } = this.state;
+    const spotlight = <Spotlight state={this.sleuthState} />;
     const className = classNames('App', { Darwin: process.platform === 'darwin' });
     const titleBar = process.platform === 'darwin' ? <MacTitlebar /> : '';
-    let content: JSX.Element | null = <Welcome state={sleuthState} openFile={this.openFile} />;
+    let content: JSX.Element | null = <Welcome state={this.sleuthState} />;
 
     if (unzippedFiles && unzippedFiles.length > 0) {
-      content = <CoreApplication state={sleuthState} unzippedFiles={unzippedFiles} />;
+      content = <CoreApplication state={this.sleuthState} unzippedFiles={unzippedFiles} />;
     }
 
     return (
       <div className={className}>
-        <Preferences state={sleuthState} />
+        <Preferences state={this.sleuthState} />
         {titleBar}
         {content}
+        {spotlight}
       </div>
     );
   }

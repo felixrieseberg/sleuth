@@ -8,7 +8,7 @@ import { PostComment } from './post';
 import { Comment } from './comment';
 import { CooperSignInOutButton } from '../cooper/sign-in-out-button';
 import { lineToCooperLine } from '../../cooper/line-to-cooper-line';
-import { SleuthState, sleuthState } from '../../state/sleuth';
+import { SleuthState } from '../../state/sleuth';
 
 const debug = require('debug')('sleuth:cooper');
 
@@ -98,7 +98,7 @@ export class LogLineComments extends React.Component<LogLineCommentsProps, Parti
     const { name, avatar, slackUserId } = author;
     const options = { lineId, comment, name, avatar, timestamp, slackUserId, commentId: id };
 
-    return <Comment didPost={this.refresh} state={sleuthState} key={timestamp} {...options} />;
+    return <Comment didPost={this.refresh} state={this.props.state} key={timestamp} {...options} />;
   }
 
   public renderSignInNeccessary() {
@@ -106,7 +106,7 @@ export class LogLineComments extends React.Component<LogLineCommentsProps, Parti
       <div className='Comments'>
         <h4>Log Intelligence</h4>
         <p>Sign in to see and post information about this log line left by fellow Slack employees.</p>
-        <CooperSignInOutButton state={sleuthState} />
+        <CooperSignInOutButton state={this.props.state} />
       </div>
     );
   }
@@ -150,7 +150,7 @@ export class LogLineComments extends React.Component<LogLineCommentsProps, Parti
           lineId={lineId}
           line={line}
           didPost={this.refresh}
-          state={sleuthState}
+          state={this.props.state}
         />
       </div>
     );

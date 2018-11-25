@@ -1,5 +1,5 @@
 import defaultMenu from 'electron-default-menu';
-import { remote } from 'electron';
+import { remote, BrowserWindow } from 'electron';
 
 import fs from 'fs-extra';
 import path from 'path';
@@ -167,6 +167,26 @@ export class AppMenu {
     return result;
   }
 
+  public insertSpotlightItem() {
+    if (!this.menu) return;
+
+    const viewItem = this.menu.find((item) => item.label === 'View');
+
+    if (viewItem && viewItem.submenu) {
+      (viewItem.submenu as Array<Electron.MenuItemConstructorOptions>).push({
+        type: 'separator'
+      });
+
+      (viewItem.submenu as Array<Electron.MenuItemConstructorOptions>).push({
+        label: 'Show Omnibar',
+        accelerator: 'CmdOrCtrl+K',
+        click(_item: Electron.MenuItem, browserWindow: BrowserWindow) {
+          browserWindow.webContents.send('spotlight');
+        }
+      });
+    }
+  }
+
   /**
    * Actually creates the menu.
    */
@@ -185,6 +205,8 @@ export class AppMenu {
     } else {
       this.menu.splice(0, 1, { label: 'File', submenu: [ ...this.getOpenItems(), preferencesItem ] });
     }
+
+    this.insertSpotlightItem();
 
     this.menu.push({
       label: 'Utilities',

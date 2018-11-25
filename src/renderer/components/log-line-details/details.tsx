@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import { sleuthState, SleuthState } from '../../state/sleuth';
+import { SleuthState } from '../../state/sleuth';
 import React from 'react';
 import classNames from 'classnames';
 import { format } from 'date-fns';
@@ -110,8 +110,8 @@ export class LogLineDetails extends React.Component<LogLineDetailsProps, LogLine
     return (
       <div className={className}>
         {logEntryInfo}
-        <LogLineData raw={selectedEntry ? selectedEntry.meta : ''} />
-        <LogLineComments state={sleuthState} />
+        <LogLineData state={this.props.state} raw={selectedEntry ? selectedEntry.meta : ''} />
+        <LogLineComments state={this.props.state} />
       </div>
     );
   }

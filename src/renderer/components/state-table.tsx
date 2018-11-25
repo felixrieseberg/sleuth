@@ -4,7 +4,7 @@ import { shell } from 'electron';
 import { Card, Elevation } from '@blueprintjs/core';
 
 import { MergedLogFile, ProcessedLogFile } from '../interfaces';
-import { SleuthState, sleuthState } from '../state/sleuth';
+import { SleuthState } from '../state/sleuth';
 import { getSettingsInfo } from '../analytics/settings-analytics';
 import { getNotifWarningsInfo } from '../analytics/notification-warning-analytics';
 import { UnzippedFile } from '../unzip';
@@ -205,7 +205,7 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
 
     const content = (!data && path)
       ? <iframe sandbox='' onLoad={onIFrameLoad} src={path} />
-      : <JSONView data={data} state={sleuthState} />;
+      : <JSONView data={data} state={this.props.state} />;
 
     return (
       <div className='StateTable' style={{ fontFamily: this.props.state.font }}>

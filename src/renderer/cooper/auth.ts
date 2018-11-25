@@ -1,7 +1,7 @@
 import path from 'path';
 import { config } from '../../config';
 import { remote } from 'electron';
-import { sleuthState } from '../state/sleuth';
+import { SleuthState } from '../state/sleuth';
 
 const { BrowserWindow, dialog } = remote;
 const debug = require('debug')('sleuth:cooper');
@@ -16,7 +16,7 @@ export class CooperAuth {
   public signinAttempt = { hasTried: false, result: false };
   private signInWindow: Electron.BrowserWindow;
 
-  constructor() {
+  constructor(public readonly sleuthState: SleuthState) {
     this.signIn = this.signIn.bind(this);
     this.signOut = this.signOut.bind(this);
 
@@ -36,7 +36,7 @@ export class CooperAuth {
       .then(async (response) => response.json())
       .then((response: any) => {
         debug(`Attempted to sign out. Result: ${response.result}`);
-        sleuthState.isCooperSignedIn = !(!!(response && response.result));
+        this.sleuthState.isCooperSignedIn = !(!!(response && response.result));
 
         return response.result;
       })
@@ -141,8 +141,8 @@ export class CooperAuth {
           const { result, slackUserId } = responseObject;
           const isSignedIn = !!(result && result === 'You are signed in');
 
-          sleuthState.slackUserId = slackUserId;
-          sleuthState.isCooperSignedIn = isSignedIn;
+          this.sleuthState.slackUserId = slackUserId;
+          this.sleuthState.isCooperSignedIn = isSignedIn;
           resolve(isSignedIn);
 
         debug(`User is signed into cooper: ${isSignedIn}`, responseObject);
@@ -191,8 +191,8 @@ export class CooperAuth {
           const parsedResult = JSON.parse(result);
 
           if (parsedResult.result && parsedResult.result === 'You are signed in') {
-            sleuthState.isCooperSignedIn = true;
-            sleuthState.slackUserId = parsedResult.slackUserId;
+            this.sleuthState.isCooperSignedIn = true;
+            this.sleuthState.slackUserId = parsedResult.slackUserId;
 
             resolve(true);
             this.signInWindow.close();
@@ -202,12 +202,10 @@ export class CooperAuth {
           debug(error);
 
           this.signInWindow.close();
-          sleuthState.isCooperSignedIn = false;
+          this.sleuthState.isCooperSignedIn = false;
           resolve(false);
         }
       });
     });
   }
 }
-
-export const cooperAuth = new CooperAuth();

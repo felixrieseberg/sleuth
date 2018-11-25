@@ -1,6 +1,8 @@
+import { observable, action, autorun } from 'mobx';
+import { ipcRenderer } from 'electron';
+
 import { UnzippedFile } from '../unzip';
 import { LevelFilter, LogEntry, MergedLogFile, ProcessedLogFile, DateRange, Suggestions } from '../interfaces';
-import { observable, action, autorun } from 'mobx';
 import { getItemsInDownloadFolder } from '../suggestions';
 
 export const defaults = {
@@ -34,6 +36,7 @@ export class SleuthState {
   @observable public showOnlySearchResults: boolean = false;
   @observable public isDetailsVisible: boolean = false;
   @observable public isSidebarOpen: boolean = true;
+  @observable public isSpotlightOpen: boolean = false;
 
   // Settings
   @observable public isDarkMode: boolean = !!this.retrieve('isDarkMode', true);
@@ -41,7 +44,8 @@ export class SleuthState {
   @observable public font: string = this.retrieve<string>('font', false)!;
   @observable public defaultEditor: string = this.retrieve<string>('defaultEditor', false)!;
 
-  constructor() {
+
+  constructor(public readonly openFile: (file: string) => void) {
     this.getSuggestions();
 
     // Setup autoruns
@@ -64,6 +68,12 @@ export class SleuthState {
         document.body.classList.remove('SidebarOpen');
       }
     });
+
+    this.toggleDarkMode = this.toggleDarkMode.bind(this);
+    this.toggleSidebar = this.toggleSidebar.bind(this);
+    this.toggleSpotlight = this.toggleSpotlight.bind(this);
+
+    ipcRenderer.on('spotlight', this.toggleSpotlight);
   }
 
   @action
@@ -82,8 +92,27 @@ export class SleuthState {
   }
 
   @action
+  public toggleSpotlight() {
+    this.isSpotlightOpen = !this.isSpotlightOpen;
+  }
+
+  @action
   public async getSuggestions() {
     this.suggestions = await getItemsInDownloadFolder();
+  }
+
+  @action
+  public reset() {
+    this.selectedEntry = undefined;
+    this.selectedLogFile = undefined;
+    this.levelFilter.debug = false;
+    this.levelFilter.error = false;
+    this.levelFilter.info = false;
+    this.levelFilter.warn = false;
+    this.searchIndex = 0;
+    this.showOnlySearchResults = false;
+    this.isDetailsVisible = false;
+    this.dateRange = { from: undefined, to: undefined };
   }
 
   /**
@@ -127,22 +156,4 @@ export class SleuthState {
 
     return value;
   }
-}
-
-export const sleuthState = new SleuthState();
-
-/**
- * Resets the state between different files. User data is retained.
- */
-export function resetState() {
-  sleuthState.selectedEntry = undefined;
-  sleuthState.selectedLogFile = undefined;
-  sleuthState.levelFilter.debug = false;
-  sleuthState.levelFilter.error = false;
-  sleuthState.levelFilter.info = false;
-  sleuthState.levelFilter.warn = false;
-  sleuthState.searchIndex = 0;
-  sleuthState.showOnlySearchResults = false;
-  sleuthState.isDetailsVisible = false;
-  sleuthState.dateRange = { from: undefined, to: undefined };
 }

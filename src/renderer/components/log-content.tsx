@@ -1,7 +1,7 @@
 import { isLogFile } from '../../utils/is-logfile';
 import { ProcessedLogFile } from '../interfaces';
 import { StateTable } from './state-table';
-import { SleuthState, sleuthState } from '../state/sleuth';
+import { SleuthState } from '../state/sleuth';
 import { LogTable } from './log-table';
 import { observer } from 'mobx-react';
 import React from 'react';
@@ -58,7 +58,7 @@ export class LogContent extends React.Component<LogContentProps, Partial<LogCont
         <div className='LogContent' style={{ fontFamily: getFontForCSS(font) }}>
           <div id='LogTableContainer' style={tableStyle}>
             <LogTable
-              state={sleuthState}
+              state={this.props.state}
               dateTimeFormat={dateTimeFormat}
               logFile={selectedLogFile as ProcessedLogFile}
               levelFilter={levelFilter}
@@ -69,11 +69,11 @@ export class LogContent extends React.Component<LogContentProps, Partial<LogCont
             />
           </div>
           {isDetailsVisible ? scrubber : null}
-          <LogLineDetails state={sleuthState} />
+          <LogLineDetails state={this.props.state} />
         </div>
       );
     } else {
-      return <StateTable state={sleuthState} />;
+      return <StateTable state={this.props.state} />;
     }
   }
 }

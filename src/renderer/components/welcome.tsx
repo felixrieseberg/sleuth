@@ -1,5 +1,4 @@
 import React from 'react';
-import fs from 'fs-extra';
 import path from 'path';
 import { ControlGroup, Button, InputGroup } from '@blueprintjs/core';
 import { distanceInWordsToNow } from 'date-fns';
@@ -19,7 +18,6 @@ export interface WelcomeState {
 export interface WelcomeProps {
   sleuth?: string;
   state: SleuthState;
-  openFile: (filePath: string) => void;
 }
 
 @observer
@@ -63,7 +61,7 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
   }
 
   public renderSuggestions(): JSX.Element | null {
-    const { openFile } = this.props;
+    const { openFile } = this.props.state;
     const suggestions = this.props.state.suggestions || {};
     const elements = Object.keys(suggestions)
       .map((filePath) => {
