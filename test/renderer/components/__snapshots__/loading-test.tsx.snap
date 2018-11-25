@@ -16,6 +16,7 @@ exports[`loading renders correctly 1`] = `
       }
     />
   </div>
+  <br />
   <p>
     Hello
   </p>
