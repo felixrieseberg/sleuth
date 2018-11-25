@@ -11,11 +11,16 @@ import { UnzippedFile } from '../unzip';
 import { isProcessedLogFile } from '../../utils/is-logfile';
 import { highlightText } from '../../utils/highlight-text';
 
-interface SpotlightItem { text: string; label?: string; click: () => void; }
+interface SpotlightItem {
+  text: string;
+  icon?: string;
+  label?: string;
+  click: () => void;
+}
 const SleuthOmnibar = Omnibar.ofType<SpotlightItem>();
 
 export const renderItem: ItemRenderer<SpotlightItem>
-  = ({ text, label }, { handleClick, modifiers, query }) => {
+  = ({ text, label, icon }, { handleClick, modifiers, query }) => {
     if (!modifiers.matchesPredicate) {
         return null;
     }
@@ -28,6 +33,7 @@ export const renderItem: ItemRenderer<SpotlightItem>
         key={text}
         onClick={handleClick}
         label={label || ''}
+        icon={icon as any}
       />
     );
   };
@@ -87,6 +93,7 @@ export class Spotlight extends React.Component<SpotlightProps, Partial<Spotlight
       .map((filePath) => ({
         text: path.basename(filePath),
         label: `${suggestions[filePath].age} old`,
+        icon: filePath.endsWith('zip') ? 'compressed' : 'folder-open',
         click: () => {
           this.props.state.openFile(filePath);
         }
@@ -101,6 +108,7 @@ export class Spotlight extends React.Component<SpotlightProps, Partial<Spotlight
           logFileSuggestions.push({
             text: logFile.logFile.fileName,
             label: `${logFile.logEntries.length} entries`,
+            icon: 'document',
             click: () => {
               this.props.selectLogFile(logFile);
             }
@@ -109,6 +117,7 @@ export class Spotlight extends React.Component<SpotlightProps, Partial<Spotlight
           logFileSuggestions.push({
             text: logFile.fileName,
             label: `State`,
+            icon: 'cog',
             click: () => {
               this.props.selectLogFile(logFile);
             }
@@ -117,6 +126,37 @@ export class Spotlight extends React.Component<SpotlightProps, Partial<Spotlight
       });
     });
 
-    return [ ...spotSuggestions, ...logFileSuggestions ];
+    const appSuggestions = [
+      {
+        text: 'Quit Sleuth',
+        icon: 'power',
+        click: () => {
+          require('electron').remote.app.quit();
+        }
+      },
+      {
+        text: 'Go Home',
+        icon: 'home',
+        click: () => {
+          this.props.state.reset(true);
+        }
+      },
+      {
+        text: 'Toggle Dark Mode',
+        icon: 'moon',
+        click: () => {
+          this.props.state.toggleDarkMode();
+        }
+      },
+      {
+        text: 'Toggle Sidebar',
+        icon: 'menu',
+        click: () => {
+          this.props.state.toggleSidebar();
+        }
+      }
+    ];
+
+    return [ ...spotSuggestions, ...logFileSuggestions, ...appSuggestions ];
   }
 }
