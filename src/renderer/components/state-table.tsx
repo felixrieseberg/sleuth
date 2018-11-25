@@ -10,6 +10,7 @@ import { getNotifWarningsInfo } from '../analytics/notification-warning-analytic
 import { UnzippedFile } from '../unzip';
 import { JSONView } from './json-view';
 import { parseJSON } from '../../utils/parse-json';
+import { getFontForCSS } from './preferences-font';
 
 const debug = require('debug')('sleuth:statetable');
 
@@ -190,6 +191,7 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
 
   public render(): JSX.Element {
     const { data, path } = this.state;
+    const { font } = this.props.state;
 
     if (!data && !path) {
       return <div />;
@@ -208,7 +210,7 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
       : <JSONView data={data} state={this.props.state} />;
 
     return (
-      <div className='StateTable' style={{ fontFamily: this.props.state.font }}>
+      <div className='StateTable' style={{ fontFamily: getFontForCSS(font) }}>
         <div className='StateTable-Content'>
           {info}
           <Card>
