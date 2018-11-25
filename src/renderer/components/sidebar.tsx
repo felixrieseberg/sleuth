@@ -5,14 +5,14 @@ import { ITreeNode, Tree, Icon, Position, Tooltip, Intent } from '@blueprintjs/c
 import { observer } from 'mobx-react';
 
 import { UnzippedFile } from '../unzip';
-import { MergedFilesLoadStatus, ProcessedLogFile, ProcessedLogFiles } from '../interfaces';
+import { MergedFilesLoadStatus, ProcessedLogFile, ProcessedLogFiles, SelectLogFileFn } from '../interfaces';
 import { levelsHave } from '../../utils/levelcounts';
 import { SleuthState } from '../state/sleuth';
 
 export interface SidebarProps {
   logFiles: ProcessedLogFiles;
   selectedLogFileName: string;
-  selectLogFile: (logFile: ProcessedLogFile | UnzippedFile | null, logType?: string) => void;
+  selectLogFile: SelectLogFileFn;
   mergedFilesStatus: MergedFilesLoadStatus;
   state: SleuthState;
 }

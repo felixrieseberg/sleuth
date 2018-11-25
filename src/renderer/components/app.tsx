@@ -172,7 +172,6 @@ export class App extends React.Component<undefined, Partial<AppState>> {
    */
   public render(): JSX.Element {
     const { unzippedFiles } = this.state;
-    const spotlight = <Spotlight state={this.sleuthState} />;
     const className = classNames('App', { Darwin: process.platform === 'darwin' });
     const titleBar = process.platform === 'darwin' ? <MacTitlebar /> : '';
     let content: JSX.Element | null = <Welcome state={this.sleuthState} />;
@@ -186,7 +185,6 @@ export class App extends React.Component<undefined, Partial<AppState>> {
         <Preferences state={this.sleuthState} />
         {titleBar}
         {content}
-        {spotlight}
       </div>
     );
   }

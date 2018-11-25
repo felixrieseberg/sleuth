@@ -23,6 +23,7 @@ import { Sidebar } from './sidebar';
 import { Loading } from './loading';
 import { LogContent } from './log-content';
 import { flushLogPerformance } from '../processor/performance';
+import { Spotlight } from './spotlight';
 
 const debug = require('debug')('sleuth:appCore');
 
@@ -241,19 +242,26 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
     };
   }
 
-  public renderSidebar() {
+  public renderSidebarSpotlight() {
     const { processedLogFiles } = this.state;
     const selectedLogFileName = this.getSelectedFileName();
     const mergedFilesStatus = this.getMergedFilesStatus();
 
     return (
-      <Sidebar
-        logFiles={processedLogFiles as ProcessedLogFiles}
-        mergedFilesStatus={mergedFilesStatus}
-        selectLogFile={this.selectLogFile}
-        selectedLogFileName={selectedLogFileName}
-        state={this.props.state}
-      />
+      <>
+        <Sidebar
+          logFiles={processedLogFiles as ProcessedLogFiles}
+          mergedFilesStatus={mergedFilesStatus}
+          selectLogFile={this.selectLogFile}
+          selectedLogFileName={selectedLogFileName}
+          state={this.props.state}
+        />
+        <Spotlight
+          state={this.props.state}
+          selectLogFile={this.selectLogFile}
+          logFiles={processedLogFiles as ProcessedLogFiles}
+        />
+      </>
     );
   }
 
@@ -282,7 +290,7 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
 
     return (
       <div className='AppCore'>
-        {this.renderSidebar()}
+        {this.renderSidebarSpotlight()}
 
         <div id='content' className={logContentClassName}>
           <AppCoreHeader state={this.props.state} />

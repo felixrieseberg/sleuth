@@ -111,6 +111,7 @@ export class SleuthState {
     this.levelFilter.warn = false;
     this.searchIndex = 0;
     this.showOnlySearchResults = false;
+    this.isSpotlightOpen = false;
     this.isDetailsVisible = false;
     this.dateRange = { from: undefined, to: undefined };
   }

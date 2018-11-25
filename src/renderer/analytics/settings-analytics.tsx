@@ -1,5 +1,4 @@
 import React from 'react';
-import { distanceInWords } from 'date-fns';
 import { getLanguageNames } from '../../utils/iso639';
 
 export function getSettingsInfo(data: any): Array<JSX.Element> {

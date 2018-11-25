@@ -1,6 +1,7 @@
 import { remote, shell } from 'electron';
 import fs from 'fs-extra';
 import path from 'path';
+import { distanceInWordsToNow } from 'date-fns';
 
 import { Suggestions } from './interfaces';
 
@@ -17,8 +18,9 @@ export async function getItemsInDownloadFolder(): Promise<Suggestions> {
       if (file.startsWith('logs') || file.startsWith('slack-logs')) {
         const filePath = path.join(dir, file);
         const stats = fs.statSync(filePath);
+        const age = distanceInWordsToNow(stats.mtimeMs);
 
-        suggestions[filePath] = stats;
+        suggestions[filePath] = { ...stats, age };
       }
     }
   } catch (error) {

@@ -130,4 +130,10 @@ export interface UserPreferences {
   font: string;
 }
 
-export type Suggestions = Record<string, fs.Stats>;
+export interface Suggestion extends fs.Stats {
+  age: string;
+}
+
+export type Suggestions = Record<string, Suggestion>;
+
+export type SelectLogFileFn = (logFile: ProcessedLogFile | UnzippedFile | null, logType?: string) => void;

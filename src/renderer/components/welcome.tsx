@@ -1,7 +1,6 @@
 import React from 'react';
 import path from 'path';
 import { ControlGroup, Button, InputGroup } from '@blueprintjs/core';
-import { distanceInWordsToNow } from 'date-fns';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import { observer } from 'mobx-react';
 
@@ -67,7 +66,6 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
       .map((filePath) => {
         const stats = suggestions[filePath];
         const basename = path.basename(filePath);
-        const age = distanceInWordsToNow(stats.mtimeMs);
         const deleteElement = (
           <Button
             icon='trash'
@@ -88,7 +86,7 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
             </Button>
             <InputGroup
               leftIcon='time'
-              defaultValue={`${age} old`}
+              defaultValue={`${stats.age} old`}
               readOnly={true}
               rightElement={deleteElement}
             />
