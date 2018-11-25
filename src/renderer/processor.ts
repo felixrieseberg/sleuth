@@ -56,8 +56,6 @@ export function mergeLogFiles(
 
     // Single file? Cool, shortcut!
     if (logFiles.length === 1) {
-      console.timeEnd(`merging-${logType}`);
-
       const singleResult: MergedLogFile = {
         logFiles: logFiles as Array<ProcessedLogFile>,
         logEntries: logFiles[0].logEntries,

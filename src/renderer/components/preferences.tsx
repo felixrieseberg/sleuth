@@ -9,7 +9,7 @@ import autoBind from 'react-autobind';
 
 import { getSleuth } from '../sleuth';
 import { CooperSignInOutButton } from './cooper/sign-in-out-button';
-import { renderFontItem, filterFont, WINDOWS_FONTS } from './preferences-font';
+import { renderFontItem, filterFont, FONTS } from './preferences-font';
 import { filterDateTime, renderDateTimeItem, DATE_TIME_FORMATS } from './preferences-datetime';
 import { renderEditorItem, Editor, EDITORS, nameForCmd } from './preferences-editor';
 
@@ -60,7 +60,7 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
             <FontSelect
               itemRenderer={renderFontItem}
               itemPredicate={filterFont}
-              items={WINDOWS_FONTS}
+              items={FONTS}
               noResults={<MenuItem disabled={true} text='No results.' />}
               onItemSelect={this.onFontSelect}
               popoverProps={{ minimal: true }}

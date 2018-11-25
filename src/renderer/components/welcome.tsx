@@ -1,9 +1,11 @@
 import React from 'react';
 import fs from 'fs-extra';
+import { remote, shell } from 'electron';
 import path from 'path';
+import { ControlGroup, Button, InputGroup } from '@blueprintjs/core';
+import { distanceInWordsToNow } from 'date-fns';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
-import { remote } from 'electron';
 import { getSleuth } from '../sleuth';
 import { getUpdateAvailable, defaultUrls } from '../update-check';
 
@@ -11,7 +13,7 @@ const debug = require('debug')('sleuth:welcome');
 
 export interface WelcomeState {
   sleuth: string;
-  suggestions: Array<string>;
+  suggestions: Record<string, fs.Stats>;
   isUpdateAvailable: boolean | string;
 }
 
@@ -26,7 +28,8 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
 
     this.state = {
       sleuth: props.sleuth || getSleuth(),
-      isUpdateAvailable: false
+      isUpdateAvailable: false,
+      suggestions: {}
     };
 
     getUpdateAvailable().then((isUpdateAvailable: boolean | string) => {
@@ -43,11 +46,14 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
 
     fs.readdir(dir)
       .then((contents) => {
-        const suggestions: Array<string> = [];
+        const suggestions = {};
 
         contents.forEach((file) => {
           if (file.startsWith('logs') || file.startsWith('slack-logs')) {
-            suggestions.push(path.join(dir, file));
+            const filePath = path.join(dir, file);
+            const stats = fs.statSync(filePath);
+
+            suggestions[filePath] = stats;
           }
         });
 
@@ -56,6 +62,25 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
       .catch((error) => {
         debug(error);
       });
+  }
+
+  public deleteSuggestion(filePath: string) {
+    const trashName = process.platform === 'darwin'
+      ? 'trash'
+      : 'recycle bin';
+
+    remote.dialog.showMessageBox({
+      title: 'Delete File?',
+      message: `Do you want to move ${filePath} to the ${trashName}?`,
+      type: 'question',
+      buttons: [ 'Cancel', `Move to ${trashName}` ],
+      cancelId: 0
+    }, (result) => {
+      if (result) {
+        shell.moveItemToTrash(filePath);
+        this.getItemsInDownloadFolder();
+      }
+    });
   }
 
   public renderUpdateAvailable() {
@@ -78,32 +103,71 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
     }
   }
 
-  public render() {
-    const { suggestions, sleuth } = this.state;
-    const { openFile } = this.props;
-    let suggestion = null;
+  public renderSuggestions(): JSX.Element | null {
 
-    if (suggestions && suggestions.length > 0) {
-      suggestion = (
+    const { openFile } = this.props;
+    const suggestions = this.state.suggestions || {};
+    const elements = Object.keys(suggestions)
+      .map((filePath) => {
+        const stats = suggestions[filePath];
+        const basename = path.basename(filePath);
+        const age = distanceInWordsToNow(stats.mtimeMs);
+        const deleteElement = (
+          <Button
+            icon='trash'
+            minimal={true}
+            onClick={() => this.deleteSuggestion(filePath)}
+          />
+        );
+
+        return (
+          <ControlGroup className='Suggestion' fill={true} key={basename}>
+            <Button
+              className='OpenButton'
+              alignText='left'
+              onClick={() => openFile(filePath)}
+              icon='document'
+            >
+              {basename}
+            </Button>
+            <InputGroup
+              leftIcon='time'
+              defaultValue={`${age} old`}
+              readOnly={true}
+              rightElement={deleteElement}
+            />
+          </ControlGroup>
+        );
+      });
+
+    if (elements.length > 0) {
+      return (
         <div className='Suggestions'>
           <h5>From your Downloads folder, may we suggest:</h5>
-          {suggestions.map((file) => <a key={file} className='small' onClick={() => openFile(file)}>{path.basename(file)}</a>)}
+          <ul>{elements}</ul>
         </div>
       );
-    } else {
-      suggestion = (<div />);
     }
+
+    return <div />;
+  }
+
+  public render() {
+    const { sleuth } = this.state;
+    const suggestions = this.renderSuggestions();
 
     return (
       <div className='Welcome'>
         <i />
         <div>
-          <h1 className='Emoji'>{sleuth}</h1>
-          <h2>Hey there!</h2>
-          <h4>Just drop a logs file or folder here.</h4>
+          <h1 className='Title'>
+            <span className='Emoji'>{sleuth}</span>
+            <span>Sleuth</span>
+          </h1>
+          <h4>Drop a logs zip file or folder anywhere on this window to open it.</h4>
           {this.renderUpdateAvailable()}
         </div>
-        {suggestion}
+        {suggestions}
       </div>
     );
   }
