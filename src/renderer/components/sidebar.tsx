@@ -29,16 +29,14 @@ const DEFAULT_NODES: Array<ITreeNode> = [
     label: 'All Desktop Logs',
     icon: 'compressed',
     nodeData: { type: 'all' }
-  },
-  {
+  }, {
     id: 0,
     hasCaret: true,
     icon: 'cog',
     label: 'State & Settings',
     isExpanded: true,
     childNodes: [],
-  },
-  {
+  }, {
     id: 1,
     hasCaret: true,
     icon: 'application',
@@ -46,8 +44,7 @@ const DEFAULT_NODES: Array<ITreeNode> = [
     isExpanded: true,
     childNodes: [],
     nodeData: { type: 'browser' }
-  },
-  {
+  }, {
     id: 2,
     hasCaret: true,
     icon: 'applications',
@@ -55,8 +52,7 @@ const DEFAULT_NODES: Array<ITreeNode> = [
     isExpanded: true,
     childNodes: [],
     nodeData: { type: 'renderer' }
-  },
-  {
+  }, {
     id: 3,
     hasCaret: true,
     icon: 'applications',
@@ -64,20 +60,32 @@ const DEFAULT_NODES: Array<ITreeNode> = [
     isExpanded: true,
     childNodes: [],
     nodeData: { type: 'preload' }
-  },
-  {
+  }, {
     id: 4,
     hasCaret: true,
     icon: 'chat',
     label: 'WebApp',
     isExpanded: true,
     childNodes: [],
-  },
-  {
+  }, {
     id: 5,
     hasCaret: true,
     icon: 'phone',
     label: 'Calls',
+    isExpanded: true,
+    childNodes: [],
+  }, {
+    id: 6,
+    hasCaret: true,
+    icon: 'automatic-updates',
+    label: 'Installer',
+    isExpanded: true,
+    childNodes: [],
+  }, {
+    id: 7,
+    hasCaret: true,
+    icon: 'feed',
+    label: 'Network',
     isExpanded: true,
     childNodes: [],
   }
@@ -95,6 +103,8 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
     nodes[4].childNodes = logFiles.preload.map((file) => Sidebar.getFileNode(file, props));
     nodes[5].childNodes = logFiles.webapp.map((file) => Sidebar.getFileNode(file, props));
     nodes[6].childNodes = logFiles.call.map((file) => Sidebar.getFileNode(file, props));
+    nodes[7].childNodes = logFiles.squirrel.map((file) => Sidebar.getSquirrelFileNode(file, props));
+    nodes[8].childNodes = logFiles.netlog.map((file, i) => Sidebar.getNetlogFileNode(file, props, i));
 
     return { nodes };
   }
@@ -152,13 +162,44 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
     if (file.fileName.endsWith('gpu-log.html')) {
       label = 'GPU';
     } else if (file.fileName.endsWith('notification-warnings.json')) {
-      label = 'notification warnings';
+      label = 'Notification Warnings';
     } else {
       const nameMatch = file.fileName.match(/slack-(\w*)/);
       label = nameMatch && nameMatch.length > 1 ? nameMatch[1] : file.fileName;
     }
 
     return Sidebar.getNode(label, { file }, isSelected);
+  }
+
+  /**
+   * Returns a single tree node for an UnzippedFile (in this case, net logs).
+   *
+   * @static
+   * @param {UnzippedFile} file
+   * @param {SidebarProps} props
+   * @param {number} index
+   * @returns {ITreeNode}
+   */
+  public static getNetlogFileNode(file: UnzippedFile, props: SidebarProps, i: number): ITreeNode {
+    const {  selectedLogFileName } = props;
+    const isSelected = (selectedLogFileName === file.fileName);
+
+    return Sidebar.getNode(`Net Log ${i + 1}`, { file }, isSelected);
+  }
+
+  /**
+   * Returns a single tree node for an UnzippedFile (in this case, net logs).
+   *
+   * @static
+   * @param {UnzippedFile} file
+   * @param {SidebarProps} props
+   * @returns {ITreeNode}
+   */
+  public static getSquirrelFileNode(file: UnzippedFile, props: SidebarProps): ITreeNode {
+    const {  selectedLogFileName } = props;
+    const isSelected = (selectedLogFileName === file.fileName);
+
+    return Sidebar.getNode(file.fileName, { file }, isSelected);
   }
 
   /**

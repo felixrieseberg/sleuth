@@ -9,6 +9,8 @@ export const enum LogType {
   CALL = 'call',
   WEBAPP = 'webapp',
   PRELOAD = 'preload',
+  NETLOG = 'netlog',
+  SQUIRREL = 'squirrel',
   ALL = 'all',
   UNKNOWN = ''
 }
@@ -19,6 +21,8 @@ export const ALL_LOG_TYPES = [
   LogType.CALL,
   LogType.WEBAPP,
   LogType.PRELOAD,
+  LogType.NETLOG,
+  LogType.SQUIRREL,
   LogType.ALL
 ];
 
@@ -90,6 +94,8 @@ export interface ProcessedLogFiles {
   webapp: Array<ProcessedLogFile>;
   state: Array<UnzippedFile>;
   call: Array<ProcessedLogFile>;
+  netlog: Array<UnzippedFile>;
+  squirrel: Array<UnzippedFile>;
 }
 
 export interface MergedLogFile {
@@ -106,6 +112,8 @@ export interface SortedUnzippedFiles {
   webapp: Array<UnzippedFile>;
   state: Array<UnzippedFile>;
   call: Array<UnzippedFile>;
+  netlog: Array<UnzippedFile>;
+  squirrel: Array<UnzippedFile>;
 }
 
 export interface MergedFilesLoadStatus {

@@ -16,7 +16,8 @@ import {
   ProcessedLogFile,
   ProcessedLogFiles,
   LogType,
-  LOG_TYPES_TO_PROCESS
+  LOG_TYPES_TO_PROCESS,
+  SortedUnzippedFiles
 } from '../interfaces';
 import { AppCoreHeader } from './app-core-header';
 import { Sidebar } from './sidebar';
@@ -55,7 +56,9 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
         preload: [],
         webapp: [],
         state: [],
-        call: []
+        call: [],
+        squirrel: [],
+        netlog: []
       },
       loadingMessage: '',
       loadedLogFiles: false,
@@ -86,10 +89,13 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
    * @param {(Array<ProcessedLogFile|UnzippedFile>)} files
    * @param {string} logType
    */
-  private addFilesToState(files: Array<ProcessedLogFile|UnzippedFile>, logType: string) {
+  private addFilesToState(files: Partial<SortedUnzippedFiles>, ...types: Array<string>) {
     const { processedLogFiles } = this.state;
     const newProcessedLogFiles: ProcessedLogFiles = { ...processedLogFiles as ProcessedLogFiles };
-    newProcessedLogFiles[logType] = newProcessedLogFiles[logType].concat(files);
+
+    types.forEach((t) => {
+      newProcessedLogFiles[t] = newProcessedLogFiles[t].concat(files[t]);
+    });
 
     this.setState({
       processedLogFiles: newProcessedLogFiles
@@ -113,7 +119,9 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
       });
     }
 
-    this.addFilesToState(sortedUnzippedFiles.state, 'state');
+    this.addFilesToState(sortedUnzippedFiles, 'state', 'netlog', 'squirrel');
+
+    console.log(this.state!.processedLogFiles!.state);
 
     console.time('process-files');
     for (const type of LOG_TYPES_TO_PROCESS) {
@@ -121,8 +129,10 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
       const files = await processLogFiles(preFiles, (loadingMessage) => {
         this.setState({ loadingMessage });
       });
+      const delta: Partial<SortedUnzippedFiles> = {};
 
-      this.addFilesToState(files, type);
+      delta[type] = files;
+      this.addFilesToState(delta, type);
     }
     console.timeEnd('process-files');
 

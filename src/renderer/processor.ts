@@ -24,6 +24,7 @@ export function sortWithWebWorker(data: Array<any>, sortFn: string): Promise<Arr
   return new Promise((resolve) => {
     // For test cases only
     if (!(window as any).Worker) {
+      // tslint:disable-next-line:function-constructor
       const sortedData = data.sort(new Function(`return ${sortFn}`)());
       resolve(sortedData);
       return;
@@ -109,6 +110,7 @@ export function mergeLogFiles(
 
 /**
  * Takes a logfile and returns the file's type (browser/renderer/webapp/preload).
+ *
  * @param {UnzippedFile} logFile
  * @returns {LogType}
  */
@@ -125,6 +127,10 @@ export function getTypeForFile(logFile: UnzippedFile): LogType {
     return LogType.WEBAPP;
   } else if (fileName.startsWith('call')) {
     return LogType.CALL;
+  } else if (fileName.startsWith('net')) {
+    return LogType.NETLOG;
+  } else if (fileName.startsWith('ShipIt')) {
+    return LogType.SQUIRREL;
   }
 
   return LogType.UNKNOWN;
@@ -137,28 +143,30 @@ export function getTypeForFile(logFile: UnzippedFile): LogType {
  * @returns {SortedUnzippedFiles}
  */
 export function getTypesForFiles(logFiles: UnzippedFiles): SortedUnzippedFiles {
-  const isStateFile = /^slack-[\s\S]*$/;
+  const isStateFile = (name: string) => {
+    return /^slack-[\s\S]*$/.test(name) || name.endsWith('.html') || name.endsWith('.json');
+  };
 
-  const result = {
-    browser: [] as Array<UnzippedFile>,
-    call: [] as Array<UnzippedFile>,
-    renderer: [] as Array<UnzippedFile>,
-    webapp: [] as Array<UnzippedFile>,
-    preload: [] as Array<UnzippedFile>,
-    state: [] as Array<UnzippedFile>
+  const result: SortedUnzippedFiles = {
+    browser: [],
+    call: [],
+    renderer: [],
+    webapp: [],
+    preload: [],
+    state: [],
+    squirrel: [],
+    netlog: []
   };
 
   logFiles.forEach((logFile) => {
-    if (isStateFile.test(logFile.fileName) || logFile.fileName.endsWith('.html') || logFile.fileName.endsWith('.json')) {
+    const logType = getTypeForFile(logFile);
+
+    if (result[logType]) {
+      result[logType].push(logFile);
+    } else if (isStateFile(logFile.fileName)) {
       result.state.push(logFile);
     } else {
-      const logType = getTypeForFile(logFile);
-
-      if (result[logType]) {
-        result[logType].push(logFile);
-      } else {
-        debug(`File ${logFile.fileName} seems weird - we don't recognize it. Throwing it away.`);
-      }
+      debug(`File ${logFile.fileName} seems weird - we don't recognize it. Throwing it away.`);
     }
   });
 
@@ -443,7 +451,6 @@ export function matchLineCall(line: string): MatchResult | undefined {
 
   return;
 }
-
 
 /**
  * Returns the correct match line function for a given log type.
