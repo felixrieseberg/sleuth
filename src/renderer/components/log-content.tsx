@@ -1,5 +1,5 @@
-import { isLogFile } from '../../utils/is-logfile';
-import { ProcessedLogFile } from '../interfaces';
+import { isLogFile, isUnzippedFile } from '../../utils/is-logfile';
+import { ProcessedLogFile, LogType } from '../interfaces';
 import { StateTable } from './state-table';
 import { SleuthState } from '../state/sleuth';
 import { LogTable } from './log-table';
@@ -9,6 +9,8 @@ import React from 'react';
 import { LogLineDetails } from './log-line-details/details';
 import { Scrubber } from './scrubber';
 import { getFontForCSS } from './preferences-font';
+import { getTypeForFile } from '../processor';
+import { NetLogView } from './net-log-view';
 
 export interface LogContentProps {
   state: SleuthState;
@@ -53,6 +55,7 @@ export class LogContent extends React.Component<LogContentProps, Partial<LogCont
     const tableStyle = isDetailsVisible ? { height: this.state.tableHeight } : { flexGrow: 1 };
     const scrubber = <Scrubber elementSelector='LogTableContainer' onResizeHandler={this.resizeHandler} />;
 
+    // In most cases, we're dealing with a log file
     if (isLog) {
       return (
         <div className='LogContent' style={{ fontFamily: getFontForCSS(font) }}>
@@ -72,8 +75,17 @@ export class LogContent extends React.Component<LogContentProps, Partial<LogCont
           <LogLineDetails state={this.props.state} />
         </div>
       );
-    } else {
-      return <StateTable state={this.props.state} />;
     }
+
+    // We're always an unzipped file, but let's make sure
+    if (isUnzippedFile(selectedLogFile)) {
+      const logType = getTypeForFile(selectedLogFile);
+
+      if (logType === LogType.NETLOG) {
+        return <NetLogView file={selectedLogFile} state={this.props.state} />;
+      }
+    }
+
+    return <StateTable state={this.props.state} />;
   }
 }

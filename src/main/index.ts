@@ -33,7 +33,8 @@ if (require('electron-squirrel-startup')) {
       minWidth: 1170,
       titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : undefined,
       webPreferences: {
-        webviewTag: false
+        webviewTag: false,
+        nodeIntegration: true
       }
     });
 
