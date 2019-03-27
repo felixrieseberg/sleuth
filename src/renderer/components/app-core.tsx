@@ -57,7 +57,7 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
         webapp: [],
         state: [],
         call: [],
-        squirrel: [],
+        installer: [],
         netlog: []
       },
       loadingMessage: '',
@@ -119,7 +119,7 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
       });
     }
 
-    this.addFilesToState(sortedUnzippedFiles, 'state', 'netlog', 'squirrel');
+    this.addFilesToState(sortedUnzippedFiles, 'state', 'netlog');
 
     console.log(this.state!.processedLogFiles!.state);
 

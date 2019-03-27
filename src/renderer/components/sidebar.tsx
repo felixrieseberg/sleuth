@@ -103,7 +103,7 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
     nodes[4].childNodes = logFiles.preload.map((file) => Sidebar.getFileNode(file, props));
     nodes[5].childNodes = logFiles.webapp.map((file) => Sidebar.getFileNode(file, props));
     nodes[6].childNodes = logFiles.call.map((file) => Sidebar.getFileNode(file, props));
-    nodes[7].childNodes = logFiles.squirrel.map((file) => Sidebar.getSquirrelFileNode(file, props));
+    nodes[7].childNodes = logFiles.installer.map((file) => Sidebar.getInstallerFileNode(file, props));
     nodes[8].childNodes = logFiles.netlog.map((file, i) => Sidebar.getNetlogFileNode(file, props, i));
 
     return { nodes };
@@ -195,11 +195,14 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
    * @param {SidebarProps} props
    * @returns {ITreeNode}
    */
-  public static getSquirrelFileNode(file: UnzippedFile, props: SidebarProps): ITreeNode {
+  public static getInstallerFileNode(
+    file: UnzippedFile | ProcessedLogFile, props: SidebarProps
+  ): ITreeNode {
     const {  selectedLogFileName } = props;
-    const isSelected = (selectedLogFileName === file.fileName);
+    const name = isProcessedLogFile(file) ? file.logFile.fileName : file.fileName;
+    const isSelected = (selectedLogFileName === name);
 
-    return Sidebar.getNode(file.fileName, { file }, isSelected);
+    return Sidebar.getNode(name, { file }, isSelected);
   }
 
   /**

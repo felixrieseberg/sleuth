@@ -10,7 +10,7 @@ export const enum LogType {
   WEBAPP = 'webapp',
   PRELOAD = 'preload',
   NETLOG = 'netlog',
-  SQUIRREL = 'squirrel',
+  INSTALLER = 'installer',
   ALL = 'all',
   UNKNOWN = ''
 }
@@ -22,7 +22,7 @@ export const ALL_LOG_TYPES = [
   LogType.WEBAPP,
   LogType.PRELOAD,
   LogType.NETLOG,
-  LogType.SQUIRREL,
+  LogType.INSTALLER,
   LogType.ALL
 ];
 
@@ -31,7 +31,8 @@ export const LOG_TYPES_TO_PROCESS = [
   LogType.RENDERER,
   LogType.WEBAPP,
   LogType.PRELOAD,
-  LogType.CALL
+  LogType.CALL,
+  LogType.INSTALLER
 ];
 
 export interface ProcessorPerformanceInfo {
@@ -95,7 +96,7 @@ export interface ProcessedLogFiles {
   state: Array<UnzippedFile>;
   call: Array<ProcessedLogFile>;
   netlog: Array<UnzippedFile>;
-  squirrel: Array<UnzippedFile>;
+  installer: Array<UnzippedFile>;
 }
 
 export interface MergedLogFile {
@@ -113,7 +114,7 @@ export interface SortedUnzippedFiles {
   state: Array<UnzippedFile>;
   call: Array<UnzippedFile>;
   netlog: Array<UnzippedFile>;
-  squirrel: Array<UnzippedFile>;
+  installer: Array<UnzippedFile>;
 }
 
 export interface MergedFilesLoadStatus {

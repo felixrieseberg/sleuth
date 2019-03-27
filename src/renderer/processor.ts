@@ -8,10 +8,13 @@ import { LogEntry, LogType, MatchResult, MergedLogFile, ProcessedLogFile, Sorted
 
 const debug = require('debug')('sleuth:processor');
 
-const DESKTOP_RGX = /^\[([\d\/\,\s\:]{22})\] ([A-Za-z]{0,20})\: (.*)$/g;
+const DESKTOP_RGX = /^\s*\[([\d\/\,\s\:]{22})\] ([A-Za-z]{0,20})\: (.*)$/g;
 const WEBAPP_A_RGX = /^(\w*): (.{3}-\d{1,2} \d{2}:\d{2}:\d{2}.\d{0,3}) (.*)$/;
 const WEBAPP_B_RGX = /^(\w*): (\d{4}\/\d{1,2}\/\d{1,2} \d{2}:\d{2}:\d{2}.\d{0,3}) (.*)$/;
 const WEBAPP_LITE_RGX = /^(\w{4,8}): (.*)$/;
+
+// 2019-01-08 08:29:56.504 ShipIt[4680:172321] Beginning installation
+const SHIPIT_MAC_RGX = /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}) (.*)$/;
 
 /**
  * Sort an array, but do it on a different thread
@@ -130,7 +133,7 @@ export function getTypeForFile(logFile: UnzippedFile): LogType {
   } else if (fileName.startsWith('net')) {
     return LogType.NETLOG;
   } else if (fileName.startsWith('ShipIt')) {
-    return LogType.SQUIRREL;
+    return LogType.INSTALLER;
   }
 
   return LogType.UNKNOWN;
@@ -154,7 +157,7 @@ export function getTypesForFiles(logFiles: UnzippedFiles): SortedUnzippedFiles {
     webapp: [],
     preload: [],
     state: [],
-    squirrel: [],
+    installer: [],
     netlog: []
   };
 
@@ -174,6 +177,27 @@ export function getTypesForFiles(logFiles: UnzippedFiles): SortedUnzippedFiles {
 }
 
 /**
+ * Checks the filename to see if we should process a log file.
+ * Does not check if we shouldn't process the whole log type,
+ * this is currently only used for those log categories that
+ * contain _some_ files that shouldn't be processed (installer).
+ *
+ * @param {UnzippedFile} logFile
+ * @returns {boolean}
+ */
+function getShouldProcessFile(logFile: UnzippedFile): boolean {
+  const name = logFile && logFile.fileName
+    ? logFile.fileName.toLowerCase()
+    : '';
+
+  if (name.includes('shipit') && name.endsWith('plist')) {
+    return false;
+  }
+
+  return true;
+}
+
+/**
  * Processes an array of unzipped logfiles.
  *
  * @param {UnzippedFiles} logFiles
@@ -182,11 +206,15 @@ export function getTypesForFiles(logFiles: UnzippedFiles): SortedUnzippedFiles {
 export function processLogFiles(
   logFiles: UnzippedFiles,
   progressCb?: (status: string) => void
-): Promise<Array<ProcessedLogFile>> {
+): Promise<Array<ProcessedLogFile | UnzippedFile>> {
   const promises: Array<any> = [];
 
   logFiles.forEach((logFile) => {
-    promises.push(processLogFile(logFile, progressCb));
+    if (getShouldProcessFile(logFile)) {
+      promises.push(processLogFile(logFile, progressCb));
+    } else {
+      promises.push(logFile);
+    }
   });
 
   return Promise.all(promises);
@@ -320,7 +348,7 @@ export function readFile(
       } else {
         // We couldn't match, let's treat it
         if (isCall && current) {
-          // Call logs sometimes have rando newlines, for like no reason.
+          // Call logs sometimes have random newlines
           current.message += line;
         } else {
           // This is (hopefully) part of a meta object
@@ -402,6 +430,41 @@ export function matchLineWebApp(line: string): MatchResult | undefined {
   };
 }
 
+export function matchLineShipItMac(line: string): MatchResult | undefined {
+  // If the line does not start with a number, we're taking a shortcut and
+  // are expecting data.
+  if (!/\d/.test(line[0])) return;
+
+  SHIPIT_MAC_RGX.lastIndex = 0;
+  const results = SHIPIT_MAC_RGX.exec(line);
+
+  if (results && results.length === 3) {
+    // Expected format: 2019-01-08 08:29:56.504
+    const momentValue = new Date(results[1]).valueOf();
+    let message = results[2];
+
+    // Handle a meta entry
+    // ShipIt logs have data on the same line
+    const hasMeta = message.indexOf(', ');
+    let toParseHead = '';
+
+    if (hasMeta > -1) {
+      toParseHead = message.slice(hasMeta + 1) + '\n';
+      message = message.slice(0, hasMeta);
+    }
+
+    return {
+      timestamp: results[1],
+      level: 'info',
+      message,
+      momentValue,
+      toParseHead
+    };
+  }
+
+  return;
+}
+
 /**
  * Matches an Electron line (Browser, Renderer, Preload)
  *
@@ -467,10 +530,12 @@ export function matchLineCall(line: string): MatchResult | undefined {
  * @returns {((line: string) => MatchResult | undefined)}
  */
 export function getMatchFunction(logType: LogType): (line: string) => MatchResult | undefined {
-  if (logType === 'webapp') {
+  if (logType === LogType.WEBAPP) {
     return matchLineWebApp;
-  } else if (logType === 'call') {
+  } else if (logType === LogType.CALL) {
     return matchLineCall;
+  } else if (logType === LogType.INSTALLER) {
+    return matchLineShipItMac;
   } else {
     return matchLineElectron;
   }
