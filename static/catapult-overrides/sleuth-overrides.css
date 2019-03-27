@@ -1,0 +1,10 @@
+#tab-list,
+#events-view-filter-box,
+#events-view-splitter-box {
+  top: 0!important;
+}
+
+#events-view-source-list-table td {
+  border-left: 1px solid rgba(16, 22, 26, 0.05)!important;
+  border-bottom: 1px solid rgba(16, 22, 26, 0.05)!important;
+}

@@ -29,6 +29,7 @@ export class NetLogView extends React.Component<NetLogViewProps, NetLogViewState
         <iframe
           src='catapult.html'
           onLoad={this.loadFile}
+          frameBorder={0}
         />
       </div>
     );

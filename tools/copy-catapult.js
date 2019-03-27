@@ -13,6 +13,9 @@ module.exports = {
       }, {
         source: path.join(__dirname, '../static/catapult.html'),
         target: path.join(__dirname, '../dist/static/catapult.html')
+      }, {
+        source: path.join(__dirname, '../static/catapult-overrides'),
+        target: path.join(__dirname, '../dist/catapult')
       }
     ]
 
