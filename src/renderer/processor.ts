@@ -275,6 +275,27 @@ export function readFile(
 
     const levelCounts = {};
 
+    function pushEntry(entry: LogEntry | null) {
+      if (entry) {
+        // If this a repeated line, save as repeated
+        const lastIndex = entries.length - 1;
+        const previous = entries.length > 0 ? entries[lastIndex] : null;
+
+        if (previous && previous.message === entry.message && previous.meta === entry.meta) {
+          entries[lastIndex].repeated = entries[lastIndex].repeated || [];
+          entries[lastIndex].repeated!.push(entry.timestamp);
+        } else {
+          entry.index = entries.length;
+
+          if (entry.level) {
+            levelCounts[entry.level] = (levelCounts[entry.level] || 0)  + 1;
+          }
+
+          entries.push(entry);
+        }
+      }
+    }
+
     function readLine(line: string) {
       lines = lines + 1;
 
@@ -291,24 +312,7 @@ export function readFile(
         }
 
         // Push the last entry
-        if (current) {
-          // If this a repeated line, save as repeated
-          const lastIndex = entries.length - 1;
-          const previous = entries.length > 0 ? entries[lastIndex] : null;
-
-          if (previous && previous.message === current.message && previous.meta === current.meta) {
-            entries[lastIndex].repeated = entries[lastIndex].repeated || [];
-            entries[lastIndex].repeated!.push(current.timestamp);
-          } else {
-            current.index = entries.length;
-
-            if (current.level) {
-              levelCounts[current.level] = (levelCounts[current.level] || 0)  + 1;
-            }
-
-            entries.push(current);
-          }
-        }
+        pushEntry(current);
 
         // Create new entry
         toParse = matched.toParseHead || '';
@@ -332,7 +336,10 @@ export function readFile(
     }
 
     readInterface.on('line', readLine);
-    readInterface.on('close', () => resolve({ entries, lines, levelCounts }));
+    readInterface.on('close', () => {
+      pushEntry(current);
+      resolve({ entries, lines, levelCounts });
+    });
   });
 }
 

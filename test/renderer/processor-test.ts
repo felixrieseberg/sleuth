@@ -67,7 +67,7 @@ describe('readFile', () => {
 
     return readFile(file, LogType.BROWSER).then(({ entries }) => {
       expect(entries).to.exist;
-      expect(entries.length).to.be.equal(12);
+      expect(entries.length).to.be.equal(13);
       expect(entries[0]).to.exist;
       expect(entries[0].timestamp).to.be.equal('02/22/17, 16:02:32:675');
       expect(entries[0].level).to.be.equal('info');
@@ -93,7 +93,7 @@ describe('readFile', () => {
 
     return readFile(file, LogType.WEBAPP).then(({ entries }) => {
       expect(entries).to.exist;
-      expect(entries.length).to.be.equal(6);
+      expect(entries.length).to.be.equal(7);
       expect(entries[3]).to.exist;
       expect(entries[3].timestamp).to.be.equal('2017/2/22 16:02:37.178');
       expect(entries[3].message).to.be.equal('didStartLoading called TSSSB.timeout_tim set for ms:60000');
@@ -132,7 +132,7 @@ describe('processLogFile', () => {
       expect(result).to.exist;
       expect(result.logFile).to.exist;
       expect(result.logEntries).to.exist;
-      expect(result.logEntries.length).to.be.equal(12);
+      expect(result.logEntries.length).to.be.equal(13);
       expect(result.logEntries[0].timestamp).to.be.equal('02/22/17, 16:02:32:675');
       expect(result.logEntries[0].level).to.be.equal('info');
       expect(result.logEntries[0].momentValue).to.be.equal(1487808152675);
@@ -154,7 +154,7 @@ describe('processLogFile', () => {
       expect(result).to.exist;
       expect(result.logFile).to.exist;
       expect(result.logEntries).to.exist;
-      expect(result.logEntries.length).to.be.equal(6);
+      expect(result.logEntries.length).to.be.equal(7);
       expect(result.logEntries[3]).to.exist;
       expect(result.logEntries[3].timestamp).to.be.equal('2017/2/22 16:02:37.178');
       expect(result.logEntries[3].message).to.be.equal('didStartLoading called TSSSB.timeout_tim set for ms:60000');
