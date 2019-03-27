@@ -15,6 +15,8 @@ const WEBAPP_LITE_RGX = /^(\w{4,8}): (.*)$/;
 
 // 2019-01-08 08:29:56.504 ShipIt[4680:172321] Beginning installation
 const SHIPIT_MAC_RGX = /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}) (.*)$/;
+// 2019-01-30 21:08:25> Program: Starting install, writing to C:\Users\felix\AppData\Local\SquirrelTemp
+const SQUIRREL_RGX = /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})> (.*)$/;
 
 /**
  * Sort an array, but do it on a different thread
@@ -132,7 +134,7 @@ export function getTypeForFile(logFile: UnzippedFile): LogType {
     return LogType.CALL;
   } else if (fileName.startsWith('net')) {
     return LogType.NETLOG;
-  } else if (fileName.startsWith('ShipIt')) {
+  } else if (fileName.startsWith('ShipIt') || fileName.includes('SquirrelSetup')) {
     return LogType.INSTALLER;
   }
 
@@ -293,7 +295,7 @@ export function readFile(
     const readStream = fs.createReadStream(logFile.fullPath);
     const readInterface = readline.createInterface({ input: readStream, terminal: false });
     const parsedlogType = logType || getTypeForFile(logFile);
-    const matchFn = getMatchFunction(parsedlogType);
+    const matchFn = getMatchFunction(parsedlogType, logFile);
     const isCall = logType === 'call';
 
     let lines = 0;
@@ -430,6 +432,41 @@ export function matchLineWebApp(line: string): MatchResult | undefined {
   };
 }
 
+/**
+ * Matches a line coming from Squirrel
+ *
+ * @export
+ * @param {string} line
+ * @returns {(MatchResult | undefined)}
+ */
+export function matchLineSquirrel(line: string): MatchResult | undefined {
+  if (line.startsWith('   at')) return;
+
+  SQUIRREL_RGX.lastIndex = 0;
+  const results = SQUIRREL_RGX.exec(line);
+
+  if (results && results.length === 3) {
+    // Expected format: 2019-01-30 21:08:25
+    const momentValue = new Date(results[1]).valueOf();
+
+    return {
+      timestamp: results[1],
+      level: 'info',
+      message: results[2],
+      momentValue
+    };
+  }
+
+  return;
+}
+
+/**
+ * Matches a line coming from a ShipIt log file
+ *
+ * @export
+ * @param {string} line
+ * @returns {(MatchResult | undefined)}
+ */
 export function matchLineShipItMac(line: string): MatchResult | undefined {
   // If the line does not start with a number, we're taking a shortcut and
   // are expecting data.
@@ -527,15 +564,23 @@ export function matchLineCall(line: string): MatchResult | undefined {
  *
  * @export
  * @param {LogType} logType
+ * @param {UnzippedFile} logFile
  * @returns {((line: string) => MatchResult | undefined)}
  */
-export function getMatchFunction(logType: LogType): (line: string) => MatchResult | undefined {
+export function getMatchFunction(
+  logType: LogType,
+  logFile: UnzippedFile
+): (line: string) => MatchResult | undefined {
   if (logType === LogType.WEBAPP) {
     return matchLineWebApp;
   } else if (logType === LogType.CALL) {
     return matchLineCall;
   } else if (logType === LogType.INSTALLER) {
-    return matchLineShipItMac;
+    if (logFile.fileName.includes('Squirrel')) {
+      return matchLineSquirrel;
+    } else {
+      return matchLineShipItMac;
+    }
   } else {
     return matchLineElectron;
   }
