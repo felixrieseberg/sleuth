@@ -14,8 +14,21 @@
     <link type="text/css" rel="stylesheet" href="../catapult/sleuth-overrides.css">
 
     <link rel="import" href="../catapult/netlog_viewer.html">
+
+    <script>
+      window.sleuth = {
+
+        setDarkMode(enabled) {
+          if (enabled) {
+            document.body.classList.add('bp3-dark');
+          } else {
+            document.body.classList.remove('bp3-dark');
+          }
+        }
+      }
+    </script>
   </head>
-  <body>
+  <body class="bp3-dark">
     <netlog-viewer></netlog-viewer>
   </body>
 </html>
