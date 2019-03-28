@@ -9,9 +9,13 @@ import { LogEntry, LogType, MatchResult, MergedLogFile, ProcessedLogFile, Sorted
 const debug = require('debug')('sleuth:processor');
 
 const DESKTOP_RGX = /^\s*\[([\d\/\,\s\:]{22})\] ([A-Za-z]{0,20})\: (.*)$/g;
+
 const WEBAPP_A_RGX = /^(\w*): (.{3}-\d{1,2} \d{2}:\d{2}:\d{2}.\d{0,3}) (.*)$/;
 const WEBAPP_B_RGX = /^(\w*): (\d{4}\/\d{1,2}\/\d{1,2} \d{2}:\d{2}:\d{2}.\d{0,3}) (.*)$/;
 const WEBAPP_LITE_RGX = /^(\w{4,8}): (.*)$/;
+
+// Mar-26 09:29:38.460 []
+const WEBAPP_NEW_TIMESTAMP_RGX = /^\w{3}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} .*$/;
 
 // 2019-01-08 08:29:56.504 ShipIt[4680:172321] Beginning installation
 const SHIPIT_MAC_RGX = /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}) (.*)$/;
@@ -383,17 +387,41 @@ export function readFile(
 export function matchLineWebApp(line: string): MatchResult | undefined {
   // Matcher for the webapp, which is a bit dirty. This beast of a regex
   // matches two possible timestamps:
+  //
   // info: 2017/2/22 16:02:37.178 didStartLoading called TSSSB.timeout_tim set for ms:60000
   // info: Mar-19 13:50:41.676 [FOCUS-EVENT] Window focused
+  //
   // Matcher for webapp logs that don't have a timestamp, but do have a level 🙄
   // info: ╔═══════════════════════════════════════════════════════════════════════╗
   // Sometimes they just log
   // TS.storage.isUsingMemberBotCache():false
 
-  WEBAPP_A_RGX.lastIndex = 0;
-  let results = WEBAPP_A_RGX.exec(line);
+  DESKTOP_RGX.lastIndex = 0;
+  let results = DESKTOP_RGX.exec(line);
 
   // First, try the expected default format
+  if (results && results.length === 4) {
+    // Expected format: MM/DD/YY, HH:mm:ss:SSS'
+    const momentValue = new Date(results[1]).valueOf();
+    let message = results[3];
+
+    // If we have two timestamps, cut that from the message
+    if (WEBAPP_NEW_TIMESTAMP_RGX.test(results[3])) {
+      message = message.slice(20);
+    }
+
+    return {
+      timestamp: results[1],
+      level: results[2],
+      message,
+      momentValue
+    };
+  }
+
+  // Alright, try WEBAPP_A.
+  WEBAPP_A_RGX.lastIndex = 0;
+  results = WEBAPP_A_RGX.exec(line);
+
   if (results && results.length === 4) {
     return {
       timestamp: results[2],
