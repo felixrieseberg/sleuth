@@ -21,7 +21,7 @@ export class JSONView extends React.Component<JSONViewProps, JSONViewState> {
   public render() {
     const data = this.props.data || parseJSON(this.props.raw || '');
 
-    if (data) {
+    if (data && Object.keys(data).length > 1) {
       const theme = getTheme(this.props.state.isDarkMode);
 
       return (
@@ -35,12 +35,14 @@ export class JSONView extends React.Component<JSONViewProps, JSONViewState> {
           />
         </div>
       );
-    } else {
+    } else if (this.props.raw) {
       return (
         <div className='Monospace'>
           <code>{this.props.raw}</code>
         </div>
       );
+    } else {
+      return <p>This file is empty and contains no data.</p>;
     }
   }
 }

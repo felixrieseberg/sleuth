@@ -52,10 +52,6 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
     const { data, path } = this.state;
     const { font } = this.props.state;
 
-    if (!data && !path) {
-      return <div />;
-    }
-
     const info = this.renderInfo();
     const onIFrameLoad = function(this: HTMLIFrameElement) {
       if (this) {
