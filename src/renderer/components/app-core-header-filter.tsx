@@ -130,6 +130,11 @@ export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
             parseDate={(str) => new Date(str)}
             value={[ dateRange.from, dateRange.to ]}
           />
+          <Button
+            icon='cross'
+            style={{ marginLeft: '5px' }}
+            onClick={() => this.onDateRangeChange([])}
+          />
           <NavbarDivider />
           <InputGroup
             leftIcon='search'
