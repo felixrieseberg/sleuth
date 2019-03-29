@@ -10,6 +10,13 @@ const options = {
     osxSign: {
       identity: '6EAE76A75A316F8CE47BDBC19A95B44536FDCD2D'
     },
+    ignore: [
+      /^\/\.vscode\//,
+      /^\/catapult\//,
+      /^\/coverage\//,
+      /^\/test\//,
+      /^\/tools\//
+    ],
     extendInfo: './static/extend.plist',
     win32metadata: {
       ProductName: 'Sleuth',
