@@ -6,16 +6,23 @@ const options = {
   },
   packagerConfig: {
     icon: './static/img/sleuth-icon',
-    asar: true,
+    asar: false,
     osxSign: {
       identity: '6EAE76A75A316F8CE47BDBC19A95B44536FDCD2D'
     },
     ignore: [
-      /^\/\.vscode\//,
-      /^\/catapult\//,
-      /^\/coverage\//,
-      /^\/test\//,
-      /^\/tools\//
+      /^\/\.vscode/,
+      /^\/catapult/,
+      /^\/coverage/,
+      /^\/test/,
+      /^\/tools/,
+      /^\/src/,
+      /^\/static\/catapult-overrides/,
+      /^\/static\/img\/sleuth/,
+      /\/test\//,
+      /\/[A-Za-z0-0]+\.md/,
+      /package-lock.json/,
+      /react.development.js/,
     ],
     extendInfo: './static/extend.plist',
     win32metadata: {
