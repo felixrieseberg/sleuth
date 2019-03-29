@@ -9,6 +9,10 @@ async function compileParcel(options = {}) {
     path.join(__dirname, '../src/main/index.ts')
   ]
 
+  if (options.production) {
+    process.env.NODE_ENV = 'production';
+  }
+
   const bundlerOptions = {
     outDir: './dist', // The out directory to put the build files in, defaults to dist
     outFile: undefined, // The name of the outputFile

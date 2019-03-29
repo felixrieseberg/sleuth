@@ -10,6 +10,10 @@ import { secureApp } from './security';
 let mainWindow: Electron.BrowserWindow | null;
 let ipcManager: IpcManager;
 
+if (!config.isDevMode) {
+  process.env.NODE_ENV = 'production';
+}
+
 if (require('electron-squirrel-startup')) {
   // No-op, we're done here
 } else {
@@ -34,7 +38,8 @@ if (require('electron-squirrel-startup')) {
       titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : undefined,
       webPreferences: {
         webviewTag: false,
-        nodeIntegration: true
+        nodeIntegration: true,
+        contextIsolation: false
       }
     });
 

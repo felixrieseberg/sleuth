@@ -6,7 +6,7 @@ const options = {
   },
   packagerConfig: {
     icon: './static/img/sleuth-icon',
-    asar: false,
+    asar: true,
     osxSign: {
       identity: '6EAE76A75A316F8CE47BDBC19A95B44536FDCD2D'
     },
@@ -16,11 +16,11 @@ const options = {
       /^\/coverage/,
       /^\/test/,
       /^\/tools/,
-      /^\/src/,
+      /^\/src\//,
       /^\/static\/catapult-overrides/,
       /^\/static\/img\/sleuth/,
       /\/test\//,
-      /\/[A-Za-z0-0]+\.md/,
+      /\/[A-Za-z0-0]+\.md$/,
       /package-lock.json/,
       /react.development.js/,
     ],
