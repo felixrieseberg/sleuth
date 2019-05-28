@@ -93,17 +93,27 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    * @param {LogTableProps} nextProps
    */
   public componentWillReceiveProps(nextProps: LogTableProps): void {
-    const { levelFilter, search, logFile, showOnlySearchResults, searchIndex, dateRange } = this.props;
-    const searchChanged = search !== nextProps.search || showOnlySearchResults !== nextProps.showOnlySearchResults;
+    const {
+      levelFilter,
+      search,
+      logFile,
+      showOnlySearchResults,
+      searchIndex,
+      dateRange
+    } = this.props;
+
+    // Next props
+    const nextshowOnlySearchResults = nextProps.showOnlySearchResults;
     const nextFile = nextProps.logFile;
+    const nextLevelFilter = nextProps.levelFilter;
+    const nextSearch = nextProps.search;
+
+    // Filter or search changed
+    const filterChanged = didFilterChange(levelFilter, nextLevelFilter);
+    const searchChanged = search !== nextProps.search || showOnlySearchResults !== nextshowOnlySearchResults;
     const fileChanged = ((!logFile && nextFile)
       || logFile && nextFile && logFile.logEntries.length !== nextFile.logEntries.length
       || logFile && nextFile && logFile.logType !== nextFile.logType);
-
-    // Filter or search changed
-    const nextLevelFilter = nextProps.levelFilter;
-    const filterChanged = didFilterChange(levelFilter, nextLevelFilter);
-    const nextSearch = nextProps.search;
 
     // Date range changed
     const rangeChanged = dateRange !== nextProps.dateRange;
@@ -111,7 +121,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
 
     if (filterChanged || searchChanged || fileChanged || rangeChanged) {
       const sortOptions: SortFilterListOptions = {
-        showOnlySearchResults: nextProps.showOnlySearchResults,
+        showOnlySearchResults: nextshowOnlySearchResults,
         filter: nextLevelFilter,
         search: nextSearch,
         logFile: nextFile,
@@ -121,14 +131,22 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
       let searchList: Array<number> = [];
 
       // Should we create a search list?
-      if (!nextProps.showOnlySearchResults && nextSearch) {
+      if (!nextshowOnlySearchResults && nextSearch) {
         debug(`showOnlySearchResults is false, making search list`);
         searchList = this.doSearchIndex(nextSearch, sortedList);
       }
 
+      // Get correct selected index
+      const selectedIndex = this.findIndexForSelectedEntry(sortedList);
+
       console.log('setting state');
 
-      this.setState({ sortedList, searchList });
+      this.setState({
+        sortedList,
+        searchList,
+        selectedIndex,
+        scrollToSelection: !!selectedIndex
+      });
     }
 
     if (searchIndex !== nextProps.searchIndex) {
@@ -173,6 +191,24 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
         </div>
       </div>
     );
+  }
+
+  private findIndexForSelectedEntry(
+    sortedList: Array<LogEntry> | undefined
+  ): number {
+    const { selectedEntry } = this.props.state;
+
+    if (selectedEntry && sortedList) {
+      const foundIndex = sortedList.findIndex((v) => {
+        return v.line === selectedEntry.line;
+      });
+
+      console.log(foundIndex);
+
+      return foundIndex;
+    }
+
+    return -1;
   }
 
   /**
