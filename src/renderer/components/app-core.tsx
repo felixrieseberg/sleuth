@@ -189,6 +189,8 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
    * @param {string} [logType]
    */
   private selectLogFile(logFile: ProcessedLogFile | UnzippedFile | null, logType?: string): void {
+    this.props.state.selectedEntry = undefined;
+
     if (!logFile && logType) {
       const { mergedLogFiles } = this.state;
 
