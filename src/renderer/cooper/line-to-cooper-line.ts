@@ -38,7 +38,7 @@ const filters: Array<Replacer> = [
     replacer: ' {User} '
   }, {
     name: 'ms',
-    rgx: /( |^)(\d{1,20}(?: )?ms)( |$)/g,
+    rgx: /( |^)([\d\.]{1,20}(?: )?ms)( |$)/g,
     replacer: ' {Time period} '
   }, {
     name: 'old-timestamp',
@@ -54,7 +54,7 @@ const filters: Array<Replacer> = [
     replacer: ' {id} '
   }, {
     name: 'channel-id',
-    rgx: /( |^)("{0,1}(C|D)[A-Z0-9]{8}"{0,1})( |$)/g,
+    rgx: /( |^|\()("{0,1}(C|D)[A-Z0-9]{8}"{0,1})( |\)|:|$)/g,
     replacer: ' {Channel} '
   }, {
     name: 'was-active',
