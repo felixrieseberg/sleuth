@@ -4,7 +4,7 @@ import { getLanguageNames } from '../../utils/iso639';
 export function getSettingsInfo(data: any): Array<JSX.Element> {
   const result: Array<JSX.Element> = [];
 
-  result.push(<p>📋 This user is running Slack <span>{getVersionInfo(data)}</span> on {getOSInfo(data)}.</p>);
+  result.push(<p>📋 This user is running Slack <span>{getVersionInfo(data)}</span> on {getOSInfo(data)}</p>);
   result.push(<p>📡 {getChannelInfo(data)}</p>);
   result.push(<p>📣 {getNotificationsInfo(data)}</p>);
   result.push(<p>🔍 {getZoomInfo(data)}</p>);
