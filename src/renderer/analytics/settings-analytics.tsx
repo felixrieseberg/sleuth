@@ -96,7 +96,9 @@ export function getLocaleInfo({ locale, spellcheckerLanguage }: any): string {
 }
 
 export function getChannelInfo({ releaseChannel }: any): string {
-  return releaseChannel ? ` Updates are coming from the ${releaseChannel} channel.` : '';
+  return releaseChannel
+    ? ` Updates are coming from the ${releaseChannel} channel.`
+    : ' No channel is specified.';
 }
 
 export function getZoomInfo({ zoomLevel }: any) {
