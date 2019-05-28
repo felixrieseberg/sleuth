@@ -11,6 +11,8 @@ import { UnzippedFile } from '../unzip';
 import { JSONView } from './json-view';
 import { parseJSON } from '../../utils/parse-json';
 import { getFontForCSS } from './preferences-font';
+import { isTruthy } from '../../utils/is-truthy';
+import { plural } from '../../utils/pluralize';
 
 const debug = require('debug')('sleuth:statetable');
 
@@ -23,7 +25,17 @@ export interface StateTableState {
   path?: string;
 }
 
-export type StateFileType = 'appTeams' | 'teams' | 'dialog' | 'unknown' | 'unreads' | 'settings' | 'windowFrame' | 'html' | 'notifs' | 'installation';
+export type StateFileType = 'appTeams' |
+  'workspaces' |
+  'teams' |
+  'dialog' |
+  'unknown' |
+  'unreads' |
+  'settings' |
+  'windowFrame' |
+  'html' |
+  'notifs' |
+  'installation';
 
 export class StateTable extends React.Component<StateTableProps, StateTableState> {
   constructor(props: StateTableProps) {
@@ -165,7 +177,7 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
       );
   }
 
-  private renderTeamsInfo(): JSX.Element | null {
+  private renderWorkspacesInfo(): JSX.Element | null {
     const { data } = this.state;
     const teams = data ? Object.keys(data).map((k) => data[k]) : null;
 
@@ -173,21 +185,60 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
       return null;
     }
 
-    const teamLinks: Array<JSX.Element | null> = teams.map((t: any) => {
+    const workspaceLinks = this.renderTeamsLinks(teams);
+    const orgLinks = this.renderEnterprisesLinks(teams);
+
+    const workspaceText = workspaceLinks.length > 0
+      ? <p>This user has {workspaceLinks.length} {plural('workspace', workspaceLinks)}: <ul>{workspaceLinks}</ul>.</p>
+      : <p>This user is not signed into any workspaces.</p>;
+
+    const enterpriseText = orgLinks.length > 0
+      ? <p>This user has {orgLinks.length} {plural('enterprise', orgLinks)}: <ul>{orgLinks}</ul>.</p>
+      : <p>This user is not signed into any enterprise organizations.</p>;
+
+    return (
+        <Card className='StateTable-Info' elevation={Elevation.TWO}>
+          {workspaceText}
+          {enterpriseText}
+        </Card>
+      );
+  }
+
+  private renderTeamsLinks(teams: Array<any>): Array<JSX.Element> {
+    return teams.map((t: any) => {
+      // The old format has team_id and user_id, the new format (Sonic)
+      // has only id
       if (t && t.team_name && t.team_id && t.user_id) {
         const teamLink = this.getSearchLink(t.team_name, t.team_id);
         const userLink = this.getSearchLink(t.user_id, t.user_id);
         return (<li key={t.team_id}>{teamLink} (as user {userLink})</li>);
+      } else if (t && t.id && t.name) {
+        const teamLink = this.getSearchLink(t.name, t.id);
+        return (<li key={t.team_id}>{teamLink}</li>);
       } else {
         return null;
       }
-    });
+    }).filter(isTruthy);
+  }
 
-    return (
-        <Card className='StateTable-Info' elevation={Elevation.TWO}>
-          This user has {teams.length} teams: <ul>{teamLinks}</ul>.
-        </Card>
-      );
+  private renderEnterprisesLinks(teams: Array<any>): Array<JSX.Element> {
+    return teams.map((t: any) => {
+      if (t && t.enterprise_id && t.enterprise_name) {
+        const enterpriseLink = this.getSearchLink(t.enterprise_name, t.enterprise_id);
+        return (<li key={t.enterprise_id}>{enterpriseLink}</li>);
+      } else {
+        return null;
+      }
+    }).filter(isTruthy)
+      // Each team in the enterprise will have the enterprise,
+      // so this is a simple way of making the array unique
+      .reduce<Array<JSX.Element>>((previous, current) => {
+        if (!previous.find((s) => s.key === current.key)) {
+          previous.push(current);
+        }
+
+        return previous;
+      }, []);
   }
 
   private renderNotifsInfo(): JSX.Element | null {
@@ -232,8 +283,8 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
   private renderInfo(): JSX.Element | null {
     const type = this.getFileType();
 
-    if (type === 'teams') {
-      return this.renderTeamsInfo();
+    if (type === 'teams' || type === 'workspaces') {
+      return this.renderWorkspacesInfo();
     } else if (type === 'windowFrame') {
       return this.renderWindowFrameInfo();
     } else if (type === 'settings') {
