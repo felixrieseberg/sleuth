@@ -33,9 +33,9 @@ export class App extends React.Component<{}, Partial<AppState>> {
     localStorage.debug = 'sleuth*';
 
     this.openFile = this.openFile.bind(this);
-    this.reset = this.reset.bind(this);
+    this.resetApp = this.resetApp.bind(this);
 
-    this.sleuthState = new SleuthState(this.openFile, this.reset);
+    this.sleuthState = new SleuthState(this.openFile, this.resetApp);
   }
 
   /**
@@ -91,7 +91,7 @@ export class App extends React.Component<{}, Partial<AppState>> {
    */
   public async openFile(url: string): Promise<void> {
     debug(`Received open-url for ${url}`);
-    this.reset();
+    this.resetApp();
 
     const isZipFile = /[\s\S]*\.zip$/.test(url);
     if (isZipFile) {
@@ -113,7 +113,7 @@ export class App extends React.Component<{}, Partial<AppState>> {
    */
   public async openDirectory(url: string): Promise<void> {
     debug(`Now opening directory ${url}`);
-    this.reset();
+    this.resetApp();
 
     const dir = await fs.readdir(url);
     const unzippedFiles: UnzippedFiles = [];
@@ -152,14 +152,15 @@ export class App extends React.Component<{}, Partial<AppState>> {
     this.setState({ unzippedFiles });
   }
 
-  public reset() {
+  public resetApp() {
     this.setState({ unzippedFiles: [] });
 
     if (this.sleuthState.opened > 0) {
-      this.sleuthState.reset();
+      this.sleuthState.reset(false);
     }
 
     this.sleuthState.opened = this.sleuthState.opened + 1;
+    this.sleuthState.getSuggestions();
   }
 
   /**
