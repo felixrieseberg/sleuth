@@ -153,7 +153,7 @@ export function getTypeForFile(logFile: UnzippedFile): LogType {
  */
 export function getTypesForFiles(logFiles: UnzippedFiles): SortedUnzippedFiles {
   const isStateFile = (name: string) => {
-    return /^slack-[\s\S]*$/.test(name) || name.endsWith('.html') || name.endsWith('.json');
+    return /^slack-[\s\S]*$/.test(name) || name.endsWith('.html') || name.endsWith('.json') || name === 'installation';
   };
 
   const result: SortedUnzippedFiles = {

@@ -23,7 +23,7 @@ export interface StateTableState {
   path?: string;
 }
 
-export type StateFileType = 'appTeams' | 'teams' | 'dialog' | 'unknown' | 'unreads' | 'settings' | 'windowFrame' | 'html' | 'notifs';
+export type StateFileType = 'appTeams' | 'teams' | 'dialog' | 'unknown' | 'unreads' | 'settings' | 'windowFrame' | 'html' | 'notifs' | 'installation';
 
 export class StateTable extends React.Component<StateTableProps, StateTableState> {
   constructor(props: StateTableProps) {
@@ -53,6 +53,7 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
     const { font } = this.props.state;
 
     const info = this.renderInfo();
+    const type = this.getFileType();
     const onIFrameLoad = function(this: HTMLIFrameElement) {
       if (this) {
         const { document: idoc } = this.contentWindow!;
@@ -62,15 +63,14 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
 
     const content = (!data && path)
       ? <iframe sandbox='' onLoad={onIFrameLoad} src={path} />
-      : <JSONView data={data} state={this.props.state} />;
+      : type === 'installation' ? null : <JSONView data={data} state={this.props.state} />;
+    const contentCard =  type === 'installation' ? <div/> : <Card> {content} </Card>;
 
     return (
       <div className='StateTable' style={{ fontFamily: getFontForCSS(font) }}>
         <div className='StateTable-Content'>
           {info}
-          <Card>
-            {content}
-          </Card>
+          {contentCard}
         </div>
       </div>
     );
@@ -87,6 +87,10 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
 
     if (this.isNotifsFile(selectedLogFile)) {
       return 'notifs' as StateFileType;
+    }
+
+    if (this.isInstallationFile(selectedLogFile)) {
+      return 'installation' as StateFileType;
     }
 
     const nameMatch = selectedLogFile.fileName.match(/slack-(\w*)/);
@@ -107,6 +111,16 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
       return;
     }
 
+    if (this.isInstallationFile(file)) {
+      try {
+        const content = await fs.readFile(file.fullPath, 'utf8');
+        this.setState({ data: [ content ], path: undefined });
+      } catch (error) {
+        debug(error);
+      }
+      return;
+    }
+
     try {
       const raw = await fs.readFile(file.fullPath, 'utf8');
       this.setState({ data: parseJSON(raw), path: undefined });
@@ -117,6 +131,12 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
 
   private getSearchLink(text: string, query: string): JSX.Element {
     const href = `https://mc.tinyspeck.com/god/search.php?q=${encodeURIComponent(query)}`;
+    return (<a onClick={() => shell.openExternal(href)}>{text}</a>);
+  }
+
+  private getBacktraceLink(text: string, installation: string): JSX.Element {
+    // tslint:disable-next-line:max-line-length
+    const href = `https://backtrace.tinyspeck.com/p/desktop/list?aperture=[[%22relative%22,[%22floating%22,%22all%22]],[[%22instanceUid%22,[%22equal%22,%22${installation}%22]]]]`;
     return (<a onClick={() => shell.openExternal(href)}>{text}</a>);
   }
 
@@ -188,6 +208,27 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
     );
   }
 
+  private renderInstallationInfo(): JSX.Element | null {
+    const { data } = this.state;
+
+
+    if (Array.isArray(data) && data.length > 0) {
+      const id = new Buffer(data[0], 'base64').toString('ascii');
+      const backTraceLink = this.getBacktraceLink(id, id);
+      return (
+        <Card className='StateTable-Info'>
+          See exceptions in Backtrace: {backTraceLink}
+        </Card>
+      );
+    }
+
+    return (
+      <Card className='StateTable-Info'>
+        No installation Id found :(
+      </Card>
+    );
+  }
+
   private renderInfo(): JSX.Element | null {
     const type = this.getFileType();
 
@@ -199,7 +240,9 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
       return this.renderSettingsInfo();
     } else if (type === 'notifs') {
       return this.renderNotifsInfo();
-    }
+    } else if (type === 'installation') {
+      return this.renderInstallationInfo();
+  }
 
     return null;
   }
@@ -215,5 +258,9 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
 
   private isNotifsFile(file: UnzippedFile) {
     return file.fullPath.endsWith('notification-warnings.json');
+  }
+
+  private isInstallationFile(file: UnzippedFile) {
+    return file.fullPath.endsWith('installation');
   }
 }
