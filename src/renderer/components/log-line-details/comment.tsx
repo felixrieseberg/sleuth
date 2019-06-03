@@ -9,6 +9,7 @@ import { Button, Card } from '@blueprintjs/core';
 import { cooperComments } from '../../cooper/comments';
 import { SleuthState } from '../../state/sleuth';
 
+// Uses react-linkify
 const markdown = new Markdown({ linkify: true })
   .use(highlight)
   .use(emoji);
