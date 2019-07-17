@@ -330,7 +330,8 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    * @returns Array<number>
    */
   private doSearchIndex(search: string, list: Array<LogEntry>): Array<number> {
-    let searchRegex = new RegExp(search || '', 'i');
+    let searchRegex = this.getRegExpSafe(search);
+
     const foundIndices: Array<number> = [];
 
     function doSearch(a: LogEntry, i: number) {
@@ -346,7 +347,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     searchParams.forEach((param) => {
       if (param.startsWith('!') && param.length > 1) {
         debug(`Index-Excluding ${param.slice(1)}`);
-        searchRegex = new RegExp(param.slice(1) || '', 'i');
+        searchRegex = this.getRegExpSafe(param.slice(1));
         list.forEach(doExclude);
       } else {
         debug(`Index-Searching for ${param}`);
@@ -355,6 +356,14 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     });
 
     return foundIndices;
+  }
+
+  private getRegExpSafe(exp: string = ''): RegExp {
+    try {
+      return new RegExp(exp, 'i');
+    } catch (error) {
+      return this.getRegExpSafe(exp.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'));
+    }
   }
 
   private doRangeFilter({ from, to }: DateRange, list: Array<LogEntry>): Array<LogEntry> {
