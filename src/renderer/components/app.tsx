@@ -12,6 +12,7 @@ import { CoreApplication } from './app-core';
 import { MacTitlebar } from './mac-titlebar';
 import { Preferences } from './preferences';
 import { AppMenu } from '../menu';
+import { TouchBarManager } from '../touch-bar-manager';
 
 const debug = require('debug')('sleuth:app');
 
@@ -22,6 +23,7 @@ export interface AppState {
 export class App extends React.Component<{}, Partial<AppState>> {
   public readonly menu: AppMenu = new AppMenu();
   public readonly sleuthState: SleuthState;
+  public touchBarManager: TouchBarManager | undefined;
 
   constructor(props: {}) {
     super(props);
@@ -36,6 +38,10 @@ export class App extends React.Component<{}, Partial<AppState>> {
     this.resetApp = this.resetApp.bind(this);
 
     this.sleuthState = new SleuthState(this.openFile, this.resetApp);
+
+    if (process.platform === 'darwin') {
+      this.touchBarManager = new TouchBarManager(this.sleuthState);
+    }
   }
 
   /**

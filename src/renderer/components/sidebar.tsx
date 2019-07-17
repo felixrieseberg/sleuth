@@ -1,6 +1,5 @@
 import React from 'react';
 import classNames from 'classnames';
-import isEqual from 'react-fast-compare';
 import { ITreeNode, Tree, Icon, Position, Tooltip, Intent } from '@blueprintjs/core';
 import { observer } from 'mobx-react';
 
@@ -260,10 +259,6 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
     this.handleNodeClick = this.handleNodeClick.bind(this);
     this.handleNodeCollapse = this.handleNodeCollapse.bind(this);
     this.handleNodeExpand = this.handleNodeExpand.bind(this);
-  }
-
-  public shouldComponentUpdate(nextProps: SidebarProps, nextState: SidebarState) {
-    return isEqual(this.state, nextState) || isEqual(this.props, nextProps);
   }
 
   public render(): JSX.Element {

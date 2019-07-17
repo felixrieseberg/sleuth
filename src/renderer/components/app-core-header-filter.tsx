@@ -47,6 +47,7 @@ export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
       this.props.state.levelFilter = filter;
     }
   }
+
   public onSearchIndexChange(change: number) {
     this.props.state.searchIndex = this.props.state.searchIndex + change;
   }
