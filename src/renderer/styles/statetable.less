@@ -1,0 +1,57 @@
+.StateTable {
+  padding: 2.2rem;
+  height: calc(100% - 50px);
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  .StateTable-Content {
+    ul li,
+    li span,
+    li label {
+      user-select: initial;
+    }
+
+    iframe {
+      width: 100%;
+      border: none;
+      height: calc(~"100vh - 170px");
+    }
+  }
+}
+
+.StateTable-Info {
+  padding-right: 5rem;
+  margin-bottom: 1.1rem;
+
+  ul {
+    display: inline;
+    list-style: none;
+    padding-left: 0;
+    margin-left: 0;
+  }
+
+  ul li {
+    display: inline;
+    user-select: initial;
+  }
+
+  ul li:after {
+    content: ", ";
+  }
+
+  ul li:last-child:after {
+    content: "";
+  }
+
+  ul li:nth-last-child(2):after {
+    content: " and ";
+  }
+
+  ul li:nth-last-child(3) ~ li:nth-last-child(2):after {
+    content: ", and ";
+  }
+}
+
+.StateTable-Warning-Info {
+  padding-right: 5rem;
+}

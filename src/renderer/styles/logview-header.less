@@ -1,0 +1,36 @@
+.AppCore {
+  .headroom {
+    width: 100vw;
+
+    a, i, span {
+      cursor: pointer!important;
+      filter: none;
+    }
+
+    a:hover {
+      filter: none;
+      border-bottom: 2px solid #007ee5;
+    }
+
+    i.ts-icon::before {
+      cursor: pointer;
+    }
+
+    .Engaged {
+      //color: @miami_pink;
+    }
+
+    .header_btns .float_right {
+      position: relative;
+      height: 100%;
+      width: 800px;
+      text-align: right;
+    }
+  }
+}
+
+.SidebarIsOpen {
+  .headroom {
+    width: calc(~"100vw - 300px");
+  }
+}

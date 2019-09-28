@@ -1,0 +1,33 @@
+.Comment {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 0.625rem;
+  margin-top: 10px;
+
+  .Avatar {
+    height: 50px;
+    width: 50px;
+    border-radius: .2rem;
+    flex-shrink: 0;
+    background-size: cover;
+  }
+
+  .Text {
+    padding-left: 10px;
+
+    p {
+      user-select: initial;
+    }
+
+    .Name {
+      font-weight: 900;
+      line-height: 18px;
+    }
+
+    .Timestamp {
+      font-size: 12px;
+      white-space: nowrap;
+      margin-left: 20px;
+    }
+  }
+}

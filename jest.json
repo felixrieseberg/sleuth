@@ -1,0 +1,39 @@
+{
+  "transform": {
+    ".(js|jsx|ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+  },
+  "testEnvironment": "jsdom",
+  "testURL": "http://localhost",
+  "setupTestFrameworkScriptFile": "<rootDir>/test/setup.ts",
+  "testRegex": "(-test)\\.(ts|tsx)$",
+  "bail": true,
+  "resetMocks": true,
+  "resetModules": true,
+  "moduleFileExtensions": [
+    "js",
+    "jsx",
+    "json",
+    "ts",
+    "tsx"
+  ],
+  "setupFiles": [
+    "raf/polyfill"
+  ],
+  "testPathIgnorePatterns": [
+    "/.tmp/",
+    "/src/main/"
+  ],
+  "coverageReporters": [
+    "json",
+    "html"
+  ],
+  "collectCoverageFrom": [
+    "src/**/*.{ts, tsx}",
+    "!src/main/*.{ts, tsx}",
+    "!**/*.d.ts"
+  ],
+  "coveragePathIgnorePatterns": [
+    "/node_modules/",
+    "/test/.*\\.(ts|js)$"
+  ]
+}

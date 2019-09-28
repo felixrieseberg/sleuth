@@ -1,0 +1,26 @@
+@import "../../../node_modules/@blueprintjs/core/lib/less/variables.less";
+@import "./colors.less";
+
+.Sidebar {
+  background: @light-gray1;
+  overflow-y: auto;
+  flex-shrink: 0;
+  width: 0;
+
+  &.Open {
+    width: 300px;
+  }
+
+  .StillLoading {
+    opacity: .5;
+  }
+}
+
+.Darwin .Sidebar {
+  padding-top: 25px;
+}
+
+.bp3-dark .Sidebar {
+  background-color: @dark-gray2;
+  box-shadow: inset -9px 0px 15px 9px #00000020;
+}

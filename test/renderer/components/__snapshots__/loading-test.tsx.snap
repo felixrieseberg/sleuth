@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`loading renders correctly 1`] = `
+<div
+  className="Loading"
+>
+  <div
+    className="bp3-progress-bar bp3-no-animation"
+  >
+    <div
+      className="bp3-progress-meter"
+      style={
+        Object {
+          "width": "20%",
+        }
+      }
+    />
+  </div>
+  <br />
+  <p>
+    Hello
+  </p>
+</div>
+`;

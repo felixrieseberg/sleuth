@@ -1,0 +1,81 @@
+@import "../../../node_modules/@blueprintjs/core/lib/less/variables.less";
+
+#LogTableContainer {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+.LogTable {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  padding: 2.2rem 2.2rem 0 0;
+  user-select: none;
+
+  &.Single {
+    .Meta {
+      display: none;
+    }
+  }
+
+  .Sizer {
+    padding-left: 2rem;
+    flex-grow: 1;
+  }
+
+  .HasData {
+    //color: @dark_purple;
+  }
+
+  .Meta {
+    padding-right: 5px;
+  }
+
+  .ReduxIcon {
+    height: 18px;
+    margin-top: -2px;
+  }
+
+  .ReactVirtualized__Table__row {
+    border-bottom: 1px solid rgba(16, 22, 26, .05)
+  }
+
+  .ReactVirtualized__Table__row:hover {
+    background-color: @light-gray4;
+  }
+
+  .HighlightRow {
+    background-color: @gray5;
+  }
+
+  .ActiveRow {
+    background-color: @gray5;
+    font-weight: 800;
+  }
+
+  .ActiveRow, .HighlightRow  {
+    .fixedDataTableCellGroupLayout_cellGroup:hover {
+      background-color: @gray3;
+    }
+  }
+}
+
+.bp3-dark {
+  .ReactVirtualized__Table__row {
+    border-bottom: 1px solid rgba(137, 191, 226, 0.05)
+  }
+
+  .ReactVirtualized__Table__row:hover {
+    background-color: @dark-gray4;
+  }
+
+  .ActiveRow, .HighlightRow  {
+    background-color: @dark-gray5;
+
+    .ReactVirtualized__Table__row:hover {
+      background-color: @gray1;
+    }
+  }
+}

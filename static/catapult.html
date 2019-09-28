@@ -1,0 +1,34 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="import" href="../catapult/polymer/polymer.html">
+
+    <link type="text/css" rel="stylesheet" href="../catapult/main.css">
+    <link type="text/css" rel="stylesheet" href="../catapult/status_view.css">
+    <link type="text/css" rel="stylesheet" href="../catapult/events_view.css">
+    <link type="text/css" rel="stylesheet" href="../catapult/timeline_view.css">
+    <link type="text/css" rel="stylesheet" href="../catapult/tab_views.css">
+
+    <link type="text/css" rel="stylesheet" href="../../node_modules/@blueprintjs/core/lib/css/blueprint.css">
+    <link type="text/css" rel="stylesheet" href="../catapult/sleuth-overrides.css">
+
+    <link rel="import" href="../catapult/netlog_viewer.html">
+
+    <script>
+      window.sleuth = {
+
+        setDarkMode(enabled) {
+          if (enabled) {
+            document.body.classList.add('bp3-dark');
+          } else {
+            document.body.classList.remove('bp3-dark');
+          }
+        }
+      }
+    </script>
+  </head>
+  <body class="bp3-dark">
+    <netlog-viewer></netlog-viewer>
+  </body>
+</html>

@@ -1,0 +1,93 @@
+@import "../../../node_modules/@blueprintjs/core/lib/less/variables.less";
+
+.Details {
+  background: @light-gray4;
+  border-top: 1px solid @neutral_grey;
+  overflow: auto;
+  flex-grow: 1;
+  flex-shrink: 1;
+
+  .ConvertedTable {
+    margin: .5rem 1.5rem 1rem
+  }
+
+  .LogLineData {
+    p, span {
+      user-select: initial;
+    }
+  }
+
+  .LogLineMeta, .LogLineData {
+    padding: 0 1.5rem 0;
+  }
+
+  .close,
+  .source {
+    padding-left: 10px;
+  }
+
+  .level, .type {
+    font-weight: 400;
+  }
+
+  .level {
+    padding-right: 5px;
+  }
+}
+
+.Scrubber {
+  cursor: ns-resize;
+  height: 10px;
+  flex-shrink: 0;
+  flex-grow: 0;
+  background-color: #ececec;
+  width: 100%;
+  border-bottom: 1px solid #dadada;
+  border-top: 1px solid #dadada;
+}
+
+.Details-LogEntry {
+  margin: .5rem 1.5rem 1rem;
+  resize: horizontal;
+
+  .Details-LogType {
+    user-select: none;
+
+    > * {
+      margin-left: .5rem;
+    }
+  }
+
+  .MetaInfo {
+    display: flex;
+    font-weight: 600;
+    justify-content: space-between;
+    padding: 0px 1px;
+  }
+
+  .Message {
+    background: @gray5;
+    font-size: 15px;
+    line-height: 18px;
+    margin-bottom: 0.625rem;
+    margin-top: 10px;
+    padding: 12px 25px 12px 12px;
+  }
+}
+
+.bp3-dark {
+  .Details {
+    border-top: @gray1;
+    background: @dark-gray5;
+  }
+
+  .Message {
+    background: @dark-gray1;
+  }
+
+  .Scrubber {
+    background-color: @dark-gray1;
+    border-bottom: 1px solid @dark-gray4;
+    border-top: 1px solid @dark-gray4;
+  }
+}

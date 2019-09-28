@@ -1,0 +1,34 @@
+.App {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  h1,h2,h3,h4,h5,h6,p,span {
+    user-select: none;
+    cursor: default;
+  }
+
+  a {
+    transition: color 0.2s ease;
+  }
+
+  a:hover {
+    filter: brightness(120%);
+  }
+
+  p, ul li, label {
+    user-select: none;
+  }
+}
+
+.Emoji {
+  font-weight: normal;
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "NotoColorEmoji", "Segoe UI Symbol", "Android Emoji", "EmojiSymbols";
+}

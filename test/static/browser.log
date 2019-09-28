@@ -1,0 +1,29 @@
+[02/22/17, 16:02:32:675] info: ╔═══════════════════════════════════════════════════════════════════════╗
+[02/22/17, 16:02:32:678] info: ║      Slack 2.5.0, darwin 16.4.0 on x64 at 02/22/17, 16:02:32:668      ║
+[02/22/17, 16:02:32:679] info: ╚═══════════════════════════════════════════════════════════════════════╝
+[02/22/17, 16:02:33:178] info: Store: persist/REHYDRATE
+[02/22/17, 16:02:33:371] info: Store: UPDATE_SETTINGS
+{ isDevMode: true,
+  appVersion: '2.5.0',
+  versionName: 'Walking on a Dream',
+  devEnv: null,
+  resourcePath: '/Users/felixr/Code/slack-winssb',
+  launchedWithLink: null,
+  webappSrcPath: null,
+  launchOnStartup: false,
+  releaseChannel: 'beta',
+  openDevToolsOnStart: false,
+  logFile: null,
+  pretendNotReallyWindows10: false,
+  isAeroGlassEnabled: false,
+  platformVersion: { major: 16, minor: 4, build: 0 },
+  isTitleBarHidden: true }
+[02/22/17, 16:02:33:382] debug: AppMenu: Rebuilding menuitem-slack
+[02/22/17, 16:02:33:384] debug: AppMenu: Rebuilding menuitem-file
+[02/22/17, 16:02:33:386] debug: AppMenu: Rebuilding menuitem-edit
+[02/22/17, 16:02:33:387] debug: AppMenu: Rebuilding menuitem-view
+[02/22/17, 16:02:33:389] debug: AppMenu: Rebuilding menuitem-history
+[02/22/17, 16:02:33:390] debug: AppMenu: Rebuilding menuitem-window
+[02/22/17, 16:02:33:393] debug: AppMenu: Rebuilding menuitem-help
+[02/22/17, 16:02:33:431] info: Store: ADD_WINDOW
+{ windowId: 1, windowType: 'MAIN' }

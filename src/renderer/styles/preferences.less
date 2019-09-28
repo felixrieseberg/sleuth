@@ -1,0 +1,36 @@
+.Preferences {
+  top: 0;
+  left: calc(50% - 350px);
+  margin: 10vh 0;
+  width: 700px;
+
+  &.bp3-overlay-appear,
+  &.bp3-overlay-enter {
+    transform: translateY(-50vh) rotate(-10deg)
+  }
+
+  &.bp3-overlay-appear-active,
+  &.bp3-overlay-enter-active {
+    transform: translateY(0) rotate(0deg);
+    transition-property: -webkit-transform;
+    transition-property: transform;
+    transition-property: transform, -webkit-transform;
+    transition-duration: .3s;
+    transition-timing-function: cubic-bezier(.54, 1.12, .38, 1.11);
+    transition-delay: 0
+  }
+
+  &.bp3-overlay-exit {
+    transform: translateY(0) rotate(0deg)
+  }
+
+  &.bp3-overlay-exit-active {
+    transform: translateY(150vh) rotate(-20deg);
+    transition-property: -webkit-transform;
+    transition-property: transform;
+    transition-property: transform, -webkit-transform;
+    transition-duration: .5s;
+    transition-timing-function: cubic-bezier(.4, 1, .75, .9);
+    transition-delay: 0
+  }
+}
