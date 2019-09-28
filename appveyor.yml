@@ -17,6 +17,7 @@ install:
   - ps: Install-Product node $env:nodejs_version x64
   - node --version
   - npm ci
+  - git submodule update --init --recursive
 
 cache:
   - '%APPDATA%\npm-cache -> appveyor.yml'
@@ -24,7 +25,6 @@ cache:
 test_script:
   - node --version
   - npm --version
-  - npm run lint
   - npm run test
 
 artifacts:

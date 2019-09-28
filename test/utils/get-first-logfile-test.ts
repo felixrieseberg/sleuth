@@ -18,7 +18,9 @@ const files: ProcessedLogFiles = {
   call: [],
   webapp: [],
   preload: [],
-  state: []
+  state: [],
+  netlog: [],
+  installer: []
 };
 
 describe('getFirstLogFile', () => {
