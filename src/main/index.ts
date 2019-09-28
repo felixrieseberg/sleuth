@@ -5,6 +5,7 @@ import { ipcManager } from './ipc';
 import { secureApp } from './security';
 import { createWindow, windows } from './windows';
 import { createMenu } from './menu';
+import { setupUpdates } from './update';
 
 if (!config.isDevMode) {
   process.env.NODE_ENV = 'production';
@@ -43,6 +44,7 @@ if (require('electron-squirrel-startup')) {
     secureApp();
     createWindow();
     createMenu();
+    setupUpdates();
   });
 
   // Quit when all windows are closed.
