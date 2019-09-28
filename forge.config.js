@@ -29,6 +29,9 @@ const options = {
       ProductName: 'Sleuth',
       CompanyName: 'Felix Rieseberg'
     },
+    osxSign: {
+      identity: 'Developer ID Application: Felix Rieseberg (LT94ZKYDCJ)'
+    }
   },
   makers: [
     {
@@ -60,8 +63,8 @@ const options = {
       name: '@electron-forge/publisher-github',
       config: {
         repository: {
-          owner: 'electron',
-          name: 'fiddle'
+          owner: 'felixrieseberg',
+          name: 'sleuth'
         },
         prerelease: true
       }
