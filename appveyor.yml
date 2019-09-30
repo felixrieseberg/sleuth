@@ -17,7 +17,6 @@ install:
   - ps: Install-Product node $env:nodejs_version x64
   - node --version
   - npm ci
-  - git submodule update --init --recursive
 
 cache:
   - '%APPDATA%\npm-cache -> appveyor.yml'
@@ -31,6 +30,7 @@ artifacts:
   - path: 'out\make\squirrel.windows\**\*.exe'
 
 build_script:
+  - git submodule update --init --recursive
   - if %APPVEYOR_REPO_TAG% EQU false npm run make
   - if %APPVEYOR_REPO_TAG% EQU true npm run publish
   - if %APPVEYOR_REPO_TAG% EQU true npm run publish -- --arch=ia32

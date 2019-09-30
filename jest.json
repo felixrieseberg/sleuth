@@ -4,7 +4,9 @@
   },
   "testEnvironment": "jsdom",
   "testURL": "http://localhost",
-  "setupTestFrameworkScriptFile": "<rootDir>/test/setup.ts",
+  "setupFilesAfterEnv": [
+    "<rootDir>/test/setup.ts"
+  ],
   "testRegex": "(-test)\\.(ts|tsx)$",
   "bail": true,
   "resetMocks": true,
