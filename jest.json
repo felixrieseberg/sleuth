@@ -1,6 +1,6 @@
 {
   "transform": {
-    ".(js|jsx|ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    ".(js|jsx|ts|tsx)": "ts-jest"
   },
   "testEnvironment": "jsdom",
   "testURL": "http://localhost",
@@ -21,7 +21,9 @@
   ],
   "testPathIgnorePatterns": [
     "/.tmp/",
-    "/src/main/"
+    "/src/main/",
+    "/catapult",
+    "/dist"
   ],
   "coverageReporters": [
     "json",
@@ -34,6 +36,7 @@
   ],
   "coveragePathIgnorePatterns": [
     "/node_modules/",
-    "/test/.*\\.(ts|js)$"
+    "/test/.*\\.(ts|js)$",
+    "/catapult"
   ]
 }
