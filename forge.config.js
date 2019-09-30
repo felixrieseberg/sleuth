@@ -5,7 +5,11 @@ const options = {
     generateAssets: require('./tools/generateAssets')
   },
   packagerConfig: {
+    name: 'Sleuth',
+    executableName: 'sleuth',
     icon: './static/img/sleuth-icon',
+    appBundleId: 'com.felixrieseberg.sleuth',
+    appCategoryType: 'public.app-category.developer-tools',
     asar: true,
     osxSign: {
       identity: '6EAE76A75A316F8CE47BDBC19A95B44536FDCD2D'
