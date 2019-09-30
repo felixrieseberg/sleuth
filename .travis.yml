@@ -24,7 +24,7 @@ branches:
   - /^v\d+\.\d+\.\d+/
 
 install:
-- npm install
+- npm ci
 - |
   if [[ "$TRAVIS_OS_NAME" == "osx" && "$TRAVIS_SECURE_ENV_VARS" == "true" ]]; then
     export CERTIFICATE_P12=cert.p12;
@@ -56,7 +56,7 @@ install:
   fi
 
 script:
-- npm run test
+# - npm run test
 - git submodule update --init --recursive
 - if test -z "$TRAVIS_TAG"; then npm run make; fi
 

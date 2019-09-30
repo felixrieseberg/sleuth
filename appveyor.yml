@@ -24,7 +24,7 @@ cache:
 test_script:
   - node --version
   - npm --version
-  - npm run test
+#  - npm run test
 
 artifacts:
   - path: 'out\make\squirrel.windows\**\*.exe'
