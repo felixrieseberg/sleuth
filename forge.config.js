@@ -60,7 +60,6 @@ const options = {
           name: 'sleuth',
           authors: 'Felix Rieseberg',
           exe: 'sleuth.exe',
-          loadingGif: './assets/loading.gif',
           noMsi: true,
           remoteReleases: '',
           setupExe: `sleuth-${version}-${arch}-setup.exe`,
