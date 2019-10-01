@@ -1,12 +1,16 @@
 /* tslint:disable */
 
+const path = require('path');
+
+const icoDir = path.join(__dirname, 'static/img');
+
 const options = {
   hooks: {
     generateAssets: require('./tools/generateAssets')
   },
   packagerConfig: {
     name: 'Sleuth',
-    executableName: 'sleuth',
+    executableName: process.platform === 'linux' ? 'sleuth' : 'Sleuth',
     icon: './static/img/sleuth-icon',
     appBundleId: 'com.felixrieseberg.sleuth',
     appCategoryType: 'public.app-category.developer-tools',
@@ -39,14 +43,29 @@ const options = {
   },
   makers: [
     {
-      name: "@electron-forge/maker-squirrel",
-      platforms: ["win32"],
-      config: {
-        name: 'Sleuth',
-        packageName: 'Sleuth',
-        productName: 'Sleuth',
-        certificateFile: process.env.SLEUTH_CERTIFICATE_FILE,
-        certificatePassword: process.env.SLEUTH_CERTIFICATE_PASSWORD
+      name: '@electron-forge/maker-squirrel',
+      platforms: ['win32'],
+      config: (arch) => {
+        const certificateFile = process.env.CI
+          ? path.join(__dirname, 'cert.p12')
+          : process.env.WINDOWS_CERTIFICATE_FILE;
+
+        if (!certificateFile || !fs.existsSync(certificateFile)) {
+          console.warn(`Warning: Could not find certificate file at ${certificateFile}`)
+        }
+
+        return {
+          name: 'sleuth',
+          authors: 'Felix Rieseberg',
+          exe: 'sleuth.exe',
+          loadingGif: './assets/loading.gif',
+          noMsi: true,
+          remoteReleases: '',
+          setupExe: `sleuth-${version}-${arch}-setup.exe`,
+          setupIcon: path.resolve(iconDir, 'sleuth-icon.ico'),
+          certificatePassword: process.env.WINDOWS_CERTIFICATE_PASSWORD,
+          certificateFile
+        }
       }
     },
     {
@@ -70,7 +89,7 @@ const options = {
           owner: 'felixrieseberg',
           name: 'sleuth'
         },
-        prerelease: true
+        prerelease: false
       }
     }
   ]
