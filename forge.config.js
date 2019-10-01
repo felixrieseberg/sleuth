@@ -1,8 +1,9 @@
 /* tslint:disable */
 
 const path = require('path');
+const fs = require('fs');
 
-const icoDir = path.join(__dirname, 'static/img');
+const iconDir = path.join(__dirname, 'static/img');
 
 const options = {
   hooks: {
