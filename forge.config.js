@@ -4,12 +4,13 @@ const path = require('path');
 const fs = require('fs');
 
 const iconDir = path.join(__dirname, 'static/img');
+const version = require('./package.json').version;
 
 const options = {
   hooks: {
     generateAssets: require('./tools/generateAssets')
   },
-  packagerConfig: {
+  packagerConfig: {fi
     name: 'Sleuth',
     executableName: process.platform === 'linux' ? 'sleuth' : 'Sleuth',
     icon: './static/img/sleuth-icon',
