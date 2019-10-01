@@ -10,7 +10,7 @@ const options = {
   hooks: {
     generateAssets: require('./tools/generateAssets')
   },
-  packagerConfig: {fi
+  packagerConfig: {
     name: 'Sleuth',
     executableName: process.platform === 'linux' ? 'sleuth' : 'Sleuth',
     icon: './static/img/sleuth-icon',
