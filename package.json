@@ -1,7 +1,7 @@
 {
   "name": "sleuth",
   "productName": "Sleuth",
-  "version": "2.4.5",
+  "version": "2.4.6",
   "description": "Slack Log Viewer",
   "main": "./dist/src/main/index",
   "scripts": {
