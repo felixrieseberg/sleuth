@@ -88,7 +88,7 @@ export class AppMenu {
 
     const openItem = {
       label: 'Open...',
-      acccelerator: 'CmdOrCtrl+O',
+      accelerator: 'CmdOrCtrl+O',
       click: () => {
         dialog.showOpenDialog({
           defaultPath: app.getPath('downloads'),
@@ -107,7 +107,7 @@ export class AppMenu {
       // Make a new one
       const openFile = {
         label: 'Open File...',
-        acccelerator: 'CmdOrCtrl+Shift+O',
+        accelerator: 'CmdOrCtrl+Shift+O',
         click: () => {
           dialog.showOpenDialog({
             defaultPath: app.getPath('downloads'),
@@ -204,6 +204,7 @@ export class AppMenu {
 
     const newWindowItem = {
       label: 'New Window',
+      accelerator: 'CtrlOrCmd+Shift+N',
       click: () => createWindow()
     };
 
