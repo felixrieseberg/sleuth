@@ -42,7 +42,7 @@ export class SleuthState {
   // Settings
   @observable public isDarkMode: boolean = !!this.retrieve('isDarkMode', true);
   @observable public dateTimeFormat: string
-    = testDateTimeFormat(this.retrieve<string>('dateTimeFormat', false)!, defaults.dateTimeFormat);
+    = testDateTimeFormat(this.retrieve<string>('dateTimeFormat_v2', false)!, defaults.dateTimeFormat);
   @observable public font: string = this.retrieve<string>('font', false)!;
   @observable public defaultEditor: string = this.retrieve<string>('defaultEditor', false)!;
 
