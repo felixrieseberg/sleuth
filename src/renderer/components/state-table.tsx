@@ -25,6 +25,7 @@ export interface StateTableProps {
 export interface StateTableState {
   data?: any;
   path?: string;
+  raw?: string;
 }
 
 export type StateFileType = 'appTeams' |
@@ -65,7 +66,7 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
   }
 
   public render(): JSX.Element {
-    const { data, path } = this.state;
+    const { data, path, raw } = this.state;
     const { font } = this.props.state;
 
     const info = this.renderInfo();
@@ -79,7 +80,7 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
 
     const content = (!data && path)
       ? <iframe sandbox='' onLoad={onIFrameLoad} src={path} />
-      : type === 'installation' ? null : <JSONView data={data} state={this.props.state} />;
+      : type === 'installation' ? null : <JSONView data={data} raw={raw} state={this.props.state} />;
     const contentCard =  type === 'installation' ? <div/> : <Card> {content} </Card>;
 
     return (
@@ -147,7 +148,7 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
 
     try {
       const raw = await fs.readFile(file.fullPath, 'utf8');
-      this.setState({ data: parseJSON(raw), path: undefined });
+      this.setState({ data: parseJSON(raw), path: undefined, raw });
     } catch (error) {
       debug(error);
     }
