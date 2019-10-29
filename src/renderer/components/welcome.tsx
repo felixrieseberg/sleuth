@@ -6,8 +6,9 @@ import { observer } from 'mobx-react';
 
 import { getSleuth } from '../sleuth';
 import { getUpdateAvailable, defaultUrls } from '../update-check';
-import { deleteSuggestion } from '../suggestions';
+import { deleteSuggestion, deleteSuggestions } from '../suggestions';
 import { SleuthState } from '../state/sleuth';
+import { isBefore } from 'date-fns';
 
 export interface WelcomeState {
   sleuth: string;
@@ -36,6 +37,11 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
 
   public async deleteSuggestion(filePath: string) {
     await deleteSuggestion(filePath);
+    await this.props.state.getSuggestions();
+  }
+
+  public async deleteSuggestions(filePaths: Array<string>) {
+    await deleteSuggestions(filePaths);
     await this.props.state.getSuggestions();
   }
 
@@ -99,11 +105,40 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
         <div className='Suggestions'>
           <h5>From your Downloads folder, may we suggest:</h5>
           <ul>{elements}</ul>
+          {this.renderDeleteAll()}
         </div>
       );
     }
 
     return <div />;
+  }
+
+  public renderDeleteAll(): JSX.Element | null {
+    const suggestions = this.props.state.suggestions || {};
+
+    // Do we have any files older than 48 hours?
+    const twoDaysAgo = Date.now() - 172800000;
+    const toDeleteAll: Array<string> = [];
+
+    Object.keys(suggestions).forEach((key) => {
+      const item = suggestions[key];
+      if (isBefore(item.atimeMs, twoDaysAgo)) {
+        toDeleteAll.push(key);
+      }
+    });
+
+    if (toDeleteAll.length > 0) {
+      return (
+        <Button
+          icon='trash'
+          onClick={() => this.deleteSuggestions(toDeleteAll)}
+        >
+          Delete files older than 2 days
+        </Button>
+      );
+    }
+
+    return null;
   }
 
   public render() {

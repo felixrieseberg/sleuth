@@ -49,3 +49,21 @@ export async function deleteSuggestion(filePath: string) {
 
   return !!result;
 }
+
+export async function deleteSuggestions(filePaths: Array<string>) {
+  const trashName = process.platform === 'darwin'
+    ? 'trash'
+    : 'recycle bin';
+
+  const result = remote.dialog.showMessageBox({
+    title: 'Delete Files?',
+    message: `Do you want to move all log files older than 48 hours to the ${trashName}?`,
+    type: 'question',
+    buttons: [ 'Cancel', `Move to ${trashName}` ],
+    cancelId: 0
+  });
+
+  if (result) {
+    filePaths.forEach(shell.moveItemToTrash);
+  }
+}
