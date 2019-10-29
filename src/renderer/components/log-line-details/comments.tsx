@@ -56,8 +56,11 @@ export class LogLineComments extends React.Component<LogLineCommentsProps, Parti
 
     if (nextProps.state.selectedEntry && nextProps.state.selectedEntry.message || newSignInStatus && nextProps.state.selectedEntry) {
       const line = lineToCooperLine.convert(nextProps.state.selectedEntry.message);
-      this.setState({ line, searchLine: line });
-      this.fetchComments(line, nextProps.state.isCooperSignedIn, nextProps.state.selectedEntry.logType);
+
+      if (line !== this.state.line) {
+        this.setState({ line, searchLine: line });
+        this.fetchComments(line, nextProps.state.isCooperSignedIn, nextProps.state.selectedEntry.logType);
+      }
     }
   }
 
