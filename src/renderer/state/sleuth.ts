@@ -7,7 +7,7 @@ import { getItemsInDownloadFolder } from '../suggestions';
 import { testDateTimeFormat } from '../../utils/test-date-time';
 
 export const defaults = {
-  dateTimeFormat: 'HH:mm:ss (dd/mm)',
+  dateTimeFormat: 'HH:mm:ss (dd/MM)',
   defaultEditor: 'code --goto {filepath}:{line}',
   font: process.platform === 'darwin' ? 'San Francisco' : 'Segoe UI',
   isDarkMode: true
@@ -42,7 +42,7 @@ export class SleuthState {
   // Settings
   @observable public isDarkMode: boolean = !!this.retrieve('isDarkMode', true);
   @observable public dateTimeFormat: string
-    = testDateTimeFormat(this.retrieve<string>('dateTimeFormat_v2', false)!, defaults.dateTimeFormat);
+    = testDateTimeFormat(this.retrieve<string>('dateTimeFormat_v3', false)!, defaults.dateTimeFormat);
   @observable public font: string = this.retrieve<string>('font', false)!;
   @observable public defaultEditor: string = this.retrieve<string>('defaultEditor', false)!;
 
@@ -53,7 +53,7 @@ export class SleuthState {
     this.getSuggestions();
 
     // Setup autoruns
-    autorun(() => this.save('dateTimeFormat', this.dateTimeFormat));
+    autorun(() => this.save('dateTimeFormat_v3', this.dateTimeFormat));
     autorun(() => this.save('font', this.font));
     autorun(() => this.save('defaultEditor', this.defaultEditor));
     autorun(() => {
