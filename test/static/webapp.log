@@ -1,7 +1,3 @@
-info: ╔═══════════════════════════════════════════════════════════════════════╗
-info: ║      Slack 2.5.0, darwin 16.4.0 on x64 at 02/22/17, 16:02:35:239      ║
-info: ╚═══════════════════════════════════════════════════════════════════════╝
-info: 2017/2/22 16:02:37.178 didStartLoading called TSSSB.timeout_tim set for ms:60000
-info: 2017/2/22 16:02:37.710  booted! pri:0 version:1487807958 start_ms:1487808157702 (8ms ago)
-info: 2017/2/22 16:02:38.273  _onDOMReady
-info: 2017/2/22 16:02:38.273  session_load_count_client: 1
+[10/28/19, 14:52:34:884] info: Oct-28 14:52:34.884 [API-Q] (T024BE7LD) noversion-1572299554.883 Flannel users/info is ACTIVE
+[10/28/19, 14:52:34:917] info: Oct-28 14:52:34.917 [API-Q] (T024BE7LD) noversion-1572299554.883 Flannel users/info is RESOLVED
+[10/28/19, 14:52:35:210] info: Oct-28 14:52:35.210 [COUNTS] (T024BE7LD) Updated unread_cnt for CA91ZPRDW: 2

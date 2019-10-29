@@ -26,23 +26,6 @@ describe('matchLineWebApp', () => {
     expect(result!.level).to.be.equal('info');
     expect(result!.message).to.be.equal('didStartLoading TSSSB.timeout_tim set for ms:60000');
   });
-
-  it('should match a dirty webapp line', () => {
-    const line = 'info: %celectron-text-substitutions %cSmart quotes are off%c +0ms';
-    const result = matchLineWebApp(line);
-
-    expect(result).to.exist;
-    expect(result!.level).to.be.equal('info');
-    expect(result!.message).to.be.equal('%celectron-text-substitutions %cSmart quotes are off%c +0ms');
-  });
-
-  it('should match a super dirty webapp line', () => {
-    const line = 'TS.storage.isUsingMemberBotCache():true';
-    const result = matchLineWebApp(line);
-
-    expect(result).to.exist;
-    expect(result!.message).to.be.equal('TS.storage.isUsingMemberBotCache():true');
-  });
 });
 
 describe('matchLineElectron', () => {
@@ -93,12 +76,7 @@ describe('readFile', () => {
 
     return readFile(file, LogType.WEBAPP).then(({ entries }) => {
       expect(entries).to.exist;
-      expect(entries.length).to.be.equal(7);
-      expect(entries[3]).to.exist;
-      expect(entries[3].timestamp).to.be.equal('2017/2/22 16:02:37.178');
-      expect(entries[3].message).to.be.equal('didStartLoading called TSSSB.timeout_tim set for ms:60000');
-      expect(entries[3].logType).to.be.equal(LogType.WEBAPP);
-      expect(entries[3].index).to.be.equal(3);
+      expect(entries.length).to.be.equal(3);
     });
   });
 });
@@ -138,28 +116,6 @@ describe('processLogFile', () => {
       expect(result.logEntries[0].momentValue).to.be.equal(1487808152675);
       expect(result.logEntries[0].logType).to.be.equal('browser');
       expect(result.logEntries[0].index).to.be.equal(0);
-      expect(result.logType).to.exist;
-      expect(result.type).to.exist;
-    });
-  });
-
-  it('should process a webapp.log log file correctly', () => {
-    const file: UnzippedFile = {
-      fullPath: path.join(__dirname, '../static/webapp.log'),
-      fileName: 'webapp.log',
-      size: 1713
-    };
-
-    return processLogFile(file).then((result) => {
-      expect(result).to.exist;
-      expect(result.logFile).to.exist;
-      expect(result.logEntries).to.exist;
-      expect(result.logEntries.length).to.be.equal(7);
-      expect(result.logEntries[3]).to.exist;
-      expect(result.logEntries[3].timestamp).to.be.equal('2017/2/22 16:02:37.178');
-      expect(result.logEntries[3].message).to.be.equal('didStartLoading called TSSSB.timeout_tim set for ms:60000');
-      expect(result.logEntries[3].logType).to.be.equal('webapp');
-      expect(result.logEntries[3].index).to.be.equal(3);
       expect(result.logType).to.exist;
       expect(result.type).to.exist;
     });
