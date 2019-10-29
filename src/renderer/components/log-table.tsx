@@ -17,6 +17,7 @@ import {
   SortFilterListOptions,
   RowClickEvent
 } from './log-table-constants';
+import { isMergedLogFile } from '../../utils/is-logfile';
 
 const debug = require('debug')('sleuth:logtable');
 const { DOWN } = Keys;
@@ -149,6 +150,10 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
       });
     }
 
+    if (isMergedLogFile(nextFile) && this.state.sortBy === 'index') {
+      this.setState({ sortBy: 'momentValue' });
+    }
+
     if (searchIndex !== nextProps.searchIndex) {
       this.setState({ ignoreSearchIndex: false });
     }
@@ -218,6 +223,8 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    */
   private onRowClick({ index }: RowClickEvent) {
     const selectedEntry = this.state.sortedList![index] || null;
+
+    console.debug(selectedEntry);
 
     this.props.state.selectedEntry = selectedEntry;
     this.props.state.isDetailsVisible = true;
@@ -405,6 +412,10 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     function doSortByMessage(a: LogEntry, b: LogEntry) { return a.message.localeCompare(b.message); }
     function doSortByLevel(a: LogEntry, b: LogEntry) { return a.level.localeCompare(b.level); }
     function doSortByLine(a: LogEntry, b: LogEntry) { return a.line > b.line ? 1 : -1; }
+    function doSortByTimestamp(a: LogEntry, b: LogEntry) {
+      if (a.momentValue === b.momentValue) return 0;
+      return (a.momentValue || 0) > (b.momentValue || 0) ? 1 : -1;
+    }
     function doFilter(a: LogEntry) { return (a.level && filter![a.level]); }
 
     // Filter
@@ -424,17 +435,15 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     }
 
     // Sort
-    if (sortBy === 'index' || sortBy === 'timestamp') {
-      debug(`Sorting by ${sortBy} (aka doing nothing)`);
-    } else if (sortBy === 'message') {
-      debug('Sorting by message');
+    debug(`Sorting by ${sortBy}`);
+    if (sortBy === 'message') {
       sortedList = sortedList.sort(doSortByMessage);
     } else if (sortBy === 'level') {
-      debug('Sorting by level');
       sortedList = sortedList.sort(doSortByLevel);
     } else if (sortBy === 'line') {
-      debug('Sorting by line');
       sortedList = sortedList.sort(doSortByLine);
+    } else if (sortBy === 'momentValue') {
+      sortedList = sortedList.sort(doSortByTimestamp);
     }
 
     if (sortDirection === SORT_DIRECTION.DESC) {
