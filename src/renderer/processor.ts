@@ -12,7 +12,6 @@ const DESKTOP_RGX = /^\s*\[([\d\/\,\s\:]{22})\] ([A-Za-z]{0,20})\: (.*)$/g;
 
 const WEBAPP_A_RGX = /^(\w*): (.{3}-\d{1,2} \d{2}:\d{2}:\d{2}.\d{0,3}) (.*)$/;
 const WEBAPP_B_RGX = /^(\w*): (\d{4}\/\d{1,2}\/\d{1,2} \d{2}:\d{2}:\d{2}.\d{0,3}) (.*)$/;
-const WEBAPP_LITE_RGX = /^(\w{4,8}): (.*)$/;
 
 // Mar-26 09:29:38.460 []
 const WEBAPP_NEW_TIMESTAMP_RGX = /^\w{3}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} .*$/;
@@ -396,6 +395,9 @@ export function matchLineWebApp(line: string): MatchResult | undefined {
   // Sometimes they just log
   // TS.storage.isUsingMemberBotCache():false
 
+  // If the line starts with a `{`, we're taking a shortcut and are expecting data.
+  if (line[0] === '{') return;
+
   DESKTOP_RGX.lastIndex = 0;
   let results = DESKTOP_RGX.exec(line);
 
@@ -442,22 +444,7 @@ export function matchLineWebApp(line: string): MatchResult | undefined {
     };
   }
 
-  // Maybe there's a level?
-  WEBAPP_LITE_RGX.lastIndex = 0;
-  results = WEBAPP_LITE_RGX.exec(line);
-
-  if (results && results.length === 3) {
-    return {
-      level: results[1],
-      message: results[2]
-    };
-  }
-
-  // Not even that? We got nothing. Webapp doesn't have clear meta
-  // objects though, so make it a line.
-  return {
-    message: line
-  };
+  return;
 }
 
 /**
