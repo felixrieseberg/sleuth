@@ -35,7 +35,7 @@ export async function deleteSuggestion(filePath: string) {
     ? 'trash'
     : 'recycle bin';
 
-  const result = remote.dialog.showMessageBox({
+  const { response } = await remote.dialog.showMessageBox({
     title: 'Delete File?',
     message: `Do you want to move ${filePath} to the ${trashName}?`,
     type: 'question',
@@ -43,11 +43,11 @@ export async function deleteSuggestion(filePath: string) {
     cancelId: 0
   });
 
-  if (result) {
+  if (response) {
     shell.moveItemToTrash(filePath);
   }
 
-  return !!result;
+  return !!response;
 }
 
 export async function deleteSuggestions(filePaths: Array<string>) {
@@ -55,7 +55,7 @@ export async function deleteSuggestions(filePaths: Array<string>) {
     ? 'trash'
     : 'recycle bin';
 
-  const result = remote.dialog.showMessageBox({
+  const { response } = await remote.dialog.showMessageBox({
     title: 'Delete Files?',
     message: `Do you want to move all log files older than 48 hours to the ${trashName}?`,
     type: 'question',
@@ -63,7 +63,9 @@ export async function deleteSuggestions(filePaths: Array<string>) {
     cancelId: 0
   });
 
-  if (result) {
+  if (response) {
     filePaths.forEach(shell.moveItemToTrash);
   }
+
+  return !!response;
 }
