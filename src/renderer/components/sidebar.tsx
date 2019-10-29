@@ -78,6 +78,7 @@ const DEFAULT_NODES: Array<ITreeNode> = [
     label: 'WebApp',
     isExpanded: true,
     childNodes: [],
+    nodeData: { type: 'webapp' }
   }, {
     id: NODE_ID.CALLS,
     hasCaret: true,
