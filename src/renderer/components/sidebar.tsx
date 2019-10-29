@@ -21,22 +21,34 @@ export interface SidebarState {
   nodes: Array<ITreeNode>;
 }
 
+const enum NODE_ID {
+  ALL = 'all-desktop',
+  STATE = 'state',
+  BROWSER = 'browser',
+  RENDERER = 'renderer',
+  PRELOAD = 'preload',
+  WEBAPP = 'webapp',
+  CALLS = 'calls',
+  INSTALLER = 'installer',
+  NETWORK = 'network'
+}
+
 const DEFAULT_NODES: Array<ITreeNode> = [
   {
-    id: 'all-desktop',
+    id: NODE_ID.ALL,
     hasCaret: false,
     label: 'All Desktop Logs',
     icon: 'compressed',
     nodeData: { type: 'all' }
   }, {
-    id: 0,
+    id: NODE_ID.STATE,
     hasCaret: true,
     icon: 'cog',
     label: 'State & Settings',
     isExpanded: true,
     childNodes: [],
   }, {
-    id: 1,
+    id: NODE_ID.BROWSER,
     hasCaret: true,
     icon: 'application',
     label: 'Browser Process',
@@ -44,7 +56,7 @@ const DEFAULT_NODES: Array<ITreeNode> = [
     childNodes: [],
     nodeData: { type: 'browser' }
   }, {
-    id: 2,
+    id: 'renderer',
     hasCaret: true,
     icon: 'applications',
     label: 'Renderer Process',
@@ -52,36 +64,36 @@ const DEFAULT_NODES: Array<ITreeNode> = [
     childNodes: [],
     nodeData: { type: 'renderer' }
   }, {
-    id: 3,
+    id: NODE_ID.PRELOAD,
     hasCaret: true,
     icon: 'applications',
     label: 'BrowserView Process',
     isExpanded: true,
     childNodes: [],
-    nodeData: { type: 'preload' }
+    nodeData: { type: 'preload' },
   }, {
-    id: 4,
+    id: NODE_ID.WEBAPP,
     hasCaret: true,
     icon: 'chat',
     label: 'WebApp',
     isExpanded: true,
     childNodes: [],
   }, {
-    id: 5,
+    id: NODE_ID.CALLS,
     hasCaret: true,
     icon: 'phone',
     label: 'Calls',
     isExpanded: true,
     childNodes: [],
   }, {
-    id: 6,
+    id: NODE_ID.INSTALLER,
     hasCaret: true,
     icon: 'automatic-updates',
     label: 'Installer',
     isExpanded: true,
     childNodes: [],
   }, {
-    id: 7,
+    id: NODE_ID.NETWORK,
     hasCaret: true,
     icon: 'feed',
     label: 'Network',
@@ -94,18 +106,17 @@ const DEFAULT_NODES: Array<ITreeNode> = [
 export class Sidebar extends React.Component<SidebarProps, SidebarState> {
   public static getDerivedStateFromProps(props: SidebarProps, state: SidebarState) {
     const { logFiles } = props;
-    const nodes = state.nodes;
 
-    nodes[1].childNodes = logFiles.state.map((file) => Sidebar.getStateFileNode(file, props));
-    nodes[2].childNodes = logFiles.browser.map((file) => Sidebar.getFileNode(file, props));
-    nodes[3].childNodes = logFiles.renderer.map((file) => Sidebar.getFileNode(file, props));
-    nodes[4].childNodes = logFiles.preload.map((file) => Sidebar.getFileNode(file, props));
-    nodes[5].childNodes = logFiles.webapp.map((file) => Sidebar.getFileNode(file, props));
-    nodes[6].childNodes = logFiles.call.map((file) => Sidebar.getFileNode(file, props));
-    nodes[7].childNodes = logFiles.installer.map((file) => Sidebar.getInstallerFileNode(file, props));
-    nodes[8].childNodes = logFiles.netlog.map((file, i) => Sidebar.getNetlogFileNode(file, props, i));
+    Sidebar.setChildNodes(NODE_ID.STATE, state, logFiles.state.map((file) => Sidebar.getStateFileNode(file, props)));
+    Sidebar.setChildNodes(NODE_ID.BROWSER, state, logFiles.browser.map((file) => Sidebar.getFileNode(file, props)));
+    Sidebar.setChildNodes(NODE_ID.RENDERER, state, logFiles.renderer.map((file) => Sidebar.getFileNode(file, props)));
+    Sidebar.setChildNodes(NODE_ID.PRELOAD, state, logFiles.preload.map((file) => Sidebar.getFileNode(file, props)));
+    Sidebar.setChildNodes(NODE_ID.WEBAPP, state, logFiles.webapp.map((file) => Sidebar.getFileNode(file, props)));
+    Sidebar.setChildNodes(NODE_ID.CALLS, state, logFiles.call.map((file) => Sidebar.getFileNode(file, props)));
+    Sidebar.setChildNodes(NODE_ID.INSTALLER, state, logFiles.installer.map((file) => Sidebar.getInstallerFileNode(file, props)));
+    Sidebar.setChildNodes(NODE_ID.NETWORK, state, logFiles.netlog.map((file, i) => Sidebar.getNetlogFileNode(file, props, i)));
 
-    return { nodes };
+    return { nodes: state.nodes };
   }
 
   /**
@@ -250,6 +261,36 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
         <Icon icon='error' intent={Intent.WARNING} />
       </Tooltip>
     );
+  }
+
+  /**
+   * Set the child nodes
+   *
+   * @static
+   * @param {NODE_ID} searchId
+   * @param {SidebarState} state
+   * @param {Array<ITreeNode>} childNodes
+   * @returns {void}
+   */
+  public static setChildNodes(
+    searchId: NODE_ID,
+    state: SidebarState,
+    childNodes: Array<ITreeNode>
+  ) {
+    const parentNode = state.nodes.find(({ id }) => id === searchId);
+
+    if (!parentNode) {
+      return;
+    }
+
+    // Renderer and Preload is on their way out, so let's not show
+    // these categories if we don't have files for them
+    const hideIfEmpty = searchId === NODE_ID.PRELOAD || searchId === NODE_ID.RENDERER;
+    if (childNodes.length === 0 && hideIfEmpty) {
+      state.nodes = state.nodes.filter(({ id }) => searchId !== id);
+    }
+
+    parentNode.childNodes = childNodes;
   }
 
   constructor(props: SidebarProps) {
