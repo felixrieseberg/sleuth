@@ -21,7 +21,7 @@ export class JSONView extends React.Component<JSONViewProps, JSONViewState> {
   public render() {
     const data = this.props.data || parseJSON(this.props.raw || '');
 
-    if (data && Object.keys(data).length > 1) {
+    if (data && Object.keys(data).length > 0) {
       const theme = getTheme(this.props.state.isDarkMode);
 
       return (
