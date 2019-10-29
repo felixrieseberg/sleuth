@@ -1,5 +1,4 @@
 // Ambient type declarations for modules that do not have type definitions
-declare module 'url';
 declare module 'yauzl';
 declare module 'react-json-tree';
 declare module 'react-throttle';

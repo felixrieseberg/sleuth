@@ -30,6 +30,12 @@ export class IpcManager {
 
   private setupFileDrop() {
     app.on('browser-window-created', (_e, window) => {
+      const parent = window.getParentWindow();
+
+      if (parent) {
+        return;
+      }
+
       window.webContents.on('will-navigate', (e, url) => {
         e.preventDefault();
 

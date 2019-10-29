@@ -40,6 +40,4 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log(e);
     }
   }
-
-  console.log('Hi!');
 });

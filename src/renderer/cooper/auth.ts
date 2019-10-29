@@ -60,11 +60,16 @@ export class CooperAuth {
     return new Promise(async (resolve) => {
       await this.showSignInWindowWarning();
 
+      const preload = config.isDevMode
+        ? path.join(__dirname, '../../src/renderer/cooper/auth-preload.js')
+        : path.join(__dirname, 'auth-preload.js');
+
       this.signInWindow = new BrowserWindow({
         height: 700,
         width: 800,
+        parent: remote.getCurrentWindow(),
         webPreferences: {
-          preload: path.join(__dirname, 'auth-preload.js'),
+          preload,
           nodeIntegration: false
         }
       });
@@ -73,6 +78,7 @@ export class CooperAuth {
 
       const { webContents } = this.signInWindow;
       const detectSlackRegex = [
+        /https:\/\/\app.slack.com\$/i,
         /https:\/\/\w*.slack.com\/messages$/i,
         /https:\/\/slack.com\/checkcookie\?redir/i
       ];
@@ -112,11 +118,13 @@ export class CooperAuth {
         }
 
         if (!url.startsWith(`${this.serverUrl}/cooper/signin/callback?access_token=`)) {
-          debug(`Sign in window loaded a page, but not the right one`, webContents.getURL());
+          debug(`Sign in window loaded a page, but not the right one (yet)`, webContents.getURL());
+          return;
         } else {
           this.getSignInResults();
         }
       });
+
 
       this.signInWindow.loadURL(this.signInUrl);
     });
@@ -135,6 +143,8 @@ export class CooperAuth {
           debug(`Tried to silently sign in and couldn't`);
           resolve(false);
         } else {
+          debug(`Received response from ${response.url}`);
+
           const responseObject = await response.json();
           const { result, slackUserId } = responseObject;
           const isSignedIn = !!(result && result === 'You are signed in');
@@ -143,7 +153,7 @@ export class CooperAuth {
           this.sleuthState.isCooperSignedIn = isSignedIn;
           resolve(isSignedIn);
 
-        debug(`User is signed into cooper: ${isSignedIn}`, responseObject);
+          debug(`User is signed into cooper: ${isSignedIn}`, responseObject);
         }
       })
       .catch((error) => {
@@ -154,22 +164,18 @@ export class CooperAuth {
   }
 
   public tryToEnterTeamName() {
-    return new Promise((resolve, reject) => {
+    return new Promise((_resolve, reject) => {
       if (!this.signInWindow) return reject('Tried to get results, but could not find window');
 
-      this.signInWindow.webContents.executeJavaScript(`tryToEnterTeamDomain()`, false, () => {
-        resolve();
-      });
+      return this.signInWindow.webContents.executeJavaScript(`tryToEnterTeamDomain()`, false);
     });
   }
 
   public tryToLaunchGlobal() {
-    return new Promise((resolve, reject) => {
+    return new Promise((_resolve, reject) => {
       if (!this.signInWindow) return reject('Tried to get results, but could not find window');
 
-      this.signInWindow.webContents.executeJavaScript(`tryToLaunchGlobal()`, false, () => {
-        resolve();
-      });
+      return this.signInWindow.webContents.executeJavaScript(`tryToLaunchGlobal()`, false);
     });
   }
 
@@ -179,31 +185,28 @@ export class CooperAuth {
     }
   }
 
-  public getSignInResults() {
-    return new Promise((resolve, reject) => {
-      if (!this.signInWindow) return reject('Tried to get results, but could not find window');
+  public async getSignInResults() {
+    this.signInWindow.hide();
+    const result = await this.signInWindow.webContents.executeJavaScript(('document.body.textContent'), false);
 
-      this.signInWindow.hide();
-      this.signInWindow.webContents.executeJavaScript(('document.body.textContent'), false, (result) => {
-        try {
-          const parsedResult = JSON.parse(result);
+    try {
+      const parsedResult = JSON.parse(result);
 
-          if (parsedResult.result && parsedResult.result === 'You are signed in') {
-            this.sleuthState.isCooperSignedIn = true;
-            this.sleuthState.slackUserId = parsedResult.slackUserId;
+      if (parsedResult.result && parsedResult.result === 'You are signed in') {
+        this.sleuthState.isCooperSignedIn = true;
+        this.sleuthState.slackUserId = parsedResult.slackUserId;
+        this.signInWindow.close();
 
-            resolve(true);
-            this.signInWindow.close();
-          }
-        } catch (error) {
-          debug(`Tried to log in - and apparently ended up on Cooper's signin page, but something went wrong`);
-          debug(error);
+        return true;
+      }
+    } catch (error) {
+      debug(`Tried to log in - and apparently ended up on Cooper's signin page, but something went wrong`);
+      debug(error);
 
-          this.signInWindow.close();
-          this.sleuthState.isCooperSignedIn = false;
-          resolve(false);
-        }
-      });
-    });
+      this.signInWindow.close();
+      this.sleuthState.isCooperSignedIn = false;
+    }
+
+    return false;
   }
 }

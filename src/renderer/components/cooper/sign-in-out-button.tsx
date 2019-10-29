@@ -25,9 +25,9 @@ export class CooperSignInOutButton extends React.Component<SignInOutButtonProps,
     this.cooperAuth = new CooperAuth(props.state);
   }
 
-  public onClick(e: React.MouseEvent<HTMLButtonElement>) {
-    const isSignIn = (e.target as HTMLButtonElement).textContent === 'Sign In';
-    const method = isSignIn ? this.cooperAuth.signIn : this.cooperAuth.signOut;
+  public onClick() {
+    const { isCooperSignedIn } = this.props.state;
+    const method = isCooperSignedIn ? this.cooperAuth.signOut : this.cooperAuth.signIn;
 
     this.setState({ isLoading: true });
     method().then(() => this.setState({ isLoading: false }));
