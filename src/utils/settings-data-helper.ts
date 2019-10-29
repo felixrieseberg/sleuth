@@ -23,7 +23,7 @@ export function getVersionInfo({ appVersion, versionName }: any): string {
 }
 
 function getPlatform(data?: Record<string, any>): string {
-  if (!data || !data.platform) {
+  if (!data) {
     return 'unknown';
   }
 
@@ -34,7 +34,7 @@ function getPlatform(data?: Record<string, any>): string {
     if (data.win32) {
       os = 'Windows';
     } else if (data.darwin) {
-      os = 'MacOS';
+      os = 'macOS';
     } else if (data.linux) {
       os = 'Linux';
     }

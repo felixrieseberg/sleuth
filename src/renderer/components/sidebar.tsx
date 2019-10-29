@@ -35,18 +35,18 @@ const enum NODE_ID {
 
 const DEFAULT_NODES: Array<ITreeNode> = [
   {
-    id: NODE_ID.ALL,
-    hasCaret: false,
-    label: 'All Desktop Logs',
-    icon: 'compressed',
-    nodeData: { type: 'all' }
-  }, {
     id: NODE_ID.STATE,
     hasCaret: true,
     icon: 'cog',
     label: 'State & Settings',
     isExpanded: true,
     childNodes: [],
+  }, {
+    id: NODE_ID.ALL,
+    hasCaret: false,
+    label: 'All Desktop Logs',
+    icon: 'compressed',
+    nodeData: { type: 'all' }
   }, {
     id: NODE_ID.BROWSER,
     hasCaret: true,
