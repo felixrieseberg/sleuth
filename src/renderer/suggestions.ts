@@ -9,8 +9,8 @@ import { getPath, sendShowMessageBox } from './ipc';
 
 const debug = require('debug')('sleuth:suggestions');
 
-export async function getItemsInSuggestionFolders(): Promise<Suggestions> {
-  let suggestions = {};
+export async function getItemsInDownloadFolder(): Promise<Suggestions> {
+  const suggestionsArr = new Array<Suggestion>();
 
   // We'll get suggestions from the downloads folder and
   // the desktop
@@ -30,8 +30,11 @@ export async function getItemsInSuggestionFolders(): Promise<Suggestions> {
   } catch (error) {
     debug(error);
   }
+  const sortedSuggestions  = suggestionsArr.sort((a, b) => {
+    return b.birthtimeMs - a.birthtimeMs;
+  });
 
-  return suggestions;
+  return sortedSuggestions;
 }
 
 export async function deleteSuggestion(filePath: string) {

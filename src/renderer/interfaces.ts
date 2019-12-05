@@ -135,8 +135,10 @@ export interface LevelFilter {
 
 export interface Suggestion extends fs.Stats {
   age: string;
+  filePath: string;
+  birthtimeMs: number;
 }
 
-export type Suggestions = Record<string, Suggestion>;
+export type Suggestions = Array<Suggestion>;
 
 export type SelectLogFileFn = (logFile: ProcessedLogFile | UnzippedFile | null, logType?: string) => void;

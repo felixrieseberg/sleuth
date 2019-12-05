@@ -29,7 +29,7 @@ export class SleuthState {
     warn: false
   };
 
-  @observable public suggestions: Suggestions = {};
+  @observable public suggestions: Suggestions = [];
   @observable public searchIndex: number = 0;
   @observable public search: string = '';
 

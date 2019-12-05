@@ -69,15 +69,15 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
   public renderSuggestions(): JSX.Element | null {
     const { openFile } = this.props.state;
     const suggestions = this.props.state.suggestions || {};
-    const elements = Object.keys(suggestions)
-      .map((filePath) => {
-        const stats = suggestions[filePath];
-        const basename = path.basename(filePath);
+    const elements = suggestions
+      .map((file) => {
+        const stats = file;
+        const basename = path.basename(file.filePath);
         const deleteElement = (
           <Button
             icon='trash'
             minimal={true}
-            onClick={() => this.deleteSuggestion(filePath)}
+            onClick={() => this.deleteSuggestion(file.filePath)}
           />
         );
 
@@ -86,7 +86,7 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
             <Button
               className='OpenButton'
               alignText='left'
-              onClick={() => openFile(filePath)}
+              onClick={() => openFile(file.filePath)}
               icon='document'
             >
               {basename}
@@ -104,7 +104,6 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
     if (elements.length > 0) {
       return (
         <div className='Suggestions'>
-          <h5>From your Downloads folder, may we suggest:</h5>
           <ul>{elements}</ul>
           {this.renderDeleteAll()}
         </div>
@@ -144,6 +143,10 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
 
   public render() {
     const { sleuth } = this.state;
+    const suggestions = this.renderSuggestions();
+    const scrollStyle = { height: '100%',  };
+    scrollStyle['overflow-y'] = 'auto';
+    scrollStyle['margin-bottom'] = '50px';
 
     return (
       <div className='Welcome'>
@@ -156,7 +159,10 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
           <h4>Drop a logs zip file or folder anywhere on this window to open it.</h4>
           {this.renderUpdateAvailable()}
         </div>
-        {this.renderSuggestions()}
+        <h5>From your Downloads folder, may we suggest:</h5>
+        <div style={scrollStyle}>
+          {this.renderSuggestions()}
+        </div>
       </div>
     );
   }
