@@ -2,12 +2,12 @@ import { observer } from 'mobx-react';
 import { SleuthState } from '../../state/sleuth';
 import React from 'react';
 import classNames from 'classnames';
-import { format } from 'date-fns';
 import { Card, Button, ButtonGroup, Tag, Elevation } from '@blueprintjs/core';
 
 import { LogEntry } from '../../interfaces';
 import { LogLineData } from './data';
 import { LogLineComments } from './comments';
+import { Timestamp } from './timestamp';
 
 const debug = require('debug')('sleuth:details');
 
@@ -72,17 +72,14 @@ export class LogLineDetails extends React.Component<LogLineDetailsProps, LogLine
    * @returns {(JSX.Element | null)}
    */
   public renderLogEntry(logEntry: LogEntry): JSX.Element | null {
-    const { level, logType, message, timestamp } = logEntry;
+    const { level, logType, message, timestamp, momentValue } = logEntry;
     const type = `${logType.charAt(0).toUpperCase() + logType.slice(1)} Process`;
-    const datetime = logEntry.momentValue
-      ? format(logEntry.momentValue, 'eeee, MMMM do y, h:mm:ss a')
-      : timestamp;
 
     return (
       <div className='Details-LogEntry'>
         <div className='MetaInfo'>
           <div className='Details-Moment'>
-            <Tag large={true} icon='calendar'>{datetime}</Tag>
+            <Timestamp timestamp={timestamp} momentValue={momentValue} />
           </div>
           <div className='Details-LogType'>
             <Tag large={true} icon='box'>{level}</Tag>
