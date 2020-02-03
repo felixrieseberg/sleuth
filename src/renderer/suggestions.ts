@@ -3,33 +3,28 @@ import fs from 'fs-extra';
 import path from 'path';
 import { formatDistanceToNow } from 'date-fns';
 
-import { Suggestions } from './interfaces';
+import { Suggestions, Suggestion } from './interfaces';
+import { StringMap } from '../shared-constants';
 
 const debug = require('debug')('sleuth:suggestions');
 
 export async function getItemsInDownloadFolder(): Promise<Suggestions> {
-  const suggestions = {};
+  let suggestions = {};
 
+  // We'll get suggestions from the downloads folder and
+  // the desktop
   try {
-    const dir = remote.app.getPath('downloads');
-    const contents = await fs.readdir(dir);
+    const downloadsDir = remote.app.getPath('downloads');
+    const downloads = (await fs.readdir(downloadsDir))
+      .map((file) => path.join(downloadsDir, file));
 
-    for (const file of contents) {
-      // If the file is from #alerts-desktop-logs, the server will
-      // have named it, not the desktop app itself.
-      // It'll look like T8KJ1FXTL_U8KCVGGLR_1580765146766674.zip
-      const serverFormat = /\w{8}_\w{8,9}_\d{16}.zip/
-      const shouldAdd = file.startsWith('logs') ||
-        file.startsWith('slack-logs') ||
-        serverFormat.test(file);
+    const desktopDir = remote.app.getPath('desktop');
+    const desktop = (await fs.readdir(desktopDir))
+      .map((file) => path.join(desktopDir, file));
 
-      if (shouldAdd) {
-        const filePath = path.join(dir, file);
-        const stats = fs.statSync(filePath);
-        const age = formatDistanceToNow(stats.mtimeMs);
-
-        suggestions[filePath] = { ...stats, age };
-      }
+    suggestions = {
+      ...(await getSuggestions(downloads)),
+      ...(await getSuggestions(desktop))
     }
   } catch (error) {
     debug(error);
@@ -76,4 +71,40 @@ export async function deleteSuggestions(filePaths: Array<string>) {
   }
 
   return !!response;
+}
+
+/**
+ * Takes an array of file paths and checks if they're files we'd like
+ * to suggest
+ *
+ * @param {Array<string>} input
+ * @returns {Promise<StringMap<Suggestion>>}
+ */
+async function getSuggestions(input: Array<string>): Promise<StringMap<Suggestion>> {
+  const suggestions: StringMap<Suggestion> = {};
+
+  for (const file of input) {
+    debug(`Checking ${file}`);
+
+    // If the file is from #alerts-desktop-logs, the server will
+    // have named it, not the desktop app itself.
+    // It'll look like T8KJ1FXTL_U8KCVGGLR_1580765146766674.zip
+    const serverFormat = /\w{9}_\w{9}_\d{16}\.zip/
+    const shouldAdd = file.startsWith('logs') ||
+      file.startsWith('slack-logs') ||
+      serverFormat.test(file);
+
+    if (shouldAdd) {
+      try {
+        const stats = fs.statSync(file);
+        const age = formatDistanceToNow(stats.mtimeMs);
+
+        suggestions[file] = { ...stats, age };
+      } catch (error) {
+        debug(`Tried to add ${file}, but failed: ${error}`);
+      }
+    }
+  }
+
+  return suggestions;
 }
