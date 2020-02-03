@@ -40,7 +40,12 @@ const options = {
       CompanyName: 'Felix Rieseberg'
     },
     osxSign: {
-      identity: 'Developer ID Application: Felix Rieseberg (LT94ZKYDCJ)'
+      identity: 'Developer ID Application: Felix Rieseberg (LT94ZKYDCJ)',
+      'hardened-runtime': true,
+      'gatekeeper-assess': false,
+      'entitlements': 'static/extend.plist',
+      'entitlements-inherit': 'static/extend.plist',
+      'signature-flags': 'library'
     }
   },
   makers: [
