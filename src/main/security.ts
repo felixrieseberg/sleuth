@@ -15,7 +15,7 @@ export function secureApp() {
 
       const isSlack = parsedUrl.hostname.endsWith('slack.com');
       const isOkta = parsedUrl.hostname.endsWith('okta.com');
-      const isFile = parsedUrl.protocol === 'file';
+      const isFile = parsedUrl.protocol === 'file:';
 
       if (!isSlack && !isOkta && !isFile) {
         console.warn(`Prevented navigation to ${url}`);
