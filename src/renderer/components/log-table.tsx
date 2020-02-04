@@ -37,7 +37,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     this.state = {
       sortedList: [],
       sortBy: 'index',
-      sortDirection: SORT_DIRECTION.DESC,
+      sortDirection: props.state.defaultSort || SORT_DIRECTION.DESC,
       searchList: [],
       ignoreSearchIndex: false
     };

@@ -1,7 +1,7 @@
 import { Select } from '@blueprintjs/select';
 import { ipcRenderer } from 'electron';
 import { observer } from 'mobx-react';
-import { Overlay, Classes, FormGroup, Button, MenuItem, Callout, ControlGroup, InputGroup } from '@blueprintjs/core';
+import { Overlay, Classes, FormGroup, Button, MenuItem, Callout, ControlGroup, InputGroup, RadioGroup, Radio } from '@blueprintjs/core';
 import { SleuthState } from '../state/sleuth';
 import classNames from 'classnames';
 import React from 'react';
@@ -12,6 +12,7 @@ import { CooperSignInOutButton } from './cooper/sign-in-out-button';
 import { renderFontItem, filterFont, FONTS } from './preferences-font';
 import { filterDateTime, renderDateTimeItem, DATE_TIME_FORMATS } from './preferences-datetime';
 import { renderEditorItem, Editor, EDITORS, nameForCmd } from './preferences-editor';
+import { SORT_DIRECTION } from './log-table-constants';
 
 const packageInfo = require('../../../package.json');
 
@@ -82,6 +83,14 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
               <Button text={dateTimeFormat} rightIcon='calendar' />
             </DateTimeSelect>
           </FormGroup>
+          <RadioGroup
+            label='Sort Direction'
+            onChange={(event) => (this.props.state.defaultSort = event.currentTarget.value as SORT_DIRECTION)}
+            selectedValue={this.props.state.defaultSort || SORT_DIRECTION.DESC}
+          >
+            <Radio label='Ascending' value={SORT_DIRECTION.ASC} />
+            <Radio label='Descending' value={SORT_DIRECTION.DESC} />
+          </RadioGroup>
           <FormGroup
             label='Editor'
             helperText='Sleuth can open log source files in your favorite editor'

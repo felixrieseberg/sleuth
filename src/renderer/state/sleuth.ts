@@ -5,6 +5,7 @@ import { UnzippedFile } from '../unzip';
 import { LevelFilter, LogEntry, MergedLogFile, ProcessedLogFile, DateRange, Suggestions } from '../interfaces';
 import { getItemsInDownloadFolder } from '../suggestions';
 import { testDateTimeFormat } from '../../utils/test-date-time';
+import { SORT_DIRECTION } from '../components/log-table-constants';
 
 export const defaults = {
   dateTimeFormat: 'HH:mm:ss (dd/MM)',
@@ -45,6 +46,7 @@ export class SleuthState {
     = testDateTimeFormat(this.retrieve<string>('dateTimeFormat_v3', false)!, defaults.dateTimeFormat);
   @observable public font: string = this.retrieve<string>('font', false)!;
   @observable public defaultEditor: string = this.retrieve<string>('defaultEditor', false)!;
+  @observable public defaultSort: SORT_DIRECTION = this.retrieve('defaultSort', false) as SORT_DIRECTION || SORT_DIRECTION.DESC;
 
   constructor(
     public readonly openFile: (file: string) => void,
@@ -56,6 +58,7 @@ export class SleuthState {
     autorun(() => this.save('dateTimeFormat_v3', this.dateTimeFormat));
     autorun(() => this.save('font', this.font));
     autorun(() => this.save('defaultEditor', this.defaultEditor));
+    autorun(() => this.save('defaultSort', this.defaultSort));
     autorun(() => {
       this.save('isDarkMode', this.isDarkMode);
 
