@@ -207,7 +207,7 @@ export class AppMenu {
 
     const newWindowItem = {
       label: 'New Window',
-      accelerator: 'CtrlOrCmd+N',
+      accelerator: 'CmdOrCtrl+N',
       click: () => createWindow()
     };
 
