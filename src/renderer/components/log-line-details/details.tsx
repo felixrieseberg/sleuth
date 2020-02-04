@@ -8,6 +8,7 @@ import { LogEntry } from '../../interfaces';
 import { LogLineData } from './data';
 import { LogLineComments } from './comments';
 import { Timestamp } from './timestamp';
+import { shell } from 'electron';
 
 const debug = require('debug')('sleuth:details');
 
@@ -45,7 +46,6 @@ export class LogLineDetails extends React.Component<LogLineDetailsProps, LogLine
 
     if (selectedEntry && selectedEntry.sourceFile) {
       const { sourceFile, line } = selectedEntry;
-      const { remote } = require('electron');
 
       if (defaultEditor) {
         const { exec } = require('child_process');
@@ -57,10 +57,10 @@ export class LogLineDetails extends React.Component<LogLineDetailsProps, LogLine
         exec(cmd, (error: Error) => {
           if (!error) return;
           debug(`Tried to open source file, but failed`, error);
-          remote.shell.showItemInFolder(sourceFile);
+          shell.showItemInFolder(sourceFile);
         });
       } else {
-        remote.shell.showItemInFolder(sourceFile);
+        shell.showItemInFolder(sourceFile);
       }
     }
   }

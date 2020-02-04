@@ -1,7 +1,6 @@
 import { observer } from 'mobx-react';
 import React from 'react';
 import classNames from 'classnames';
-import { remote } from 'electron';
 
 import { getFirstLogFile } from '../../utils/get-first-logfile';
 import { isMergedLogFile, isProcessedLogFile, isUnzippedFile } from '../../utils/is-logfile';
@@ -25,6 +24,7 @@ import { Loading } from './loading';
 import { LogContent } from './log-content';
 import { flushLogPerformance } from '../processor/performance';
 import { Spotlight } from './spotlight';
+import { sendShowMessageBox } from '../ipc';
 
 const debug = require('debug')('sleuth:appCore');
 
@@ -111,12 +111,14 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
     const sortedUnzippedFiles = getTypesForFiles(unzippedFiles);
 
     if (Object.keys(sortedUnzippedFiles).map((k) => sortedUnzippedFiles[k]).every((s) => s.length === 0)) {
-      const title = 'Huh, weird logs!';
-      const message = 'Sorry, Sleuth does not understand the files. It seems like there are no Slack logs here.';
+      sendShowMessageBox({
+        title: 'Huh, weird logs!',
+        message: 'Sorry, Sleuth does not understand the files. It seems like there are no Slack logs here.',
+        type: 'error'
+      });
 
-
-      await remote.dialog.showMessageBox({ type: 'error', title, message });
-      remote.getCurrentWindow().reload();
+      // Reload
+      window.location.reload();
     }
 
     this.addFilesToState(sortedUnzippedFiles, 'state', 'netlog');

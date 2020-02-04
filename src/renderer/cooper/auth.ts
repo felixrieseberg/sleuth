@@ -2,8 +2,9 @@ import path from 'path';
 import { config } from '../../config';
 import { remote } from 'electron';
 import { SleuthState } from '../state/sleuth';
+import { sendShowMessageBox } from '../ipc';
 
-const { BrowserWindow, dialog } = remote;
+const { BrowserWindow } = remote;
 const debug = require('debug')('sleuth:cooper');
 
 export interface SigninOptions {
@@ -53,7 +54,7 @@ export class CooperAuth {
         `Sleuth will attempt to click the right buttons automatically.`
     };
 
-    return dialog.showMessageBox(remote.getCurrentWindow(), options);
+    return sendShowMessageBox(options);
   }
 
   public showSignInWindow(): Promise<boolean> {

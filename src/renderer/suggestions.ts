@@ -1,10 +1,11 @@
-import { remote, shell } from 'electron';
+import { shell } from 'electron';
 import fs from 'fs-extra';
 import path from 'path';
 import { formatDistanceToNow } from 'date-fns';
 
 import { Suggestions, Suggestion } from './interfaces';
 import { StringMap } from '../shared-constants';
+import { getPath, sendShowMessageBox } from './ipc';
 
 const debug = require('debug')('sleuth:suggestions');
 
@@ -14,18 +15,18 @@ export async function getItemsInDownloadFolder(): Promise<Suggestions> {
   // We'll get suggestions from the downloads folder and
   // the desktop
   try {
-    const downloadsDir = remote.app.getPath('downloads');
+    const downloadsDir = await getPath('downloads');
     const downloads = (await fs.readdir(downloadsDir))
       .map((file) => path.join(downloadsDir, file));
 
-    const desktopDir = remote.app.getPath('desktop');
+    const desktopDir = await getPath('desktop');
     const desktop = (await fs.readdir(desktopDir))
       .map((file) => path.join(desktopDir, file));
 
     suggestions = {
       ...(await getSuggestions(downloads)),
       ...(await getSuggestions(desktop))
-    }
+    };
   } catch (error) {
     debug(error);
   }
@@ -38,7 +39,7 @@ export async function deleteSuggestion(filePath: string) {
     ? 'trash'
     : 'recycle bin';
 
-  const { response } = await remote.dialog.showMessageBox({
+  const { response } = await sendShowMessageBox({
     title: 'Delete File?',
     message: `Do you want to move ${filePath} to the ${trashName}?`,
     type: 'question',
@@ -58,7 +59,7 @@ export async function deleteSuggestions(filePaths: Array<string>) {
     ? 'trash'
     : 'recycle bin';
 
-  const { response } = await remote.dialog.showMessageBox({
+  const { response } = await sendShowMessageBox({
     title: 'Delete Files?',
     message: `Do you want to move all log files older than 48 hours to the ${trashName}?`,
     type: 'question',
@@ -89,7 +90,7 @@ async function getSuggestions(input: Array<string>): Promise<StringMap<Suggestio
     // If the file is from #alerts-desktop-logs, the server will
     // have named it, not the desktop app itself.
     // It'll look like T8KJ1FXTL_U8KCVGGLR_1580765146766674.zip
-    const serverFormat = /\w{9}_\w{9}_\d{16}\.zip/
+    const serverFormat = /\w{9}_\w{9}_\d{16}\.zip/;
     const shouldAdd = file.startsWith('logs') ||
       file.startsWith('slack-logs') ||
       serverFormat.test(file);

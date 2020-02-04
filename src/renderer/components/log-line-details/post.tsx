@@ -1,10 +1,10 @@
 import { observer } from 'mobx-react';
 import React from 'react';
-import { remote } from 'electron';
 import { Card, FormGroup, Button, EditableText } from '@blueprintjs/core';
 
 import { cooperComments } from '../../cooper/comments';
 import { SleuthState } from '../../state/sleuth';
+import { sendShowMessageBox } from '../../ipc';
 
 const debug = require('debug')('sleuth:cooper');
 
@@ -59,9 +59,9 @@ export class PostComment extends React.Component<PostCommentProps, Partial<PostC
         debug(await result.text());
       })
       .catch((error) => {
-        debug(`Tried to post commen to cooper, but failed`, error);
+        debug(`Tried to post comment to cooper, but failed`, error);
 
-        remote.dialog.showMessageBox({
+        sendShowMessageBox({
           title: `Posting Failed`,
           type: 'error',
           message: `We could not reach the log service and failed to post your comment 😢`,

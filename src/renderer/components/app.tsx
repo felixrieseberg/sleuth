@@ -1,7 +1,7 @@
 import { SleuthState } from '../state/sleuth';
 import { shouldIgnoreFile } from '../../utils/should-ignore-file';
 import React from 'react';
-import { ipcRenderer, remote } from 'electron';
+import { ipcRenderer } from 'electron';
 import classNames from 'classnames';
 import fs from 'fs-extra';
 import path from 'path';
@@ -12,6 +12,7 @@ import { CoreApplication } from './app-core';
 import { MacTitlebar } from './mac-titlebar';
 import { Preferences } from './preferences';
 import { TouchBarManager } from '../touch-bar-manager';
+import { sendWindowReady } from '../ipc';
 
 const debug = require('debug')('sleuth:app');
 
@@ -63,7 +64,7 @@ export class App extends React.Component<{}, Partial<AppState>> {
    * Alright, time to show the window!
    */
   public componentDidMount() {
-    remote.getCurrentWindow().show();
+    sendWindowReady();
 
     this.setupFileDrop();
     this.setupBusyResponse();

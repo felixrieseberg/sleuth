@@ -1,10 +1,13 @@
-import { shell, BrowserWindow, app, ipcMain } from 'electron';
+import { shell, BrowserWindow, app, ipcMain, dialog } from 'electron';
 import { createWindow } from './windows';
 
 export class IpcManager {
   constructor() {
     this.setupFileDrop();
     this.setupOpenWindow();
+    this.setupMessageBoxHandler();
+    this.setupWindowReady();
+    this.setupGetPath();
   }
 
   public openFile(path: string) {
@@ -51,6 +54,34 @@ export class IpcManager {
   private setupOpenWindow() {
     ipcMain.on('new-sleuth-window', () => {
       createWindow();
+    });
+  }
+
+  private setupWindowReady() {
+    ipcMain.on('window-ready', (event) => {
+      try {
+        const browserWindow = BrowserWindow.fromWebContents(event.sender);
+
+        if (browserWindow) {
+          browserWindow.show();
+        }
+      } catch (error) {
+        console.warn(`Could not show window`, error);
+      }
+    });
+  }
+
+  private setupMessageBoxHandler() {
+    ipcMain.handle('message-box', async (_event, options: Electron.MessageBoxOptions) => {
+      return dialog.showMessageBox(options);
+    });
+  }
+
+  private setupGetPath() {
+    type name = 'home' | 'appData' | 'userData' | 'cache' | 'temp' | 'exe' | 'module' | 'desktop' | 'documents' | 'downloads' | 'music' | 'pictures' | 'videos' | 'logs' | 'pepperFlashSystemPlugin';
+
+    ipcMain.handle('get-path', async (_event, path: name) => {
+      return app.getPath(path);
     });
   }
 }
