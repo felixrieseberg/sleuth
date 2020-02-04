@@ -79,22 +79,21 @@ export class AppMenu {
    * @returns {Array<Electron.MenuItemOptions>}
    */
   public getOpenItems(): Array<Electron.MenuItemConstructorOptions> {
-    const handleFilePaths = async (filePaths: Array<string>) => {
-      if (filePaths && filePaths.length > 0) {
-        const { webContents } = await getCurrentWindow();
-        webContents.send('file-dropped', filePaths[0]);
-      }
-    };
-
     const openItem = {
       label: 'Open...',
       accelerator: 'CmdOrCtrl+O',
-      click: () => {
-        dialog.showOpenDialog({
-          defaultPath: app.getPath('downloads'),
-          filters: [ { name: 'zip', extensions: [ 'zip' ] } ],
-          properties: [ 'openFile', 'openDirectory', 'showHiddenFiles' ],
-        }, handleFilePaths);
+      click: async () => {
+        try {
+          const { filePaths } = await dialog.showOpenDialog({
+            defaultPath: app.getPath('downloads'),
+            filters: [ { name: 'zip', extensions: [ 'zip' ] } ],
+            properties: [ 'openFile', 'openDirectory', 'showHiddenFiles' ],
+          });
+
+          await this.handleFilePaths(filePaths);
+        } catch (error) {
+          debug(`Failed to open item. ${error}`);
+        }
       }
     };
 
@@ -108,12 +107,14 @@ export class AppMenu {
       const openFile = {
         label: 'Open File...',
         accelerator: 'CmdOrCtrl+Shift+O',
-        click: () => {
-          dialog.showOpenDialog({
+        click: async () => {
+          const { filePaths } = await dialog.showOpenDialog({
             defaultPath: app.getPath('downloads'),
             filters: [ { name: 'zip', extensions: [ 'zip' ] } ],
             properties: [ 'openFile', 'showHiddenFiles' ],
-          }, handleFilePaths);
+          });
+
+          await this.handleFilePaths(filePaths);
         }
       };
 
@@ -191,6 +192,8 @@ export class AppMenu {
    * Actually creates the menu.
    */
   public setupMenu() {
+    require('electron-context-menu')();
+
     this.menu = defaultMenu(app, shell) as Array<any>;
 
     const preferencesItem = {
@@ -204,7 +207,7 @@ export class AppMenu {
 
     const newWindowItem = {
       label: 'New Window',
-      accelerator: 'CtrlOrCmd+Shift+N',
+      accelerator: 'CtrlOrCmd+N',
       click: () => createWindow()
     };
 
@@ -229,6 +232,13 @@ export class AppMenu {
     });
 
     Menu.setApplicationMenu(Menu.buildFromTemplate(this.menu));
+  }
+
+  private async handleFilePaths(filePaths: Array<string>): Promise<void> {
+    if (filePaths && filePaths.length > 0) {
+      const { webContents } = await getCurrentWindow();
+      webContents.send('file-dropped', filePaths[0]);
+    }
   }
 }
 
