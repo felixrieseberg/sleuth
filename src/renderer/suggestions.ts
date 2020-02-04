@@ -9,7 +9,7 @@ import { getPath, sendShowMessageBox } from './ipc';
 
 const debug = require('debug')('sleuth:suggestions');
 
-export async function getItemsInDownloadFolder(): Promise<Suggestions> {
+export async function getItemsInSuggestionFolders(): Promise<Suggestions> {
   let suggestions = {};
 
   // We'll get suggestions from the downloads folder and

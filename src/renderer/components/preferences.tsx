@@ -1,7 +1,7 @@
 import { Select } from '@blueprintjs/select';
 import { ipcRenderer } from 'electron';
 import { observer } from 'mobx-react';
-import { Overlay, Classes, FormGroup, Button, MenuItem, Callout, ControlGroup, InputGroup, RadioGroup, Radio } from '@blueprintjs/core';
+import { Overlay, Classes, FormGroup, Button, MenuItem, Callout, ControlGroup, InputGroup, RadioGroup, Radio, Label, Checkbox } from '@blueprintjs/core';
 import { SleuthState } from '../state/sleuth';
 import classNames from 'classnames';
 import React from 'react';
@@ -91,6 +91,20 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
             <Radio label='Ascending' value={SORT_DIRECTION.ASC} />
             <Radio label='Descending' value={SORT_DIRECTION.DESC} />
           </RadioGroup>
+          <RadioGroup
+            label='Skip home screen and open most recent file immediately'
+            onChange={(event) => (this.props.state.defaultSort = event.currentTarget.value as SORT_DIRECTION)}
+            selectedValue={this.props.state.defaultSort || SORT_DIRECTION.DESC}
+          >
+            <Radio label='Yes' value={SORT_DIRECTION.ASC} />
+            <Radio label='Descending' value={SORT_DIRECTION.DESC} />
+          </RadioGroup>
+          <Label>Skip home screen and always open most recent file automatically</Label>
+          <Checkbox
+            checked={this.props.state.isOpenMostRecent}
+            label='Enabled'
+            onChange={(event) => (this.props.state.isOpenMostRecent = event.currentTarget.checked)}
+          />
           <FormGroup
             label='Editor'
             helperText='Sleuth can open log source files in your favorite editor'

@@ -3,7 +3,7 @@ import { ipcRenderer } from 'electron';
 
 import { UnzippedFile } from '../unzip';
 import { LevelFilter, LogEntry, MergedLogFile, ProcessedLogFile, DateRange, Suggestions } from '../interfaces';
-import { getItemsInDownloadFolder } from '../suggestions';
+import { getItemsInSuggestionFolders } from '../suggestions';
 import { testDateTimeFormat } from '../../utils/test-date-time';
 import { SORT_DIRECTION } from '../components/log-table-constants';
 
@@ -11,7 +11,8 @@ export const defaults = {
   dateTimeFormat: 'HH:mm:ss (dd/MM)',
   defaultEditor: 'code --goto {filepath}:{line}',
   font: process.platform === 'darwin' ? 'San Francisco' : 'Segoe UI',
-  isDarkMode: true
+  isDarkMode: true,
+  isOpenMostRecent: false,
 };
 
 export class SleuthState {
@@ -42,11 +43,15 @@ export class SleuthState {
 
   // Settings
   @observable public isDarkMode: boolean = !!this.retrieve('isDarkMode', true);
+  @observable public isOpenMostRecent: boolean = !!this.retrieve<boolean>('isOpenMostRecent', true);
   @observable public dateTimeFormat: string
     = testDateTimeFormat(this.retrieve<string>('dateTimeFormat_v3', false)!, defaults.dateTimeFormat);
   @observable public font: string = this.retrieve<string>('font', false)!;
   @observable public defaultEditor: string = this.retrieve<string>('defaultEditor', false)!;
   @observable public defaultSort: SORT_DIRECTION = this.retrieve('defaultSort', false) as SORT_DIRECTION || SORT_DIRECTION.DESC;
+
+  // Internal setting
+  private didOpenMostRecent = false;
 
   constructor(
     public readonly openFile: (file: string) => void,
@@ -57,6 +62,7 @@ export class SleuthState {
     // Setup autoruns
     autorun(() => this.save('dateTimeFormat_v3', this.dateTimeFormat));
     autorun(() => this.save('font', this.font));
+    autorun(() => this.save('isOpenMostRecent', this.isOpenMostRecent));
     autorun(() => this.save('defaultEditor', this.defaultEditor));
     autorun(() => this.save('defaultSort', this.defaultSort));
     autorun(() => {
@@ -106,7 +112,36 @@ export class SleuthState {
 
   @action
   public async getSuggestions() {
-    this.suggestions = await getItemsInDownloadFolder();
+    this.suggestions = await getItemsInSuggestionFolders();
+
+    // This is a side effect. There's probably a better
+    // place for it, since we only want to run it once,
+    // but here we are.
+    this.openMostRecentSuggestionMaybe();
+  }
+
+  @action
+  public openMostRecentSuggestionMaybe() {
+    if (!this.isOpenMostRecent || this.didOpenMostRecent) return;
+
+    const keys = Object.keys(this.suggestions);
+
+    if (keys.length === 0) return;
+
+    let mostRecentStats = this.suggestions[keys[0]];
+    let mostRecentFilePath = keys[0];
+
+    for (const filePath of keys) {
+      const stats = this.suggestions[filePath];
+
+      if (stats.mtimeMs > mostRecentStats.mtimeMs) {
+        mostRecentFilePath = filePath;
+        mostRecentStats = stats;
+      }
+    }
+
+    this.didOpenMostRecent = true;
+    this.openFile(mostRecentFilePath);
   }
 
   @action

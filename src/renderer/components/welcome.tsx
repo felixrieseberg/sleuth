@@ -1,5 +1,6 @@
 import React from 'react';
 import path from 'path';
+
 import { ControlGroup, Button, InputGroup } from '@blueprintjs/core';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import { observer } from 'mobx-react';
@@ -143,7 +144,6 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
 
   public render() {
     const { sleuth } = this.state;
-    const suggestions = this.renderSuggestions();
 
     return (
       <div className='Welcome'>
@@ -156,7 +156,7 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
           <h4>Drop a logs zip file or folder anywhere on this window to open it.</h4>
           {this.renderUpdateAvailable()}
         </div>
-        {suggestions}
+        {this.renderSuggestions()}
       </div>
     );
   }
