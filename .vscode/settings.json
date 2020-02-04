@@ -5,6 +5,7 @@
     "**/.svn": true,
     "**/.hg": true,
     "**/.DS_Store": true,
-    "**/out": true
+    "**/out": true,
+    "**/catapult": true,
   }
 }
