@@ -52,8 +52,6 @@ function getWindowState() {
 export async function createWindow(): Promise<BrowserWindow> {
   console.log(`Creating window. Current window size: ${windows.length}`);
 
-  require('electron-context-menu')();
-
   const { mainWindowState, x, y } = getWindowState();
 
   // Create the browser window.

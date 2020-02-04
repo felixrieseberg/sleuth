@@ -13,6 +13,7 @@ import { MacTitlebar } from './mac-titlebar';
 import { Preferences } from './preferences';
 import { TouchBarManager } from '../touch-bar-manager';
 import { sendWindowReady } from '../ipc';
+import { openBacktrace } from '../backtrace';
 
 const debug = require('debug')('sleuth:app');
 
@@ -68,36 +69,7 @@ export class App extends React.Component<{}, Partial<AppState>> {
 
     this.setupFileDrop();
     this.setupBusyResponse();
-  }
-
-  /**
-   * Whenever a file is dropped into the window, we'll try to open it
-   */
-  public setupFileDrop() {
-    document.ondragover = document.ondrop = (event) => event.preventDefault();
-    document.body.ondrop = (event) => {
-      if (event.dataTransfer && event.dataTransfer.files.length > 0) {
-        let url = event.dataTransfer.files[0].path;
-        url = url.replace('file:///', '/');
-        this.openFile(url);
-      }
-
-      event.preventDefault();
-    };
-
-    ipcRenderer.on('file-dropped', (_event: any, url: string) => this.openFile(url));
-  }
-
-  /**
-   * Sometimes, the main process wants to know whether or not this window is currently
-   * handling a set of logfiles.
-   */
-  public setupBusyResponse() {
-    ipcRenderer.on('are-you-busy', (event) => {
-      const { unzippedFiles } = this.state;
-
-      event.returnValue = !(!unzippedFiles || unzippedFiles.length === 0);
-    });
+    this.setupOpenBacktrace();
   }
 
   /**
@@ -202,5 +174,47 @@ export class App extends React.Component<{}, Partial<AppState>> {
         {content}
       </div>
     );
+  }
+
+  /**
+   * Whenever a file is dropped into the window, we'll try to open it
+   */
+  private setupFileDrop() {
+    document.ondragover = document.ondrop = (event) => event.preventDefault();
+    document.body.ondrop = (event) => {
+      if (event.dataTransfer && event.dataTransfer.files.length > 0) {
+        let url = event.dataTransfer.files[0].path;
+        url = url.replace('file:///', '/');
+        this.openFile(url);
+      }
+
+      event.preventDefault();
+    };
+
+    ipcRenderer.on('file-dropped', (_event: any, url: string) => this.openFile(url));
+  }
+
+  private setupOpenBacktrace() {
+    ipcRenderer.on('open-backtrace', () => {
+      // Get the file path to the installation file. Only app-* classes know.
+      const installationFile = this.state.unzippedFiles?.find((file) => {
+        return (file.fileName === 'installation');
+      });
+
+      // Then, let the utility handle the details
+      openBacktrace(installationFile?.fullPath);
+    });
+  }
+
+  /**
+   * Sometimes, the main process wants to know whether or not this window is currently
+   * handling a set of logfiles.
+   */
+  private setupBusyResponse() {
+    ipcRenderer.on('are-you-busy', (event) => {
+      const { unzippedFiles } = this.state;
+
+      event.returnValue = !(!unzippedFiles || unzippedFiles.length === 0);
+    });
   }
 }

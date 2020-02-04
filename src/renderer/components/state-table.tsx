@@ -15,6 +15,7 @@ import { parseJSON } from '../../utils/parse-json';
 import { getFontForCSS } from './preferences-font';
 import { isTruthy } from '../../utils/is-truthy';
 import { plural } from '../../utils/pluralize';
+import { getBacktraceHref, convertInstallation } from '../backtrace';
 
 const debug = require('debug')('sleuth:statetable');
 
@@ -159,12 +160,6 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
     return (<a onClick={() => shell.openExternal(href)}>{text}</a>);
   }
 
-  private getBacktraceLink(text: string, installation: string): JSX.Element {
-    // tslint:disable-next-line:max-line-length
-    const href = `https://backtrace.tinyspeck.com/p/desktop/list?aperture=[[%22relative%22,[%22floating%22,%22all%22]],[[%22instanceUid%22,[%22equal%22,%22${installation}%22]]]]`;
-    return (<a onClick={() => shell.openExternal(href)}>{text}</a>);
-  }
-
   private renderWindowFrameInfo(): JSX.Element | null {
     const data = this.state.data || {};
     const windowSettings = data.windowSettings || {};
@@ -274,20 +269,20 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
   private renderInstallationInfo(): JSX.Element | null {
     const { data } = this.state;
 
-
     if (Array.isArray(data) && data.length > 0) {
-      const id = new Buffer(data[0], 'base64').toString('ascii');
-      const backTraceLink = this.getBacktraceLink(id, id);
+      const id = convertInstallation(data[0]);
+      const href = getBacktraceHref(id);
+
       return (
         <Card className='StateTable-Info'>
-          See exceptions in Backtrace: {backTraceLink}
+          See exceptions in Backtrace: <a onClick={() => shell.openExternal(href)}>{id}</a>
         </Card>
       );
     }
 
     return (
       <Card className='StateTable-Info'>
-        No installation Id found :(
+        No installation id found.
       </Card>
     );
   }

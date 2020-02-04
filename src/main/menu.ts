@@ -228,7 +228,16 @@ export class AppMenu {
 
     this.menu.push({
       label: 'Utilities',
-      submenu: this.getPruneItems()
+      submenu: [
+        {
+          label: 'Open Backtrace',
+          click(_item: Electron.MenuItem, browserWindow: BrowserWindow) {
+            browserWindow.webContents.send('open-backtrace');
+          }
+        }
+        { type: 'separator' },
+        ...this.getPruneItems()
+      ]
     });
 
     Menu.setApplicationMenu(Menu.buildFromTemplate(this.menu));
