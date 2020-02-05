@@ -234,7 +234,7 @@ export class AppMenu {
           click(_item: Electron.MenuItem, browserWindow: BrowserWindow) {
             browserWindow.webContents.send('open-backtrace');
           }
-        }
+        },
         { type: 'separator' },
         ...this.getPruneItems()
       ]
