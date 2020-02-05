@@ -19,8 +19,8 @@ const options = {
     asar: true,
     osxSign: {
       identity: 'Developer ID Application: Felix Rieseberg (LT94ZKYDCJ)',
-      'hardened-runtime': true,
-      'gatekeeper-assess': false,
+      hardenedRuntime: true,
+      'gatekeeper-assess': true,
       'entitlements': 'static/entitlements.plist',
       'entitlements-inherit': 'static/entitlements.plist',
       'signature-flags': 'library'
@@ -119,6 +119,8 @@ function notarizeMaybe() {
     appleIdPassword: process.env.APPLE_ID_PASSWORD,
     ascProvider: 'LT94ZKYDCJ'
   }
+
+  console.log(`Notarization enabled`);
 }
 
 notarizeMaybe()
