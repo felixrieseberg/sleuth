@@ -2,15 +2,11 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
   <dict>
-    <key>com.apple.security.cs.allow-jit</key>
-    <true/>
-    <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
-    <true/>
-    <key>com.apple.security.cs.debugger</key>
-    <true/>
     <key>CFBundleDocumentTypes</key>
     <array>
       <dict>
+        <key>CFBundleTypeRole</key>
+        <string>Viewer</string>
         <key>CFBundleTypeName</key>
         <string>All Files</string>
         <key>LSHandlerRank</key>
@@ -22,6 +18,8 @@
         </array>
       </dict>
       <dict>
+        <key>CFBundleTypeRole</key>
+        <string>Viewer</string>
         <key>CFBundleTypeName</key>
         <string>ZIP</string>
         <key>LSHandlerRank</key>

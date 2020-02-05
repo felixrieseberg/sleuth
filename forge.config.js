@@ -18,7 +18,12 @@ const options = {
     appCategoryType: 'public.app-category.developer-tools',
     asar: true,
     osxSign: {
-      identity: '6EAE76A75A316F8CE47BDBC19A95B44536FDCD2D'
+      identity: 'Developer ID Application: Felix Rieseberg (LT94ZKYDCJ)',
+      'hardened-runtime': true,
+      'gatekeeper-assess': false,
+      'entitlements': 'static/entitlements.plist',
+      'entitlements-inherit': 'static/entitlements.plist',
+      'signature-flags': 'library'
     },
     ignore: [
       /^\/\.vscode/,
@@ -38,14 +43,6 @@ const options = {
     win32metadata: {
       ProductName: 'Sleuth',
       CompanyName: 'Felix Rieseberg'
-    },
-    osxSign: {
-      identity: 'Developer ID Application: Felix Rieseberg (LT94ZKYDCJ)',
-      'hardened-runtime': true,
-      'gatekeeper-assess': false,
-      'entitlements': 'static/extend.plist',
-      'entitlements-inherit': 'static/extend.plist',
-      'signature-flags': 'library'
     }
   },
   makers: [
