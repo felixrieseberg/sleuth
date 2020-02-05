@@ -98,4 +98,29 @@ const options = {
   ]
 };
 
+function notarizeMaybe() {
+  if (process.platform !== 'darwin') {
+    return;
+  }
+
+  if (!process.env.CI) {
+    console.log(`Not in CI, skipping notarization`);
+    return;
+  }
+
+  if (!process.env.APPLE_ID || !process.env.APPLE_ID_PASSWORD) {
+    console.warn('Should be notarizing, but environment variables APPLE_ID or APPLE_ID_PASSWORD are missing!');
+    return;
+  }
+
+  options.packagerConfig.osxNotarize = {
+    appBundleId: 'com.felixrieseberg.sleuth',
+    appleId: process.env.APPLE_ID,
+    appleIdPassword: process.env.APPLE_ID_PASSWORD,
+    ascProvider: 'LT94ZKYDCJ'
+  }
+}
+
+notarizeMaybe()
+
 module.exports = options;
