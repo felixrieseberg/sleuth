@@ -4,13 +4,12 @@ import path from 'path';
 import { formatDistanceToNow } from 'date-fns';
 
 import { Suggestions, Suggestion } from './interfaces';
-import { StringMap } from '../shared-constants';
 import { getPath, sendShowMessageBox } from './ipc';
 
 const debug = require('debug')('sleuth:suggestions');
 
-export async function getItemsInDownloadFolder(): Promise<Suggestions> {
-  const suggestionsArr = new Array<Suggestion>();
+export async function getItemsInSuggestionFolders(): Promise<Suggestions> {
+ let suggestionsArr: Array<Suggestion>;
 
   // We'll get suggestions from the downloads folder and
   // the desktop
@@ -23,18 +22,16 @@ export async function getItemsInDownloadFolder(): Promise<Suggestions> {
     const desktop = (await fs.readdir(desktopDir))
       .map((file) => path.join(desktopDir, file));
 
-    suggestions = {
-      ...(await getSuggestions(downloads)),
-      ...(await getSuggestions(desktop))
-    };
+    suggestionsArr = (await getSuggestions(downloads)).concat(await getSuggestions(desktop));
+    const sortedSuggestions  = suggestionsArr.sort((a, b) => {
+      return b.mtimeMs - a.mtimeMs;
+    });
+
+    return sortedSuggestions;
   } catch (error) {
     debug(error);
   }
-  const sortedSuggestions  = suggestionsArr.sort((a, b) => {
-    return b.birthtimeMs - a.birthtimeMs;
-  });
-
-  return sortedSuggestions;
+  return [];
 }
 
 export async function deleteSuggestion(filePath: string) {
@@ -84,26 +81,24 @@ export async function deleteSuggestions(filePaths: Array<string>) {
  * @param {Array<string>} input
  * @returns {Promise<StringMap<Suggestion>>}
  */
-async function getSuggestions(input: Array<string>): Promise<StringMap<Suggestion>> {
-  const suggestions: StringMap<Suggestion> = {};
+async function getSuggestions(input: Array<string>): Promise<Array<Suggestion>> {
+  const suggestions: Array<Suggestion> = [];
 
   for (const file of input) {
     debug(`Checking ${file}`);
-
     // If the file is from #alerts-desktop-logs, the server will
     // have named it, not the desktop app itself.
     // It'll look like T8KJ1FXTL_U8KCVGGLR_1580765146766674.zip
     const serverFormat = /\w{9}_\w{9}_\d{16}\.zip/;
-    const shouldAdd = file.startsWith('logs') ||
-      file.startsWith('slack-logs') ||
-      serverFormat.test(file);
+    const logsFormat = /.*logs.*\.zip/;
+    const shouldAdd = logsFormat.test(file) || serverFormat.test(file);
 
     if (shouldAdd) {
       try {
         const stats = fs.statSync(file);
         const age = formatDistanceToNow(stats.mtimeMs);
 
-        suggestions[file] = { ...stats, age };
+        suggestions.push({filePath: file, ...stats, age });
       } catch (error) {
         debug(`Tried to add ${file}, but failed: ${error}`);
       }
