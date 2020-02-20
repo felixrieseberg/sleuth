@@ -1,7 +1,7 @@
 import { Select } from '@blueprintjs/select';
 import { ipcRenderer } from 'electron';
 import { observer } from 'mobx-react';
-import { Overlay, Classes, FormGroup, Button, MenuItem, Callout, ControlGroup, InputGroup, RadioGroup, Radio, Label, Checkbox } from '@blueprintjs/core';
+import { Overlay, Classes, FormGroup, Button, MenuItem, Callout, ControlGroup, InputGroup, RadioGroup, Radio, Label, Checkbox, Divider } from '@blueprintjs/core';
 import { SleuthState } from '../state/sleuth';
 import classNames from 'classnames';
 import React from 'react';
@@ -53,7 +53,9 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
         <div className={classes}>
           <h2>Preferences</h2>
           <Callout>You're running Sleuth {packageInfo.version} {getSleuth()}</Callout>
+          <Divider style={{ marginTop: '15px' }} />
           <FormGroup
+            inline={true}
             label='Font'
             helperText='Choose a custom font to override how Sleuth renders various text elements'
           >
@@ -68,7 +70,9 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
               <Button text={font} rightIcon='font' />
             </FontSelect>
           </FormGroup>
+          <Divider />
           <FormGroup
+            inline={true}
             label='Date Time Format'
             helperText='Choose a custom format for dates to override how timestamps will be displayed'
           >
@@ -83,21 +87,36 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
               <Button text={dateTimeFormat} rightIcon='calendar' />
             </DateTimeSelect>
           </FormGroup>
-          <RadioGroup
-            label='Sort Direction'
-            onChange={(event) => (this.props.state.defaultSort = event.currentTarget.value as SORT_DIRECTION)}
-            selectedValue={this.props.state.defaultSort || SORT_DIRECTION.DESC}
-          >
-            <Radio label='Ascending' value={SORT_DIRECTION.ASC} />
-            <Radio label='Descending' value={SORT_DIRECTION.DESC} />
-          </RadioGroup>
-          <Label>Skip home screen and always open most recent file automatically</Label>
-          <Checkbox
-            checked={this.props.state.isOpenMostRecent}
-            label='Enabled'
-            onChange={(event) => (this.props.state.isOpenMostRecent = event.currentTarget.checked)}
-          />
+          <Divider />
           <FormGroup
+            inline={true}
+            label='Sort Direction'
+            helperText='Skip home screen and always open most recent file automatically'
+          >
+            <RadioGroup
+              onChange={(event) => (this.props.state.defaultSort = event.currentTarget.value as SORT_DIRECTION)}
+              selectedValue={this.props.state.defaultSort || SORT_DIRECTION.DESC}
+              inline={true}
+            >
+              <Radio label='Ascending' value={SORT_DIRECTION.ASC} />
+              <Radio label='Descending' value={SORT_DIRECTION.DESC} />
+            </RadioGroup>
+          </FormGroup>
+          <Divider />
+          <FormGroup
+            inline={true}
+            label='Always open most recent file'
+            helperText='Skip home screen and always open most recent file automatically'
+          >
+            <Checkbox
+              checked={this.props.state.isOpenMostRecent}
+              label='Enabled'
+              onChange={(event) => (this.props.state.isOpenMostRecent = event.currentTarget.checked)}
+            />
+          </FormGroup>
+          <Divider />
+          <FormGroup
+            inline={true}
             label='Editor'
             helperText='Sleuth can open log source files in your favorite editor'
           >
@@ -119,6 +138,7 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
               />
             </ControlGroup>
           </FormGroup>
+          <Divider />
           {this.renderCooperOptions()}
         </div>
       </Overlay>
@@ -128,6 +148,7 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
   private renderCooperOptions() {
     return (
       <FormGroup
+        inline={true}
         helperText='The log service allows Slack employees to leave comments and hints for log entries'
         label='Sign into the Cooper Log Service'
       >
