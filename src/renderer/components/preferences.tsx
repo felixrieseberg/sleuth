@@ -91,14 +91,6 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
             <Radio label='Ascending' value={SORT_DIRECTION.ASC} />
             <Radio label='Descending' value={SORT_DIRECTION.DESC} />
           </RadioGroup>
-          <RadioGroup
-            label='Skip home screen and open most recent file immediately'
-            onChange={(event) => (this.props.state.defaultSort = event.currentTarget.value as SORT_DIRECTION)}
-            selectedValue={this.props.state.defaultSort || SORT_DIRECTION.DESC}
-          >
-            <Radio label='Yes' value={SORT_DIRECTION.ASC} />
-            <Radio label='Descending' value={SORT_DIRECTION.DESC} />
-          </RadioGroup>
           <Label>Skip home screen and always open most recent file automatically</Label>
           <Checkbox
             checked={this.props.state.isOpenMostRecent}
