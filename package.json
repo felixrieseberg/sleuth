@@ -15,7 +15,8 @@
     "start": "rimraf ./dist && electron-forge start",
     "dev": "electron .",
     "test": "npm run lint && jest --config=jest.json --coverage",
-    "update-snapshots": "jest --config=jest.json --updateSnapshot"
+    "update-snapshots": "jest --config=jest.json --updateSnapshot",
+    "catapult:update": "git submodule foreach git pull origin master"
   },
   "keywords": [],
   "author": "Felix Rieseberg <felix@felixrieseberg.com>",
