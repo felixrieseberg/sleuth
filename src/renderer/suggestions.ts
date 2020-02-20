@@ -68,7 +68,7 @@ export async function deleteSuggestions(filePaths: Array<string>) {
   });
 
   if (response) {
-    filePaths.forEach(shell.moveItemToTrash);
+    filePaths.forEach((filePath) => shell.moveItemToTrash(filePath));
   }
 
   return !!response;

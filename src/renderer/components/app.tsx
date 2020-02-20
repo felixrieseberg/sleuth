@@ -94,6 +94,38 @@ export class App extends React.Component<{}, Partial<AppState>> {
     if (stats.isDirectory()) {
       return this.openDirectory(url);
     }
+
+    // This is probably a file then
+    if (stats.isFile()) {
+      return this.openSingleFile(url);
+    }
+  }
+
+
+  /**
+   * We were handed a single log file. We'll pretend it's an imaginary folder
+   * with a single file in it.
+   *
+   * @param {string} url
+   * @returns {Promise<void>}
+   */
+  public async openSingleFile(url: string): Promise<void> {
+    debug(`Now opening single file ${url}`);
+    this.resetApp();
+
+    console.groupCollapsed(`Open single file`);
+
+    const stats = fs.statSync(url);
+    const file: UnzippedFile = {
+      fileName: path.basename(url),
+      fullPath: url,
+      size: stats.size
+    };
+
+    this.sleuthState.setSource(url);
+    this.setState({ unzippedFiles: [ file ] });
+
+    console.groupEnd();
   }
 
   /**

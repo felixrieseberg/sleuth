@@ -123,25 +123,18 @@ export class SleuthState {
   @action
   public openMostRecentSuggestionMaybe() {
     if (!this.isOpenMostRecent || this.didOpenMostRecent) return;
+    if (this.suggestions.length === 0) return;
 
-    const keys = Object.keys(this.suggestions);
+    let mostRecentStats = this.suggestions[0];
 
-    if (keys.length === 0) return;
-
-    let mostRecentStats = this.suggestions[keys[0]];
-    let mostRecentFilePath = keys[0];
-
-    for (const filePath of keys) {
-      const stats = this.suggestions[filePath];
-
+    for (const stats of this.suggestions) {
       if (stats.mtimeMs > mostRecentStats.mtimeMs) {
-        mostRecentFilePath = filePath;
         mostRecentStats = stats;
       }
     }
 
     this.didOpenMostRecent = true;
-    this.openFile(mostRecentFilePath);
+    this.openFile(mostRecentStats.filePath);
   }
 
   @action

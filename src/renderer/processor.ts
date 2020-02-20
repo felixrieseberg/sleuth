@@ -129,7 +129,9 @@ export function getTypeForFile(logFile: UnzippedFile): LogType {
     return LogType.BROWSER;
   } else if (fileName.endsWith('preload.log') || fileName.startsWith('webview')) {
     return LogType.PRELOAD;
-  } else if (fileName.startsWith('renderer') || fileName === 'epics-renderer.log') {
+  } else if (fileName.startsWith('renderer')
+    || fileName === 'epics-renderer.log'
+    || fileName.endsWith('window-console.log')) {
     return LogType.RENDERER;
   } else if (fileName.startsWith('webapp')) {
     return LogType.WEBAPP;
