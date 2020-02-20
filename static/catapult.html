@@ -16,16 +16,28 @@
     <link rel="import" href="../catapult/netlog_viewer.html">
 
     <script>
-      window.sleuth = {
+      // Since we're on a file:// protocol, we can't just
+      // call window.myMethod() from Sleuth and have to send
+      // it as a cross-origin message. This will help.
+      window.addEventListener('message', ({ data }) => {
+        if (!data) return;
 
-        setDarkMode(enabled) {
-          if (enabled) {
+        const { instruction, payload } = data;
+
+        if (instruction === 'load') {
+          console.log(`Attempting to load`, payload);
+          return LogUtil.loadLogFile(payload.content, payload.fileName);
+        }
+
+        if (instruction === 'dark-mode') {
+          console.log(`Setting dark mode to`, payload);
+          if (!!payload) {
             document.body.classList.add('bp3-dark');
           } else {
             document.body.classList.remove('bp3-dark');
           }
         }
-      }
+      });
     </script>
   </head>
   <body class="bp3-dark">

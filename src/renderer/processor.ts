@@ -135,7 +135,7 @@ export function getTypeForFile(logFile: UnzippedFile): LogType {
     return LogType.WEBAPP;
   } else if (fileName.startsWith('call')) {
     return LogType.CALL;
-  } else if (fileName.startsWith('net')) {
+  } else if (fileName.startsWith('net') && !fileName.includes('net-log-window-console')) {
     return LogType.NETLOG;
   } else if (fileName.startsWith('ShipIt') || fileName.includes('SquirrelSetup')) {
     return LogType.INSTALLER;
