@@ -50,7 +50,7 @@ function getWindowState() {
  * @returns {Promise<BrowserWindow>}
  */
 export async function createWindow(): Promise<BrowserWindow> {
-  console.log(`Creating window. Current window size: ${windows.length}`);
+  console.log(`Creating window. Current number of windows: ${windows.length}`);
 
   const { mainWindowState, x, y } = getWindowState();
 
