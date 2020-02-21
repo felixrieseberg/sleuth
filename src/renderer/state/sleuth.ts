@@ -6,6 +6,8 @@ import { LevelFilter, LogEntry, MergedLogFile, ProcessedLogFile, DateRange, Sugg
 import { getItemsInSuggestionFolders } from '../suggestions';
 import { testDateTimeFormat } from '../../utils/test-date-time';
 import { SORT_DIRECTION } from '../components/log-table-constants';
+import { changeIcon, ICON_NAMES, getIconPath } from '../../utils/app-icon';
+import { setSetting } from '../settings';
 
 export const defaults = {
   dateTimeFormat: 'HH:mm:ss (dd/MM)',
@@ -49,6 +51,7 @@ export class SleuthState {
   @observable public font: string = this.retrieve<string>('font', false)!;
   @observable public defaultEditor: string = this.retrieve<string>('defaultEditor', false)!;
   @observable public defaultSort: SORT_DIRECTION = this.retrieve('defaultSort', false) as SORT_DIRECTION || SORT_DIRECTION.DESC;
+  @observable public isMarkIcon: boolean = !!this.retrieve('isMarkIcon', true);
 
   // Internal setting
   private didOpenMostRecent = false;
@@ -80,6 +83,10 @@ export class SleuthState {
       } else {
         document.body.classList.remove('SidebarOpen');
       }
+    });
+    autorun(() => {
+      this.save('isMarkIcon', this.isMarkIcon);
+      changeIcon(this.isMarkIcon ? ICON_NAMES.mark : ICON_NAMES.default);
     });
 
     this.reset = this.reset.bind(this);
@@ -157,6 +164,19 @@ export class SleuthState {
   }
 
   /**
+   * Return the default icon path
+   *
+   * @returns {string}
+   */
+  public getIconPath(): string {
+    if (this.isMarkIcon) {
+      return getIconPath(ICON_NAMES.mark);
+    } else {
+      return getIconPath(ICON_NAMES.default);
+    }
+  }
+
+  /**
    * Save a key/value to localStorage.
    *
    * @param {string} key
@@ -172,6 +192,8 @@ export class SleuthState {
     } else {
       localStorage.removeItem(key);
     }
+
+    setSetting(key, value);
   }
 
   /**

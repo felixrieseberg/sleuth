@@ -16,6 +16,9 @@ module.exports = {
       }, {
         source: path.join(__dirname, '../static/catapult-overrides'),
         target: path.join(__dirname, '../dist/catapult')
+      }, {
+        source: path.join(__dirname, '../static/img'),
+        target: path.join(__dirname, '../dist/static/img')
       }
     ]
 

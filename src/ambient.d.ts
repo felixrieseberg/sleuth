@@ -1,7 +1,6 @@
 // Ambient type declarations for modules that do not have type definitions
 declare module 'yauzl';
 declare module 'react-json-tree';
-declare module 'react-throttle';
 declare module 'react-keydown';
 declare module 'react-autobind';
 declare module 'jsonic';

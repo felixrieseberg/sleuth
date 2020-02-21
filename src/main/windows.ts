@@ -2,7 +2,9 @@ import { BrowserWindow } from 'electron';
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
 import windowStateKeeper from 'electron-window-state';
 
+import { settingsFileManager } from './settings';
 import { config } from '../config';
+import { getIconPath, ICON_NAMES } from '../utils/app-icon';
 
 export let windows: Array<Electron.BrowserWindow> = [];
 
@@ -52,15 +54,22 @@ function getWindowState() {
 export async function createWindow(): Promise<BrowserWindow> {
   console.log(`Creating window. Current number of windows: ${windows.length}`);
 
+  // Let's keep the window position in mind
   const { mainWindowState, x, y } = getWindowState();
 
+  // We might want a custom window
+  const icon = process.platform !== 'darwin' && !!(await settingsFileManager.getItem('isMarkIcon'))
+    ? getIconPath(ICON_NAMES.mark)
+    : getIconPath(ICON_NAMES.default);
+
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  const options: Electron.BrowserWindowConstructorOptions = {
     x,
     y,
     width: mainWindowState.width,
     height: mainWindowState.height,
     show: !!config.isDevMode,
+    icon,
     minHeight: 500,
     minWidth: 1170,
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : undefined,
@@ -69,7 +78,10 @@ export async function createWindow(): Promise<BrowserWindow> {
       nodeIntegration: true,
       contextIsolation: false
     }
-  });
+  };
+  console.log(`Windows: Creating window with options`, options);
+
+  const mainWindow = new BrowserWindow(options);
 
   mainWindowState.manage(mainWindow);
 
