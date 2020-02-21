@@ -1,5 +1,7 @@
 import { app } from 'electron';
 
+console.log(`Welcome to Sleuth ${app.getVersion()}`);
+
 import { config } from '../config';
 import { ipcManager } from './ipc';
 import { secureApp } from './security';
@@ -11,7 +13,7 @@ if (!config.isDevMode) {
   process.env.NODE_ENV = 'production';
 }
 
-console.log(`Welcome to Sleuth ${app.getVersion()}`);
+app.allowRendererProcessReuse = false;
 
 if (require('electron-squirrel-startup')) {
   // No-op, we're done here

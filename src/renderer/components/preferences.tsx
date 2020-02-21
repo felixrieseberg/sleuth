@@ -1,7 +1,7 @@
 import { Select } from '@blueprintjs/select';
 import { ipcRenderer } from 'electron';
 import { observer } from 'mobx-react';
-import { Overlay, Classes, FormGroup, Button, MenuItem, Callout, ControlGroup, InputGroup, RadioGroup, Radio, Label, Checkbox, Divider } from '@blueprintjs/core';
+import { Overlay, Classes, FormGroup, Button, MenuItem, Callout, ControlGroup, InputGroup, RadioGroup, Radio, Checkbox, Divider } from '@blueprintjs/core';
 import { SleuthState } from '../state/sleuth';
 import classNames from 'classnames';
 import React from 'react';
@@ -137,6 +137,18 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
                 onChange={this.onEditorCmdChange}
               />
             </ControlGroup>
+          </FormGroup>
+          <Divider />
+          <FormGroup
+            inline={true}
+            label='Use the Mark Christian™️ icon'
+            helperText='Mark did some art and made a special Sleuth icon. Requires a restart.'
+          >
+            <Checkbox
+              checked={this.props.state.isMarkIcon}
+              label='Enabled'
+              onChange={(event) => (this.props.state.isMarkIcon = event.currentTarget.checked)}
+            />
           </FormGroup>
           <Divider />
           {this.renderCooperOptions()}

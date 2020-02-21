@@ -1,5 +1,6 @@
 import { shell, BrowserWindow, app, ipcMain, dialog } from 'electron';
 import { createWindow } from './windows';
+import { settingsFileManager } from './settings';
 
 export class IpcManager {
   constructor() {
@@ -8,6 +9,7 @@ export class IpcManager {
     this.setupMessageBoxHandler();
     this.setupWindowReady();
     this.setupGetPath();
+    this.setupSettings();
   }
 
   public openFile(path: string) {
@@ -80,9 +82,14 @@ export class IpcManager {
   private setupGetPath() {
     type name = 'home' | 'appData' | 'userData' | 'cache' | 'temp' | 'exe' | 'module' | 'desktop' | 'documents' | 'downloads' | 'music' | 'pictures' | 'videos' | 'logs' | 'pepperFlashSystemPlugin';
 
-    ipcMain.handle('get-path', async (_event, path: name) => {
+    ipcMain.handle('get-path', (_event, path: name) => {
       return app.getPath(path);
     });
+  }
+
+  private setupSettings() {
+    ipcMain.handle('get-settings', (_event, key: string) => settingsFileManager.getItem(key));
+    ipcMain.handle('set-settings', (_event, key: string, value: any) => settingsFileManager.setItem(key, value));
   }
 }
 
