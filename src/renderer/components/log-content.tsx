@@ -11,7 +11,7 @@ import { Scrubber } from './scrubber';
 import { getFontForCSS } from './preferences-font';
 import { getTypeForFile } from '../processor';
 import { NetLogView } from './net-log-view';
-import { Tool } from './tool';
+import { ToolView } from './tool-view';
 
 export interface LogContentProps {
   state: SleuthState;
@@ -89,7 +89,7 @@ export class LogContent extends React.Component<LogContentProps, Partial<LogCont
 
     // If _that's_ not the case, we're probably a tool
     if (isTool(selectedLogFile)) {
-      return <Tool state={this.props.state} />;
+      return <ToolView state={this.props.state} />;
     }
 
     return <StateTable state={this.props.state} />;
