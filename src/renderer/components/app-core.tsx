@@ -3,7 +3,7 @@ import React from 'react';
 import classNames from 'classnames';
 
 import { getFirstLogFile } from '../../utils/get-first-logfile';
-import { isMergedLogFile, isProcessedLogFile, isUnzippedFile } from '../../utils/is-logfile';
+import { isMergedLogFile, isProcessedLogFile, isUnzippedFile, isTool } from '../../utils/is-logfile';
 import { SleuthState } from '../state/sleuth';
 import { UnzippedFile, UnzippedFiles } from '../unzip';
 import { getTypesForFiles, mergeLogFiles, processLogFiles } from '../processor';
@@ -16,7 +16,8 @@ import {
   ProcessedLogFiles,
   LogType,
   LOG_TYPES_TO_PROCESS,
-  SortedUnzippedFiles
+  SortedUnzippedFiles,
+  Tool
 } from '../interfaces';
 import { AppCoreHeader } from './app-core-header';
 import { Sidebar } from './sidebar';
@@ -25,6 +26,7 @@ import { LogContent } from './log-content';
 import { flushLogPerformance } from '../processor/performance';
 import { Spotlight } from './spotlight';
 import { sendShowMessageBox } from '../ipc';
+import { capitalize } from 'lodash';
 
 const debug = require('debug')('sleuth:appCore');
 
@@ -200,7 +202,10 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
 
       debug(`Selecting log type ${logType}`);
 
-      if (mergedLogFiles && mergedLogFiles[logType]) {
+      // If our "logtype" is actually a tool (like Cache), we'll set it
+      if (logType in Tool) {
+        this.props.state.selectedLogFile = logType as Tool;
+      } else if (mergedLogFiles && mergedLogFiles[logType]) {
         this.props.state.selectedLogFile = mergedLogFiles[logType];
       }
     } else if (logFile) {
@@ -225,6 +230,8 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
       return selectedLogFile.logType;
     } else if (isUnzippedFile(selectedLogFile)) {
       return selectedLogFile.fileName;
+    } else if (isTool(selectedLogFile)) {
+      return capitalize(selectedLogFile);
     } else {
       return '';
     }
