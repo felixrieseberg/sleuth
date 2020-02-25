@@ -19,3 +19,11 @@ export function getPath(
 export function sendWindowReady() {
   ipcRenderer.send('window-ready');
 }
+
+export function showOpenDialog(): Promise<Electron.OpenDialogReturnValue> {
+  return ipcRenderer.invoke('show-open-dialog');
+}
+
+export function showSaveDialog(filename: string): Promise<Electron.SaveDialogReturnValue> {
+  return ipcRenderer.invoke('show-save-dialog', filename);
+}

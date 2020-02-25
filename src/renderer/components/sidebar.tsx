@@ -30,7 +30,8 @@ const enum NODE_ID {
   WEBAPP = 'webapp',
   CALLS = 'calls',
   INSTALLER = 'installer',
-  NETWORK = 'network'
+  NETWORK = 'network',
+  CACHE = 'cache'
 }
 
 const DEFAULT_NODES: Array<ITreeNode> = [
@@ -100,6 +101,12 @@ const DEFAULT_NODES: Array<ITreeNode> = [
     label: 'Network',
     isExpanded: true,
     childNodes: [],
+  }, {
+    id: NODE_ID.NETWORK,
+    hasCaret: false,
+    icon: 'projects',
+    label: 'Cache',
+    nodeData: { type: 'cache' }
   }
 ];
 

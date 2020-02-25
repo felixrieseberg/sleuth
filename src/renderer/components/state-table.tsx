@@ -3,7 +3,7 @@ import fs from 'fs-extra';
 import { shell } from 'electron';
 import { Card, Elevation } from '@blueprintjs/core';
 
-import { MergedLogFile, ProcessedLogFile } from '../interfaces';
+import { MergedLogFile, ProcessedLogFile, Tool } from '../interfaces';
 import { SleuthState } from '../state/sleuth';
 import { getSettingsInfo } from '../analytics/settings-analytics';
 import { getEnvInfo } from '../analytics/environment-analytics';
@@ -325,7 +325,7 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
     return null;
   }
 
-  private isStateFile(file?: ProcessedLogFile | MergedLogFile | UnzippedFile): file is UnzippedFile {
+  private isStateFile(file?: ProcessedLogFile | MergedLogFile | UnzippedFile | Tool): file is UnzippedFile {
     const _file = file as UnzippedFile;
     return !!_file.fullPath;
   }

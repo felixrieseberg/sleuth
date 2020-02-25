@@ -1,4 +1,4 @@
-import { isLogFile, isUnzippedFile } from '../../utils/is-logfile';
+import { isLogFile, isUnzippedFile, isTool } from '../../utils/is-logfile';
 import { ProcessedLogFile, LogType } from '../interfaces';
 import { StateTable } from './state-table';
 import { SleuthState } from '../state/sleuth';
@@ -11,6 +11,7 @@ import { Scrubber } from './scrubber';
 import { getFontForCSS } from './preferences-font';
 import { getTypeForFile } from '../processor';
 import { NetLogView } from './net-log-view';
+import { ToolView } from './tool-view';
 
 export interface LogContentProps {
   state: SleuthState;
@@ -77,13 +78,18 @@ export class LogContent extends React.Component<LogContentProps, Partial<LogCont
       );
     }
 
-    // We're always an unzipped file, but let's make sure
+    // If we're not a log file, we're probably a state file
     if (isUnzippedFile(selectedLogFile)) {
       const logType = getTypeForFile(selectedLogFile);
 
       if (logType === LogType.NETLOG) {
         return <NetLogView file={selectedLogFile} state={this.props.state} />;
       }
+    }
+
+    // If _that's_ not the case, we're probably a tool
+    if (isTool(selectedLogFile)) {
+      return <ToolView state={this.props.state} />;
     }
 
     return <StateTable state={this.props.state} />;

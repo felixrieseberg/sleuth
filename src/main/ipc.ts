@@ -1,4 +1,6 @@
 import { shell, BrowserWindow, app, ipcMain, dialog } from 'electron';
+import * as path from 'path';
+
 import { createWindow } from './windows';
 import { settingsFileManager } from './settings';
 
@@ -10,10 +12,12 @@ export class IpcManager {
     this.setupWindowReady();
     this.setupGetPath();
     this.setupSettings();
+    this.setupOpenDialog();
+    this.setupSaveDialog();
   }
 
-  public openFile(path: string) {
-    this.getCurrentWindow().webContents.send('file-dropped', path);
+  public openFile(pathName: string) {
+    this.getCurrentWindow().webContents.send('file-dropped', pathName);
   }
 
   private getCurrentWindow(): Electron.BrowserWindow {
@@ -82,14 +86,44 @@ export class IpcManager {
   private setupGetPath() {
     type name = 'home' | 'appData' | 'userData' | 'cache' | 'temp' | 'exe' | 'module' | 'desktop' | 'documents' | 'downloads' | 'music' | 'pictures' | 'videos' | 'logs' | 'pepperFlashSystemPlugin';
 
-    ipcMain.handle('get-path', (_event, path: name) => {
-      return app.getPath(path);
+    ipcMain.handle('get-path', (_event, pathName: name) => {
+      return app.getPath(pathName);
     });
   }
 
   private setupSettings() {
     ipcMain.handle('get-settings', (_event, key: string) => settingsFileManager.getItem(key));
     ipcMain.handle('set-settings', (_event, key: string, value: any) => settingsFileManager.setItem(key, value));
+  }
+
+  private setupOpenDialog() {
+    ipcMain.handle('show-open-dialog', async (event) => {
+      const window = BrowserWindow.fromWebContents(event.sender);
+
+      if (!window) return {
+        filePaths: []
+      };
+
+      return dialog.showOpenDialog(window, {
+        defaultPath: app.getPath('downloads'),
+        properties: [ 'openDirectory' ]
+      });
+    });
+  }
+
+  private setupSaveDialog() {
+    ipcMain.handle('show-save-dialog', async (event, filename: string) => {
+      const window = BrowserWindow.fromWebContents(event.sender);
+
+      if (!window) return {
+        filePaths: []
+      };
+
+      return dialog.showSaveDialog(window, {
+        defaultPath: path.join(app.getPath('downloads'), filename),
+        properties: ['createDirectory']
+      });
+    });
   }
 }
 

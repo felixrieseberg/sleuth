@@ -2,7 +2,7 @@ import { observable, action, autorun } from 'mobx';
 import { ipcRenderer } from 'electron';
 
 import { UnzippedFile } from '../unzip';
-import { LevelFilter, LogEntry, MergedLogFile, ProcessedLogFile, DateRange, Suggestions } from '../interfaces';
+import { LevelFilter, LogEntry, MergedLogFile, ProcessedLogFile, DateRange, Suggestions, Tool } from '../interfaces';
 import { getItemsInSuggestionFolders } from '../suggestions';
 import { testDateTimeFormat } from '../../utils/test-date-time';
 import { SORT_DIRECTION } from '../components/log-table-constants';
@@ -22,7 +22,10 @@ export class SleuthState {
   @observable public isCooperSignedIn = false;
   @observable public selectedEntry?: LogEntry;
   @observable public source?: string;
-  @observable.ref public selectedLogFile?: ProcessedLogFile | MergedLogFile | UnzippedFile;
+  @observable.ref public selectedLogFile?: ProcessedLogFile | MergedLogFile | UnzippedFile | Tool;
+  @observable public selectedCacheKey?: string;
+  @observable public cachePath?: string;
+  @observable public cacheKeys: Array<string> = [];
 
   @observable public levelFilter: LevelFilter = {
     debug: false,
@@ -157,6 +160,9 @@ export class SleuthState {
     this.isSpotlightOpen = false;
     this.isDetailsVisible = false;
     this.dateRange = { from: undefined, to: undefined };
+    this.cacheKeys = [];
+    this.cachePath = undefined;
+    this.selectedCacheKey = undefined;
 
     if (goBackToHome) {
       this.resetApp();

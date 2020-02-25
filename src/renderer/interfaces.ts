@@ -142,3 +142,7 @@ export interface Suggestion extends fs.Stats {
 export type Suggestions = Array<Suggestion>;
 
 export type SelectLogFileFn = (logFile: ProcessedLogFile | UnzippedFile | null, logType?: string) => void;
+
+export enum Tool {
+  cache = 'cache'
+}
