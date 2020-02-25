@@ -37,7 +37,7 @@ export class Cachetool extends React.Component<CachetoolProps, Partial<Cachetool
     const warning = this.renderPlatformWarning();
     let content: JSX.Element;
 
-    if (false) {
+    if (warning) {
       content = warning;
     } else if (!cachePath) {
       content = this.renderIntroduction();

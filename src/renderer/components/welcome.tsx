@@ -144,7 +144,6 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
   public render() {
     const { sleuth } = this.state;
     const scrollStyle: React.CSSProperties = {
-      height: '100%',
       marginTop: '50px',
       marginBottom: '50px',
       overflowY: 'auto'
