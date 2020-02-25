@@ -16,7 +16,9 @@ const options = {
     icon: './static/img/sleuth-icon',
     appBundleId: 'com.felixrieseberg.sleuth',
     appCategoryType: 'public.app-category.developer-tools',
-    asar: true,
+    asar: {
+      unpackDir: '**/cachetool'
+    },
     osxSign: {
       identity: 'Developer ID Application: Felix Rieseberg (LT94ZKYDCJ)',
       hardenedRuntime: true,
