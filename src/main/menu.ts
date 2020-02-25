@@ -16,17 +16,32 @@ export class AppMenu {
   private productionLogsExist: boolean;
   private devEnvLogsExist: boolean;
   private devModeLogsExist: boolean;
+  private productionCache: string;
+  private devEnvCache: string;
+  private devModeCache: string;
+  private productionCacheExist: boolean;
+  private devEnvCacheExist: boolean;
+  private devModeCacheExist: boolean;
   private menu: Array<any> | null = null;
 
   constructor() {
     const appData = app.getPath('appData');
 
+    // Logs
     this.productionLogs = path.join(appData, `Slack`, 'logs');
     this.devEnvLogs = path.join(appData, `SlackDevEnv`, 'logs');
     this.devModeLogs = path.join(appData, `SlackDevMode`, 'logs');
     this.productionLogsExist = fs.existsSync(this.productionLogs);
     this.devEnvLogsExist = fs.existsSync(this.devEnvLogs);
     this.devModeLogsExist = fs.existsSync(this.devModeLogs);
+
+    // Cache
+    this.productionCache = path.join(appData, `Slack`, 'Cache');
+    this.devEnvCache = path.join(appData, `SlackDevEnv`, 'Cache');
+    this.devModeCache = path.join(appData, `SlackDevMode`, 'Cache');
+    this.productionCacheExist = fs.existsSync(this.productionLogs);
+    this.devEnvCacheExist = fs.existsSync(this.devEnvLogs);
+    this.devModeCacheExist = fs.existsSync(this.devModeLogs);
 
     this.setupMenu();
   }
@@ -68,6 +83,22 @@ export class AppMenu {
             message: `We attempted to find your local Slack's logs, but we couldn't find them. We checked for them in ${logsPath}.`
           });
         }
+      }
+    };
+  }
+
+  /**
+   * Opens, you guessed it, a cache folder.
+   */
+  public getOpenCacheItem(type: '' | 'DevEnv' | 'DevMode' = ''): Electron.MenuItemConstructorOptions {
+    const appData = app.getPath('appData');
+    const cachePath = path.join(appData, `Slack${type}`, 'Cache');
+
+    return {
+      label: `Open local Slack${type} Cache...`,
+      click: async () => {
+        const { webContents } = await getCurrentWindow();
+        webContents.send('file-dropped', cachePath);
       }
     };
   }
@@ -128,6 +159,14 @@ export class AppMenu {
     if (this.productionLogsExist) openItems.push(this.getOpenItem());
     if (this.devEnvLogsExist) openItems.push(this.getOpenItem('DevEnv'));
     if (this.devModeLogsExist) openItems.push(this.getOpenItem('DevMode'));
+
+    if (this.productionCacheExist || this.devEnvCacheExist || this.devModeCacheExist) {
+      openItems.push({ type: 'separator' });
+    }
+
+    if (this.productionCacheExist) openItems.push(this.getOpenCacheItem());
+    if (this.devEnvCacheExist) openItems.push(this.getOpenCacheItem('DevEnv'));
+    if (this.devModeCacheExist) openItems.push(this.getOpenCacheItem('DevMode'));
 
     return openItems;
   }
