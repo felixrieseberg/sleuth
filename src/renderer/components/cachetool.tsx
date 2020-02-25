@@ -7,11 +7,14 @@ import { SleuthState } from '../state/sleuth';
 import { showOpenDialog } from '../ipc';
 import { Loading } from './loading';
 import { CachetoolTable } from './cachetool-table';
+import { CachetoolDetails } from './cachetool-details';
+import { Scrubber } from './scrubber';
+import { getFontForCSS } from './preferences-font';
 
 export interface CachetoolState {
-  cachePath?: string;
   isLoadingKeys?: boolean;
   keys: Array<string>;
+  tableHeight: number;
 }
 
 export interface CachetoolProps {
@@ -25,14 +28,16 @@ export class Cachetool extends React.Component<CachetoolProps, Partial<Cachetool
     super(props);
 
     this.state = {
-      keys: []
+      keys: [],
+      tableHeight: 600
     };
 
     autoBind(this);
   }
 
   public render() {
-    const { cachePath, isLoadingKeys } = this.state;
+    const { isLoadingKeys } = this.state;
+    const { cachePath } = this.props.state;
     const warning = this.renderPlatformWarning();
     let content: JSX.Element;
 
@@ -57,25 +62,36 @@ export class Cachetool extends React.Component<CachetoolProps, Partial<Cachetool
     const { filePaths } = await showOpenDialog();
 
     if (filePaths && filePaths.length > 0) {
-      this.setState({
-        cachePath: filePaths[0]
-      });
+      this.props.state.cachePath = filePaths[0];
     }
 
     this.getKeys();
   }
 
+  public resizeHandler(height: number) {
+    if (height < 100 || height > (window.innerHeight - 100)) return;
+    this.setState({ tableHeight: height });
+  }
+
   private renderData() {
-    const { search, searchIndex, showOnlySearchResults } = this.props.state;
+    const { search, searchIndex, showOnlySearchResults, isDetailsVisible, font, cacheKeys } = this.props.state;
+    const scrubber = <Scrubber elementSelector='LogTableContainer' onResizeHandler={this.resizeHandler} />;
+    const tableStyle = isDetailsVisible ? { height: this.state.tableHeight } : { flexGrow: 1 };
 
     return (
-      <CachetoolTable
-        state={this.props.state}
-        keys={this.state.keys}
-        showOnlySearchResults={showOnlySearchResults}
-        searchIndex={searchIndex}
-        search={search}
-      />
+      <div className='LogContent' style={{ fontFamily: getFontForCSS(font) }}>
+        <div id='LogTableContainer' style={tableStyle}>
+          <CachetoolTable
+            state={this.props.state}
+            keys={cacheKeys}
+            showOnlySearchResults={showOnlySearchResults}
+            searchIndex={searchIndex}
+            search={search}
+          />
+        </div>
+        {isDetailsVisible ? scrubber : null}
+        <CachetoolDetails state={this.props.state} />
+      </div>
     );
   }
 
@@ -127,16 +143,11 @@ export class Cachetool extends React.Component<CachetoolProps, Partial<Cachetool
     this.setState({ isLoadingKeys: true });
 
     const { listKeys } = await import('cachetool');
-    const { cachePath } = this.state;
+    const { cachePath } = this.props.state;
 
     if (!cachePath) return [];
 
-    const keys = await listKeys({ cachePath });
-
-    console.log(keys);
-
-    this.setState({ isLoadingKeys: false, keys });
-
-    return keys;
+    this.props.state.cacheKeys = await listKeys({ cachePath });
+    this.setState({ isLoadingKeys: false });
   }
 }

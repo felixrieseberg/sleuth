@@ -388,8 +388,6 @@ export class CachetoolTable extends React.Component<CachetoolTableProps, Partial
       sortDirection: this.state.sortDirection,
     };
 
-    console.log(tableOptions);
-
     if (!ignoreSearchIndex) tableOptions.scrollToIndex = searchList![searchIndex] || 0;
     if (scrollToSelection) tableOptions.scrollToIndex = selectedIndex || 0;
 

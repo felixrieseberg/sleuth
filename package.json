@@ -107,6 +107,6 @@
     "typescript": "3.7.5"
   },
   "optionalDependencies": {
-    "cachetool": "^1.0.1"
+    "cachetool": "^1.0.3"
   }
 }
