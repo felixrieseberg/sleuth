@@ -26,6 +26,7 @@ export class SleuthState {
   @observable public selectedCacheKey?: string;
   @observable public cachePath?: string;
   @observable public cacheKeys: Array<string> = [];
+  @observable public isLoadingCacheKeys?: boolean;
 
   @observable public levelFilter: LevelFilter = {
     debug: false,
@@ -90,6 +91,17 @@ export class SleuthState {
     autorun(() => {
       this.save('isMarkIcon', this.isMarkIcon);
       changeIcon(this.isMarkIcon ? ICON_NAMES.mark : ICON_NAMES.default);
+    });
+    autorun(async () => {
+      if (process.platform !== 'darwin') return;
+
+      this.isLoadingCacheKeys = true;
+
+      if (!this.cachePath) return [];
+
+      const { listKeys } = await import('cachetool');
+      this.cacheKeys = await listKeys({ cachePath: this.cachePath });
+      this.isLoadingCacheKeys = false;
     });
 
     this.reset = this.reset.bind(this);
@@ -163,6 +175,7 @@ export class SleuthState {
     this.cacheKeys = [];
     this.cachePath = undefined;
     this.selectedCacheKey = undefined;
+    this.isLoadingCacheKeys = false;
 
     if (goBackToHome) {
       this.resetApp();

@@ -10,10 +10,8 @@ import { CachetoolTable } from './cachetool-table';
 import { CachetoolDetails } from './cachetool-details';
 import { Scrubber } from './scrubber';
 import { getFontForCSS } from './preferences-font';
-import { IReactionDisposer, autorun } from 'mobx';
 
 export interface CachetoolState {
-  isLoadingKeys?: boolean;
   tableHeight: number;
 }
 
@@ -24,8 +22,6 @@ export interface CachetoolProps {
 
 @observer
 export class Cachetool extends React.Component<CachetoolProps, Partial<CachetoolState>> {
-  private getKeysAutorunDispose: IReactionDisposer;
-
   constructor(props: CachetoolProps) {
     super(props);
 
@@ -36,17 +32,8 @@ export class Cachetool extends React.Component<CachetoolProps, Partial<Cachetool
     autoBind(this);
   }
 
-  public componentWillMount() {
-    this.getKeysAutorunDispose = autorun(this.getKeys);
-  }
-
-  public componentWillUnmount() {
-    this.getKeysAutorunDispose();
-  }
-
   public render() {
-    const { isLoadingKeys } = this.state;
-    const { cachePath } = this.props.state;
+    const { cachePath, isLoadingCacheKeys } = this.props.state;
     const warning = this.renderPlatformWarning();
     let content: JSX.Element;
 
@@ -54,7 +41,7 @@ export class Cachetool extends React.Component<CachetoolProps, Partial<Cachetool
       content = warning;
     } else if (!cachePath) {
       content = this.renderIntroduction();
-    } else if (isLoadingKeys) {
+    } else if (isLoadingCacheKeys) {
       content = this.renderLoading();
     } else {
       content = this.renderData();
@@ -144,16 +131,5 @@ export class Cachetool extends React.Component<CachetoolProps, Partial<Cachetool
     } else {
       return null;
     }
-  }
-
-  private async getKeys() {
-    this.setState({ isLoadingKeys: true });
-
-    const { cachePath } = this.props.state;
-    if (!cachePath) return [];
-
-    const { listKeys } = await import('cachetool');
-    this.props.state.cacheKeys = await listKeys({ cachePath });
-    this.setState({ isLoadingKeys: false });
   }
 }

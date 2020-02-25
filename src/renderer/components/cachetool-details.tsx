@@ -4,11 +4,11 @@ import * as path from 'path';
 import classNames from 'classnames';
 import * as fs from 'fs-extra';
 import autoBind from 'react-autobind';
-import { Card, Elevation, Tabs, Tab, Callout, Intent, Button } from '@blueprintjs/core';
+import { Card, Elevation, Tabs, Tab, Callout, Intent, Button, Tag, ButtonGroup } from '@blueprintjs/core';
 import { autorun, IReactionDisposer } from 'mobx';
 
 import { SleuthState } from '../state/sleuth';
-import { tmpdir } from 'os';
+import { tmpdir, type } from 'os';
 import { showSaveDialog } from '../ipc';
 
 
@@ -72,8 +72,20 @@ export class CachetoolDetails extends React.Component<CachetoolDetailsProps, Cac
   public renderEntry(key: string): JSX.Element | null {
     return (
       <div className='Details-LogEntry'>
-        <Card className='Message Monospace' elevation={Elevation.THREE}>{key}</Card>
+        <Card
+          className='Message Monospace'
+          elevation={Elevation.THREE}
+          style={{ overflowWrap: 'break-word' }}
+        >
+          {key}
+        </Card>
         <Card elevation={Elevation.TWO}>
+          <div style={{ float: 'right' }}>
+            <ButtonGroup>
+              <Button icon='download' onClick={this.download} text='Save File'  />
+              <Button icon='cross' onClick={this.toggle} text='Close' />
+            </ButtonGroup>
+          </div>
           <Tabs>
             <Tab id='headers' title='Headers' panel={this.renderHeaders()} />
             <Tab id='content' title='Content' panel={this.renderContent()} />
@@ -103,11 +115,6 @@ export class CachetoolDetails extends React.Component<CachetoolDetailsProps, Cac
             We're blindly hoping that we're dealing with an image. If we're not, you
             might be able to open the file yourself with another program.
           </p>
-          <Button
-            text='Save File'
-            icon='download'
-            onClick={this.download}
-          />
         </Callout>
       </>
     );
