@@ -140,7 +140,7 @@ export class CachetoolDetails extends React.Component<CachetoolDetailsProps, Cac
     const { dataPath } = this.state;
     if (!dataPath) return;
 
-    const filename = this.getFilename(dataPath);
+    const filename = path.basename(dataPath);
     const { filePath } = await showSaveDialog(filename);
 
     if (filePath) {
@@ -181,7 +181,7 @@ export class CachetoolDetails extends React.Component<CachetoolDetailsProps, Cac
         this.tmpdir = await fs.mkdtemp(path.join(tmpdir(), 'sleuth'));
       }
 
-      const fileName = this.getFilename(key);
+      const fileName = path.basename(key);
       const targetPath = path.join(this.tmpdir, fileName);
       await fs.emptyDir(this.tmpdir);
       await fs.writeFile(targetPath, data);
@@ -192,10 +192,6 @@ export class CachetoolDetails extends React.Component<CachetoolDetailsProps, Cac
 
       return undefined;
     }
-  }
-
-  public getFilename(key: string): string {
-    return `${path.basename(key)}.${path.extname(key)}`;
   }
 }
 
