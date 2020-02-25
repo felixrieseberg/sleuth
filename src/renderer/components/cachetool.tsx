@@ -119,12 +119,16 @@ export class Cachetool extends React.Component<CachetoolProps, Partial<Cachetool
   private renderPlatformWarning(): JSX.Element | null {
     if (process.platform !== 'darwin') {
       return (
-        <Callout intent={Intent.WARNING}>
+        <Callout intent={Intent.WARNING} style={{ margin: '2.2rem', width: 'unset' }}>
           <p>
-            Bad news: This tool is currently only supported on macOS.
-            It can analze caches from Slack, Electron, or Chrome ran
+            Bad news: This feature is currently <strong>only supported on macOS.</strong>
+            It can analyze caches from Slack, Electron, or Chrome ran
             on any platform, but the tool itself can only do so when
             running on macOS.
+          </p>
+          <p>
+            Once Chromium offers a <code>cachetool.cc</code> version for Windows,
+            Sleuth will be able to offer this feature on Windows, too.
           </p>
         </Callout>
       );

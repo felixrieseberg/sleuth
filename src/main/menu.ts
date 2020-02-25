@@ -16,9 +16,6 @@ export class AppMenu {
   private productionLogsExist: boolean;
   private devEnvLogsExist: boolean;
   private devModeLogsExist: boolean;
-  private productionCache: string;
-  private devEnvCache: string;
-  private devModeCache: string;
   private productionCacheExist: boolean;
   private devEnvCacheExist: boolean;
   private devModeCacheExist: boolean;
@@ -36,9 +33,6 @@ export class AppMenu {
     this.devModeLogsExist = fs.existsSync(this.devModeLogs);
 
     // Cache
-    this.productionCache = path.join(appData, `Slack`, 'Cache');
-    this.devEnvCache = path.join(appData, `SlackDevEnv`, 'Cache');
-    this.devModeCache = path.join(appData, `SlackDevMode`, 'Cache');
     this.productionCacheExist = fs.existsSync(this.productionLogs);
     this.devEnvCacheExist = fs.existsSync(this.devEnvLogs);
     this.devModeCacheExist = fs.existsSync(this.devModeLogs);
@@ -160,13 +154,16 @@ export class AppMenu {
     if (this.devEnvLogsExist) openItems.push(this.getOpenItem('DevEnv'));
     if (this.devModeLogsExist) openItems.push(this.getOpenItem('DevMode'));
 
-    if (this.productionCacheExist || this.devEnvCacheExist || this.devModeCacheExist) {
-      openItems.push({ type: 'separator' });
-    }
+    // We only support cache files on macOS right now
+    if (process.platform === 'darwin') {
+      if (this.productionCacheExist || this.devEnvCacheExist || this.devModeCacheExist) {
+        openItems.push({ type: 'separator' });
+      }
 
-    if (this.productionCacheExist) openItems.push(this.getOpenCacheItem());
-    if (this.devEnvCacheExist) openItems.push(this.getOpenCacheItem('DevEnv'));
-    if (this.devModeCacheExist) openItems.push(this.getOpenCacheItem('DevMode'));
+      if (this.productionCacheExist) openItems.push(this.getOpenCacheItem());
+      if (this.devEnvCacheExist) openItems.push(this.getOpenCacheItem('DevEnv'));
+      if (this.devModeCacheExist) openItems.push(this.getOpenCacheItem('DevMode'));
+    }
 
     return openItems;
   }
@@ -260,7 +257,8 @@ export class AppMenu {
       (this.menu[0].submenu as Array<any>).splice(1, 0, preferencesItem);
       this.menu.splice(1, 0, { label: 'File', submenu: newAndOpen });
     } else {
-      this.menu.splice(0, 1, { label: 'File', submenu: [ ...newAndOpen, preferencesItem ] });
+      const windowsLinuxSubmenu = [ ...newAndOpen, { type: 'separator' }, preferencesItem ];
+      this.menu.splice(0, 1, { label: 'File', submenu: windowsLinuxSubmenu });
     }
 
     this.insertSpotlightItem();
