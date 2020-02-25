@@ -362,7 +362,12 @@ export class CachetoolTable extends React.Component<CachetoolTableProps, Partial
    * @returns
    */
   private rowGetter({ index }: { index: number }): CachetoolKey {
-    return { index, key: this.state.sortedList![index] };
+    const key = this.state.sortedList![index];
+
+    return {
+      index: this.props.state.cacheKeys.indexOf(key),
+      key
+    };
   }
 
   /**

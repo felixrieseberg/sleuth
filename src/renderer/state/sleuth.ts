@@ -100,7 +100,14 @@ export class SleuthState {
       if (!this.cachePath) return [];
 
       const { listKeys } = await import('cachetool');
-      this.cacheKeys = await listKeys({ cachePath: this.cachePath });
+      const keys = await listKeys({ cachePath: this.cachePath });
+
+      // Last entry is sometimes empty
+      if (keys.length > 0 && !keys[keys.length - 1]) {
+        keys.splice(keys.length - 1, 1);
+      }
+
+      this.cacheKeys = keys;
       this.isLoadingCacheKeys = false;
     });
 
