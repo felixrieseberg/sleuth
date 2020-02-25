@@ -1,0 +1,12 @@
+diff --git a/node_modules/electron-notarize/lib/index.js b/node_modules/electron-notarize/lib/index.js
+index 801e595..28f0cf3 100644
+--- a/node_modules/electron-notarize/lib/index.js
++++ b/node_modules/electron-notarize/lib/index.js
+@@ -170,6 +170,7 @@ function stapleApp(opts) {
+                     if (result.code !== 0) {
+                         throw new Error("Failed to staple your application with code: " + result.code + "\n\n" + result.output);
+                     }
++                    d(result.output.toString());
+                     d('staple succeeded');
+                     return [2 /*return*/];
+             }
