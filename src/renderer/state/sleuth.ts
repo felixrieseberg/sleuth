@@ -21,6 +21,7 @@ export class SleuthState {
   @observable public slackUserId?: string;
   @observable public isCooperSignedIn = false;
   @observable public selectedEntry?: LogEntry;
+  @observable public selectedCacheKey?: string;
   @observable public source?: string;
   @observable.ref public selectedLogFile?: ProcessedLogFile | MergedLogFile | UnzippedFile | Tool;
 

@@ -1,5 +1,5 @@
 import { shell, BrowserWindow, app, ipcMain, dialog } from 'electron';
-import { createWindow } from './windows';
+import { createWindow, getCurrentWindow } from './windows';
 import { settingsFileManager } from './settings';
 
 export class IpcManager {
@@ -10,6 +10,7 @@ export class IpcManager {
     this.setupWindowReady();
     this.setupGetPath();
     this.setupSettings();
+    this.setupOpenDialog();
   }
 
   public openFile(path: string) {
@@ -90,6 +91,21 @@ export class IpcManager {
   private setupSettings() {
     ipcMain.handle('get-settings', (_event, key: string) => settingsFileManager.getItem(key));
     ipcMain.handle('set-settings', (_event, key: string, value: any) => settingsFileManager.setItem(key, value));
+  }
+
+  private setupOpenDialog() {
+    ipcMain.handle('show-open-dialog', async (event) => {
+      const window = BrowserWindow.fromWebContents(event.sender);
+
+      if (!window) return {
+        filePaths: []
+      };
+
+      return dialog.showOpenDialog(window, {
+        defaultPath: app.getPath('downloads'),
+        properties: [ 'openDirectory' ]
+      });
+    });
   }
 }
 

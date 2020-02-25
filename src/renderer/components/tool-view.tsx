@@ -3,7 +3,7 @@ import React from 'react';
 
 import { SleuthState } from '../state/sleuth';
 import { Tool } from '../interfaces';
-import { CacheTool } from './cachetool';
+import { Cachetool } from './cachetool';
 
 export interface ToolViewState {
   sleuth: string;
@@ -20,7 +20,7 @@ export class ToolView extends React.Component<ToolViewProps, Partial<ToolViewSta
     const { state } = this.props;
 
     if (state.selectedLogFile === Tool.cache) {
-      return <CacheTool state={state} />;
+      return <Cachetool state={state} />;
     }
 
     return null;

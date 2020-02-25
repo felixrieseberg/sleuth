@@ -18,6 +18,7 @@ import {
   RowClickEvent
 } from './log-table-constants';
 import { isMergedLogFile } from '../../utils/is-logfile';
+import { getRegExpSafe } from '../../utils/regexp';
 
 const debug = require('debug')('sleuth:logtable');
 const { DOWN } = Keys;
@@ -139,8 +140,6 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
 
       // Get correct selected index
       const selectedIndex = this.findIndexForSelectedEntry(sortedList);
-
-      console.log('setting state');
 
       this.setState({
         sortedList,
@@ -337,7 +336,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    * @returns Array<number>
    */
   private doSearchIndex(search: string, list: Array<LogEntry>): Array<number> {
-    let searchRegex = this.getRegExpSafe(search);
+    let searchRegex = getRegExpSafe(search);
 
     const foundIndices: Array<number> = [];
 
@@ -354,7 +353,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     searchParams.forEach((param) => {
       if (param.startsWith('!') && param.length > 1) {
         debug(`Index-Excluding ${param.slice(1)}`);
-        searchRegex = this.getRegExpSafe(param.slice(1));
+        searchRegex = getRegExpSafe(param.slice(1));
         list.forEach(doExclude);
       } else {
         debug(`Index-Searching for ${param}`);
@@ -363,14 +362,6 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     });
 
     return foundIndices;
-  }
-
-  private getRegExpSafe(exp: string = ''): RegExp {
-    try {
-      return new RegExp(exp, 'i');
-    } catch (error) {
-      return this.getRegExpSafe(exp.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'));
-    }
   }
 
   private doRangeFilter({ from, to }: DateRange, list: Array<LogEntry>): Array<LogEntry> {

@@ -4,6 +4,7 @@ import { ProgressBar } from '@blueprintjs/core';
 export interface LoadingProps {
   percentage?: number;
   message?: string;
+  animate?: boolean;
 }
 
 /**
@@ -13,7 +14,7 @@ export interface LoadingProps {
  * @returns {JSX.Element}
  */
 export const Loading = (props: LoadingProps) => {
-  const { percentage, message } = props;
+  const { percentage, message, animate } = props;
 
   if (percentage === 100) {
     return <div />;
@@ -21,7 +22,7 @@ export const Loading = (props: LoadingProps) => {
 
   return (
     <div className='Loading'>
-      <ProgressBar animate={false} value={percentage! / 100} />
+      <ProgressBar animate={!!animate} value={percentage! / 100} />
       <br />
       <p>{message}</p>
     </div>
