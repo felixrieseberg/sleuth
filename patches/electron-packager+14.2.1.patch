@@ -1,0 +1,15 @@
+diff --git a/node_modules/electron-packager/src/platform.js b/node_modules/electron-packager/src/platform.js
+index 5ff9da5..d2d4c4f 100644
+--- a/node_modules/electron-packager/src/platform.js
++++ b/node_modules/electron-packager/src/platform.js
+@@ -215,7 +215,9 @@ class App {
+ 
+     if (this.opts.tmpdir !== false) {
+       debug(`Moving ${this.stagingPath} to ${finalPath}`)
+-      await fs.move(this.stagingPath, finalPath)
++      await fs.move(this.stagingPath, finalPath, {
++        overwrite: true
++      })
+     }
+ 
+     return finalPath
