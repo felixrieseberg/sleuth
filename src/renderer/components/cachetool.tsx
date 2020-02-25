@@ -37,7 +37,7 @@ export class Cachetool extends React.Component<CachetoolProps, Partial<Cachetool
     const warning = this.renderPlatformWarning();
     let content: JSX.Element;
 
-    if (warning) {
+    if (false) {
       content = warning;
     } else if (!cachePath) {
       content = this.renderIntroduction();
@@ -105,8 +105,15 @@ export class Cachetool extends React.Component<CachetoolProps, Partial<Cachetool
       <Card>
         <h2>Cachetool</h2>
         <p>
-          This tool allows you to closely examine Slack's cache.
+          This tool allows you to closely examine Slack's cache. It will accept the <code>Cache</code> folder
+          found in the user's "app data" directory from Slack, Chrome, or any other Electron application.
+          By default, it can be found in the following locations:
         </p>
+        <ul>
+          <li><strong>Windows:</strong> <code>%APPDATA%\Slack\Cache</code></li>
+          <li><strong>macOS:</strong> <code>~/Libary/Application Support/Slack/Cache</code></li>
+          <li><strong>Linux:</strong> <code>~/.config/Slack/Cache</code></li>
+        </ul>
         <Button
           text='Open Cache Folder'
           icon='folder-open'
