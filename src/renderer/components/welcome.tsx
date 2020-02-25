@@ -143,13 +143,15 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
 
   public render() {
     const { sleuth } = this.state;
-    const scrollStyle = { height: '100%',  };
-    scrollStyle['overflow-y'] = 'auto';
-    scrollStyle['margin-bottom'] = '50px';
+    const scrollStyle: React.CSSProperties = {
+      height: '100%',
+      marginTop: '50px',
+      marginBottom: '50px',
+      overflowY: 'auto'
+    };
 
     return (
       <div className='Welcome'>
-        <i />
         <div>
           <h1 className='Title'>
             <span className='Emoji'>{sleuth}</span>
@@ -158,9 +160,12 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
           <h4>Drop a logs zip file or folder anywhere on this window to open it.</h4>
           {this.renderUpdateAvailable()}
         </div>
-        <h5>From your Downloads folder, may we suggest:</h5>
+
         <div style={scrollStyle}>
-          {this.renderSuggestions()}
+          <h5>From your Downloads folder, may we suggest:</h5>
+          <div >
+            {this.renderSuggestions()}
+          </div>
         </div>
       </div>
     );
