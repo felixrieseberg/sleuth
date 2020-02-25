@@ -48,27 +48,6 @@ export class App extends React.Component<{}, Partial<AppState>> {
   }
 
   /**
-   * Should this component update?
-   *
-   * @param {{}} _nextProps
-   * @param {AppState} nextState
-   */
-  public shouldComponentUpdate(_nextProps: {}, nextState: AppState) {
-    const currentFiles = this.state.unzippedFiles || [];
-    const nextFiles = nextState.unzippedFiles || [];
-
-    if (nextState.openEmpty) {
-      return true;
-    }
-
-    if (currentFiles.length === 0 && nextFiles.length === 0) {
-      return false;
-    }
-
-    return true;
-  }
-
-  /**
    * Alright, time to show the window!
    */
   public componentDidMount() {
@@ -190,7 +169,7 @@ export class App extends React.Component<{}, Partial<AppState>> {
   }
 
   public resetApp() {
-    this.setState({ unzippedFiles: [], openEmpty: undefined });
+    this.setState({ unzippedFiles: [], openEmpty: false });
 
     if (this.sleuthState.opened > 0) {
       this.sleuthState.reset(false);

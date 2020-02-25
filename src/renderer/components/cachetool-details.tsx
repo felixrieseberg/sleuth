@@ -107,7 +107,7 @@ export class CachetoolDetails extends React.Component<CachetoolDetailsProps, Cac
     return (
       <>
         <Callout>
-          <img src={this.state.dataPath} />
+          <img style={{ maxWidth: '100%' }} src={this.state.dataPath} />
         </Callout>
         <br />
         <Callout intent={Intent.WARNING}>

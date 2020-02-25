@@ -102,7 +102,7 @@ const DEFAULT_NODES: Array<ITreeNode> = [
     isExpanded: true,
     childNodes: [],
   }, {
-    id: NODE_ID.NETWORK,
+    id: NODE_ID.CACHE,
     hasCaret: false,
     icon: 'projects',
     label: 'Cache',
