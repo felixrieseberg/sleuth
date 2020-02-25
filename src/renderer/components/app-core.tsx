@@ -79,7 +79,7 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
   }
 
   public render() {
-    return this.props.state.selectedLogFile
+    return this.state.loadedLogFiles
       ? this.renderContent()
       : this.renderLoading();
   }
@@ -109,10 +109,12 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
    */
   private async processFiles() {
     const { unzippedFiles } = this.props;
+    const { cachePath } = this.props.state;
 
     const sortedUnzippedFiles = getTypesForFiles(unzippedFiles);
+    const noFiles = Object.keys(sortedUnzippedFiles).map((k) => sortedUnzippedFiles[k]).every((s) => s.length === 0);
 
-    if (Object.keys(sortedUnzippedFiles).map((k) => sortedUnzippedFiles[k]).every((s) => s.length === 0)) {
+    if (noFiles && !cachePath) {
       sendShowMessageBox({
         title: 'Huh, weird logs!',
         message: 'Sorry, Sleuth does not understand the files. It seems like there are no Slack logs here.',

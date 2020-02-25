@@ -1,5 +1,3 @@
-import { SleuthState } from '../state/sleuth';
-import { shouldIgnoreFile } from '../../utils/should-ignore-file';
 import React from 'react';
 import { ipcRenderer } from 'electron';
 import classNames from 'classnames';
@@ -14,11 +12,15 @@ import { Preferences } from './preferences';
 import { TouchBarManager } from '../touch-bar-manager';
 import { sendWindowReady } from '../ipc';
 import { openBacktrace } from '../backtrace';
+import { SleuthState } from '../state/sleuth';
+import { shouldIgnoreFile } from '../../utils/should-ignore-file';
+import { isCacheDir } from '../../utils/is-cache';
 
 const debug = require('debug')('sleuth:app');
 
 export interface AppState {
   unzippedFiles: UnzippedFiles;
+  openEmpty?: boolean;
 }
 
 export class App extends React.Component<{}, Partial<AppState>> {
@@ -35,6 +37,7 @@ export class App extends React.Component<{}, Partial<AppState>> {
     localStorage.debug = 'sleuth*';
 
     this.openFile = this.openFile.bind(this);
+    this.openDirectory = this.openDirectory.bind(this);
     this.resetApp = this.resetApp.bind(this);
 
     this.sleuthState = new SleuthState(this.openFile, this.resetApp);
@@ -53,6 +56,10 @@ export class App extends React.Component<{}, Partial<AppState>> {
   public shouldComponentUpdate(_nextProps: {}, nextState: AppState) {
     const currentFiles = this.state.unzippedFiles || [];
     const nextFiles = nextState.unzippedFiles || [];
+
+    if (nextState.openEmpty) {
+      return true;
+    }
 
     if (currentFiles.length === 0 && nextFiles.length === 0) {
       return false;
@@ -143,14 +150,21 @@ export class App extends React.Component<{}, Partial<AppState>> {
 
     console.groupCollapsed(`Open directory`);
 
-    for (const fileName of dir) {
-      if (!shouldIgnoreFile(fileName)) {
-        const fullPath = path.join(url, fileName);
-        const stats = fs.statSync(fullPath);
-        const file: UnzippedFile = { fileName, fullPath, size: stats.size };
+    if (isCacheDir(dir)) {
+      console.log(`${url} is a cache directory`);
+      this.sleuthState.cachePath = url;
+      this.setState({ openEmpty: true });
+    } else {
+      // Not a cache?
+      for (const fileName of dir) {
+        if (!shouldIgnoreFile(fileName)) {
+          const fullPath = path.join(url, fileName);
+          const stats = fs.statSync(fullPath);
+          const file: UnzippedFile = { fileName, fullPath, size: stats.size };
 
-        debug('Found file, adding to result.', file);
-        unzippedFiles.push(file);
+          debug('Found file, adding to result.', file);
+          unzippedFiles.push(file);
+        }
       }
     }
 
@@ -176,7 +190,7 @@ export class App extends React.Component<{}, Partial<AppState>> {
   }
 
   public resetApp() {
-    this.setState({ unzippedFiles: [] });
+    this.setState({ unzippedFiles: [], openEmpty: undefined });
 
     if (this.sleuthState.opened > 0) {
       this.sleuthState.reset(false);
@@ -192,10 +206,10 @@ export class App extends React.Component<{}, Partial<AppState>> {
    * @returns {JSX.Element}
    */
   public render(): JSX.Element {
-    const { unzippedFiles } = this.state;
+    const { unzippedFiles, openEmpty } = this.state;
     const className = classNames('App', { Darwin: process.platform === 'darwin' });
     const titleBar = process.platform === 'darwin' ? <MacTitlebar /> : '';
-    const content = unzippedFiles && unzippedFiles.length
+    const content = unzippedFiles && (unzippedFiles.length || openEmpty)
       ? <CoreApplication state={this.sleuthState} unzippedFiles={unzippedFiles} />
       : <Welcome state={this.sleuthState} />;
 

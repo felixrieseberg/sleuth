@@ -1,7 +1,7 @@
-import { ProcessedLogFile, ProcessedLogFiles } from '../renderer/interfaces';
+import { ProcessedLogFile, ProcessedLogFiles, Tool } from '../renderer/interfaces';
 import { UnzippedFile } from '../renderer/unzip';
 
-export function getFirstLogFile(files: ProcessedLogFiles | undefined): ProcessedLogFile | UnzippedFile | undefined {
+export function getFirstLogFile(files: ProcessedLogFiles | undefined): ProcessedLogFile | UnzippedFile | Tool {
   if (files) {
     if (files.browser && files.browser.length > 0) return files.browser[0];
     if (files.renderer && files.renderer.length > 0) return files.renderer[0];
@@ -13,5 +13,5 @@ export function getFirstLogFile(files: ProcessedLogFiles | undefined): Processed
     if (files.state && files.state.length > 0) return files.state[0];
   }
 
-  return undefined;
+  return Tool.cache;
 }

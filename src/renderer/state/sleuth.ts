@@ -160,6 +160,9 @@ export class SleuthState {
     this.isSpotlightOpen = false;
     this.isDetailsVisible = false;
     this.dateRange = { from: undefined, to: undefined };
+    this.cacheKeys = [];
+    this.cachePath = undefined;
+    this.selectedCacheKey = undefined;
 
     if (goBackToHome) {
       this.resetApp();
