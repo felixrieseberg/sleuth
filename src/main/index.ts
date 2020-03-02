@@ -8,6 +8,7 @@ import { secureApp } from './security';
 import { createWindow, windows } from './windows';
 import { createMenu } from './menu';
 import { setupUpdates } from './update';
+import { installProtocol } from './protocol';
 
 if (!config.isDevMode) {
   process.env.NODE_ENV = 'production';
@@ -65,6 +66,8 @@ if (require('electron-squirrel-startup')) {
       createWindow();
     }
   });
+
+  installProtocol();
 
   console.log(`Setup all listeners, now waiting for ready event`);
 }
