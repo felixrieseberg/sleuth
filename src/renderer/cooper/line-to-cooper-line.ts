@@ -18,23 +18,23 @@ export interface ExtraReplacer {
 const filters: Array<Replacer> = [
   {
     name: 'team-ids',
-    rgx: /((?:\(| |^|')*(?:"{0,1}T[A-Z0-9]{8}"{0,1})(?:\)|,| |'|$)){2,}/g,
+    rgx: /((?:\(| |^|')*(?:"{0,1}T[A-Z0-9]{8,}"{0,1})(?:\)|,| |'|$)){2,}/g,
     replacer: ` {Team IDs} `
   }, {
     name: 'user-ids',
-    rgx: /((?:\(| |^|')*(?:"{0,1}(?:U|W|B)[A-Z0-9]{8}"{0,1})(?:\)|,| |'|$)){2,}/g,
+    rgx: /((?:\(| |^|')*(?:"{0,1}(?:U|W|B)[A-Z0-9]{8,}"{0,1})(?:\)|,| |'|$)){2,}/g,
     replacer: ` {User IDs} `
   }, {
     name: 'channel-ids',
-    rgx: /((?:\(| |^|')*(?:"{0,1}C[A-Z0-9]{8}"{0,1})(?:\)|,| |'|$)){2,}/g,
+    rgx: /((?:\(| |^|')*(?:"{0,1}C[A-Z0-9]{8,}"{0,1})(?:\)|,| |'|$)){2,}/g,
     replacer: ` {Channel IDs} `
   }, {
     name: 'team-id',
-    rgx: /(\(| |^|')("{0,1}T[A-Z0-9]{8}"{0,1})(\)| |'|$)/g,
+    rgx: /(\(| |^|')("{0,1}T[A-Z0-9]{8,}"{0,1})(\)| |'|$)/g,
     replacer: ' {Team ID} '
   }, {
     name: 'user-id',
-    rgx: /( |^)("{0,1}(?:U|W|B)[A-Z0-9]{8}"{0,1})( |$)/g,
+    rgx: /( |^)("{0,1}(?:U|W|B)[A-Z0-9]{8,}"{0,1})( |$)/g,
     replacer: ' {User} '
   }, {
     name: 'ms',
@@ -54,7 +54,7 @@ const filters: Array<Replacer> = [
     replacer: ' {id} '
   }, {
     name: 'channel-id',
-    rgx: /( |^|\()("{0,1}(C|D)[A-Z0-9]{8}"{0,1})( |\)|:|$)/g,
+    rgx: /( |^|\()("{0,1}(C|D)[A-Z0-9]{8,}"{0,1})( |\)|:|$)/g,
     replacer: ' {Channel} '
   }, {
     name: 'was-active',
@@ -66,7 +66,7 @@ const filters: Array<Replacer> = [
     replacer: '$1{Time}'
   }, {
     name: 'deep-link',
-    rgx: /slack:\/\/channel\?team=(T[A-Z0-9]{8})&id=(C|D)[A-Z0-9]{8}/,
+    rgx: /slack:\/\/channel\?team=(T[A-Z0-9]{8,})&id=(C|D)[A-Z0-9]{8,}/,
     replacer: 'slack://channel?team={Team ID}&id={Channel ID}'
   }, {
     name: 'double-space',
@@ -96,6 +96,10 @@ const filters: Array<Replacer> = [
     name: 'notification-id',
     rgx: / [a-zA-Z0-9]{14}$/g,
     replacer: ` {ID} `
+  }, {
+    name: 'api-descriptor',
+    rgx: /noversion-[\d]{10}\.[\d]{3}/g,
+    replacer: `{API Version}-{Timestamp}`
   }
 ];
 
