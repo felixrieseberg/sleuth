@@ -18,36 +18,47 @@ export const defaults = {
 };
 
 export class SleuthState {
+  // ** Cooper log line logging **
   @observable public slackUserId?: string;
   @observable public isCooperSignedIn = false;
+
+  // ** Log file selection **
+  // The selected log entry (single log message plus meta data)
   @observable public selectedEntry?: LogEntry;
+  // Path to the source directory (zip file, folder path, etc)
   @observable public source?: string;
+  // A reference to the selected log file
   @observable.ref public selectedLogFile?: ProcessedLogFile | MergedLogFile | UnzippedFile | Tool;
+
+  //** Cachetool **
+  // When looking at the cache using cachetool, we'll keep the selected
+  // cache key in this property
   @observable public selectedCacheKey?: string;
   @observable public cachePath?: string;
   @observable public cacheKeys: Array<string> = [];
   @observable public isLoadingCacheKeys?: boolean;
 
+  // ** Search and Filter **
   @observable public levelFilter: LevelFilter = {
     debug: false,
     error: false,
     info: false,
     warn: false
   };
-
-  @observable public suggestions: Suggestions = [];
   @observable public searchIndex: number = 0;
   @observable public search: string = '';
+  @observable public showOnlySearchResults: boolean = false;
 
+  // ** Various "what are we showing" properties **
+  @observable public suggestions: Suggestions = [];
   @observable public webAppLogsWarningDismissed: boolean = false;
   @observable public opened: number = 0;
   @observable public dateRange: DateRange = { from: undefined, to: undefined };
-  @observable public showOnlySearchResults: boolean = false;
   @observable public isDetailsVisible: boolean = false;
   @observable public isSidebarOpen: boolean = true;
   @observable public isSpotlightOpen: boolean = false;
 
-  // Settings
+  // ** Settings **
   @observable public isDarkMode: boolean = !!this.retrieve('isDarkMode', true);
   @observable public isOpenMostRecent: boolean = !!this.retrieve<boolean>('isOpenMostRecent', true);
   @observable public dateTimeFormat: string
@@ -57,7 +68,7 @@ export class SleuthState {
   @observable public defaultSort: SORT_DIRECTION = this.retrieve('defaultSort', false) as SORT_DIRECTION || SORT_DIRECTION.DESC;
   @observable public isMarkIcon: boolean = !!this.retrieve('isMarkIcon', true);
 
-  // Internal setting
+  // ** Internal settings **
   private didOpenMostRecent = false;
 
   constructor(
