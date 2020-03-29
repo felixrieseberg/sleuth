@@ -89,7 +89,7 @@ async function getSuggestions(input: Array<string>): Promise<Array<Suggestion>> 
     // If the file is from #alerts-desktop-logs, the server will
     // have named it, not the desktop app itself.
     // It'll look like T8KJ1FXTL_U8KCVGGLR_1580765146766674.zip
-    const serverFormat = /\w{9}_\w{9}_\d{16}\.zip/;
+    const serverFormat = /\w{9,}_\w{9,}_\d{16,}\.zip/;
     const logsFormat = /.*logs.*\.zip/;
     const shouldAdd = logsFormat.test(file) || serverFormat.test(file);
 

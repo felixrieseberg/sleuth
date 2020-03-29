@@ -4,11 +4,11 @@ import * as path from 'path';
 import classNames from 'classnames';
 import * as fs from 'fs-extra';
 import autoBind from 'react-autobind';
-import { Card, Elevation, Tabs, Tab, Callout, Intent, Button, Tag, ButtonGroup } from '@blueprintjs/core';
+import { Card, Elevation, Tabs, Tab, Callout, Intent, Button, ButtonGroup } from '@blueprintjs/core';
 import { autorun, IReactionDisposer } from 'mobx';
 
 import { SleuthState } from '../state/sleuth';
-import { tmpdir, type } from 'os';
+import { tmpdir } from 'os';
 import { showSaveDialog } from '../ipc';
 
 
