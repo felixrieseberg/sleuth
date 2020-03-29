@@ -105,14 +105,14 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     } = this.props;
 
     // Next props
-    const nextshowOnlySearchResults = nextProps.showOnlySearchResults;
+    const nextShowOnlySearchResults = nextProps.showOnlySearchResults;
     const nextFile = nextProps.logFile;
     const nextLevelFilter = nextProps.levelFilter;
     const nextSearch = nextProps.search;
 
     // Filter or search changed
     const filterChanged = didFilterChange(levelFilter, nextLevelFilter);
-    const searchChanged = search !== nextProps.search || showOnlySearchResults !== nextshowOnlySearchResults;
+    const searchChanged = search !== nextProps.search || showOnlySearchResults !== nextShowOnlySearchResults;
     const fileChanged = ((!logFile && nextFile)
       || logFile && nextFile && logFile.logEntries.length !== nextFile.logEntries.length
       || logFile && nextFile && logFile.logType !== nextFile.logType);
@@ -123,7 +123,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
 
     if (filterChanged || searchChanged || fileChanged || rangeChanged) {
       const sortOptions: SortFilterListOptions = {
-        showOnlySearchResults: nextshowOnlySearchResults,
+        showOnlySearchResults: nextShowOnlySearchResults,
         filter: nextLevelFilter,
         search: nextSearch,
         logFile: nextFile,
@@ -133,7 +133,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
       let searchList: Array<number> = [];
 
       // Should we create a search list?
-      if (!nextshowOnlySearchResults && nextSearch) {
+      if (!nextShowOnlySearchResults && nextSearch) {
         debug(`showOnlySearchResults is false, making search list`);
         searchList = this.doSearchIndex(nextSearch, sortedList);
       }

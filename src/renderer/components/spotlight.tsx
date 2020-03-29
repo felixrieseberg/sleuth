@@ -6,7 +6,7 @@ import { Omnibar, ItemRenderer, ItemPredicate } from '@blueprintjs/select';
 import { MenuItem } from '@blueprintjs/core';
 
 import { SleuthState } from '../state/sleuth';
-import { ProcessedLogFiles, SelectLogFileFn, ProcessedLogFile } from '../interfaces';
+import { ProcessedLogFiles, ProcessedLogFile } from '../interfaces';
 import { UnzippedFile } from '../unzip';
 import { isProcessedLogFile } from '../../utils/is-logfile';
 import { highlightText } from '../../utils/highlight-text';
@@ -50,7 +50,6 @@ export interface SpotlightState {
 export interface SpotlightProps {
   state: SleuthState;
   logFiles: ProcessedLogFiles;
-  selectLogFile: SelectLogFileFn;
 }
 
 @observer
@@ -110,7 +109,7 @@ export class Spotlight extends React.Component<SpotlightProps, Partial<Spotlight
             label: `${logFile.logEntries.length} entries`,
             icon: 'document',
             click: () => {
-              this.props.selectLogFile(logFile);
+              this.props.state.selectLogFile(logFile);
             }
           });
         } else {
@@ -119,7 +118,7 @@ export class Spotlight extends React.Component<SpotlightProps, Partial<Spotlight
             label: `State`,
             icon: 'cog',
             click: () => {
-              this.props.selectLogFile(logFile);
+              this.props.state.selectLogFile(logFile);
             }
           });
         }

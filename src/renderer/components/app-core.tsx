@@ -3,21 +3,17 @@ import React from 'react';
 import classNames from 'classnames';
 
 import { getFirstLogFile } from '../../utils/get-first-logfile';
-import { isMergedLogFile, isProcessedLogFile, isUnzippedFile, isTool } from '../../utils/is-logfile';
 import { SleuthState } from '../state/sleuth';
-import { UnzippedFile, UnzippedFiles } from '../unzip';
+import { UnzippedFiles } from '../unzip';
 import { getTypesForFiles, mergeLogFiles, processLogFiles } from '../processor';
 import {
   LevelFilter,
   MergedFilesLoadStatus,
-  MergedLogFile,
   MergedLogFiles,
-  ProcessedLogFile,
   ProcessedLogFiles,
   LogType,
   LOG_TYPES_TO_PROCESS,
   SortedUnzippedFiles,
-  Tool
 } from '../interfaces';
 import { AppCoreHeader } from './app-core-header';
 import { Sidebar } from './sidebar';
@@ -26,9 +22,6 @@ import { LogContent } from './log-content';
 import { flushLogPerformance } from '../processor/performance';
 import { Spotlight } from './spotlight';
 import { sendShowMessageBox } from '../ipc';
-import { capitalize } from 'lodash';
-
-const debug = require('debug')('sleuth:appCore');
 
 export interface CoreAppProps {
   state: SleuthState;
@@ -37,8 +30,6 @@ export interface CoreAppProps {
 
 export interface CoreAppState {
   processedLogFiles: ProcessedLogFiles;
-  selectedLogFile?: ProcessedLogFile | MergedLogFile | UnzippedFile;
-  mergedLogFiles?: MergedLogFiles;
   loadingMessage: string;
   loadedLogFiles: boolean;
   loadedMergeFiles: boolean;
@@ -66,9 +57,6 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
       loadedLogFiles: false,
       loadedMergeFiles: false
     };
-
-    this.setMergedFile = this.setMergedFile.bind(this);
-    this.selectLogFile = this.selectLogFile.bind(this);
   }
 
   /**
@@ -142,13 +130,12 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
     }
     console.timeEnd('process-files');
 
-    const { selectedLogFile, processedLogFiles } = this.state;
+    const { processedLogFiles } = this.state;
+    const { selectedLogFile } = this.props.state;
     if (!selectedLogFile && processedLogFiles) {
       this.props.state.selectedLogFile = getFirstLogFile(processedLogFiles);
-      this.setState({ loadedLogFiles: true });
-    } else {
-      this.setState({ loadedLogFiles: true });
     }
+    this.setState({ loadedLogFiles: true });
 
     // We're done processing the files, so let's get started on the merge files.
     await this.processMergeFiles();
@@ -156,86 +143,23 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
   }
 
   /**
-   * Update this component's status with a merged logfile
-   *
-   * @param {MergedLogFile} mergedFile
-   */
-  private setMergedFile(mergedFile: MergedLogFile) {
-    const { mergedLogFiles } = this.state;
-    const newMergedLogFiles = { ...mergedLogFiles as MergedLogFiles };
-
-    debug(`Merged log file for ${mergedFile.logType} now created!`);
-    newMergedLogFiles[mergedFile.logType] = mergedFile;
-    this.setState({ mergedLogFiles: newMergedLogFiles });
-  }
-
-  /**
    * Kick off merging of all the log files
    */
   private async processMergeFiles() {
     const { processedLogFiles } = this.state;
+    const { setMergedFile } = this.props.state;
 
     if (processedLogFiles) {
-      await mergeLogFiles(processedLogFiles.browser, LogType.BROWSER).then(this.setMergedFile);
-      await mergeLogFiles(processedLogFiles.renderer, LogType.RENDERER).then(this.setMergedFile);
-      await mergeLogFiles(processedLogFiles.preload, LogType.PRELOAD).then(this.setMergedFile);
-      await mergeLogFiles(processedLogFiles.call, LogType.CALL).then(this.setMergedFile);
-      await mergeLogFiles(processedLogFiles.webapp, LogType.WEBAPP).then(this.setMergedFile);
+      await mergeLogFiles(processedLogFiles.browser, LogType.BROWSER).then(setMergedFile);
+      await mergeLogFiles(processedLogFiles.renderer, LogType.RENDERER).then(setMergedFile);
+      await mergeLogFiles(processedLogFiles.preload, LogType.PRELOAD).then(setMergedFile);
+      await mergeLogFiles(processedLogFiles.call, LogType.CALL).then(setMergedFile);
+      await mergeLogFiles(processedLogFiles.webapp, LogType.WEBAPP).then(setMergedFile);
 
-      const merged = this.state.mergedLogFiles as MergedLogFiles;
+      const merged = this.props.state.mergedLogFiles as MergedLogFiles;
       const toMerge = [merged.browser, merged.renderer, merged.preload, merged.call, merged.webapp];
 
-      mergeLogFiles(toMerge, LogType.ALL).then((r) => this.setMergedFile(r));
-    }
-  }
-
-  /**
-   * Select a log file. This is a more complex operation than one might think -
-   * mostly because we might need to create a merged file on-the-fly.
-   *
-   * @param {ProcessedLogFile} logFile
-   * @param {string} [logType]
-   */
-  private selectLogFile(logFile: ProcessedLogFile | UnzippedFile | null, logType?: string): void {
-    this.props.state.selectedEntry = undefined;
-
-    if (!logFile && logType) {
-      const { mergedLogFiles } = this.state;
-
-      debug(`Selecting log type ${logType}`);
-
-      // If our "logtype" is actually a tool (like Cache), we'll set it
-      if (logType in Tool) {
-        this.props.state.selectedLogFile = logType as Tool;
-      } else if (mergedLogFiles && mergedLogFiles[logType]) {
-        this.props.state.selectedLogFile = mergedLogFiles[logType];
-      }
-    } else if (logFile) {
-      const name = isProcessedLogFile(logFile) ? logFile.logType : logFile.fileName;
-      debug(`Selecting log file ${name}`);
-
-      this.props.state.selectedLogFile = logFile;
-    }
-  }
-
-  /**
-   * Return the file name of the currently selected file.
-   *
-   * @returns {string}
-   */
-  private getSelectedFileName(): string {
-    const { selectedLogFile } = this.props.state;
-
-    if (isProcessedLogFile(selectedLogFile)) {
-      return selectedLogFile.logFile.fileName;
-    } else if (isMergedLogFile(selectedLogFile)) {
-      return selectedLogFile.logType;
-    } else if (isUnzippedFile(selectedLogFile)) {
-      return selectedLogFile.fileName;
-    } else if (isTool(selectedLogFile)) {
-      return capitalize(selectedLogFile);
-    } else {
-      return '';
+      mergeLogFiles(toMerge, LogType.ALL).then((r) => setMergedFile(r));
     }
   }
 
@@ -261,7 +185,7 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
    * @returns {MergedFilesLoadStatus}
    */
   private getMergedFilesStatus(): MergedFilesLoadStatus {
-    const { mergedLogFiles } = this.state;
+    const { mergedLogFiles } = this.props.state;
 
     return {
       all: !!(mergedLogFiles && mergedLogFiles.all && mergedLogFiles.all.logEntries),
@@ -280,7 +204,7 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
    */
   private renderSidebarSpotlight(): JSX.Element {
     const { processedLogFiles } = this.state;
-    const selectedLogFileName = this.getSelectedFileName();
+    const { selectedFileName } = this.props.state;
     const mergedFilesStatus = this.getMergedFilesStatus();
 
     return (
@@ -288,13 +212,11 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
         <Sidebar
           logFiles={processedLogFiles as ProcessedLogFiles}
           mergedFilesStatus={mergedFilesStatus}
-          selectLogFile={this.selectLogFile}
-          selectedLogFileName={selectedLogFileName}
+          selectedLogFileName={selectedFileName}
           state={this.props.state}
         />
         <Spotlight
           state={this.props.state}
-          selectLogFile={this.selectLogFile}
           logFiles={processedLogFiles as ProcessedLogFiles}
         />
       </>

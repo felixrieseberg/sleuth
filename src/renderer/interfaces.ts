@@ -35,6 +35,12 @@ export const LOG_TYPES_TO_PROCESS = [
   LogType.INSTALLER
 ];
 
+export interface Bookmark {
+  logEntry: LogEntry;
+  logFile: LogFile;
+  index: number;
+}
+
 export interface ProcessorPerformanceInfo {
   name: string;
   type: LogType;

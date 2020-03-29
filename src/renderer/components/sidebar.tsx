@@ -4,7 +4,7 @@ import { ITreeNode, Tree, Icon, Position, Tooltip, Intent } from '@blueprintjs/c
 import { observer } from 'mobx-react';
 
 import { UnzippedFile } from '../unzip';
-import { MergedFilesLoadStatus, ProcessedLogFile, ProcessedLogFiles, SelectLogFileFn } from '../interfaces';
+import { MergedFilesLoadStatus, ProcessedLogFile, ProcessedLogFiles } from '../interfaces';
 import { levelsHave } from '../../utils/level-counts';
 import { SleuthState } from '../state/sleuth';
 import { isProcessedLogFile } from '../../utils/is-logfile';
@@ -12,7 +12,6 @@ import { isProcessedLogFile } from '../../utils/is-logfile';
 export interface SidebarProps {
   logFiles: ProcessedLogFiles;
   selectedLogFileName: string;
-  selectLogFile: SelectLogFileFn;
   mergedFilesStatus: MergedFilesLoadStatus;
   state: SleuthState;
 }
@@ -359,11 +358,11 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
     const nodeData: any = node.nodeData;
 
     if (nodeData && nodeData.file) {
-      this.props.selectLogFile(nodeData.file);
+      this.props.state.selectLogFile(nodeData.file);
     }
 
     if (nodeData && nodeData.type) {
-      this.props.selectLogFile(null, nodeData.type);
+      this.props.state.selectLogFile(null, nodeData.type);
     }
 
     if (nodeData) {

@@ -1,14 +1,17 @@
-import { observable, action, autorun } from 'mobx';
+import { observable, action, autorun, computed } from 'mobx';
 import { ipcRenderer } from 'electron';
 
 import { UnzippedFile } from '../unzip';
-import { LevelFilter, LogEntry, MergedLogFile, ProcessedLogFile, DateRange, Suggestions, Tool } from '../interfaces';
+import { LevelFilter, LogEntry, MergedLogFile, ProcessedLogFile, DateRange, Suggestions, Tool, Bookmark, MergedLogFiles } from '../interfaces';
 import { getItemsInSuggestionFolders } from '../suggestions';
 import { testDateTimeFormat } from '../../utils/test-date-time';
 import { SORT_DIRECTION } from '../components/log-table-constants';
 import { changeIcon, ICON_NAMES, getIconPath } from '../../utils/app-icon';
 import { setSetting } from '../settings';
+import { isProcessedLogFile, isMergedLogFile, isUnzippedFile, isTool } from '../../utils/is-logfile';
+import { capitalize } from 'lodash';
 
+const debug = require('debug')('sleuth:state');
 export const defaults = {
   dateTimeFormat: 'HH:mm:ss (dd/MM)',
   defaultEditor: 'code --goto {filepath}:{line}',
@@ -57,6 +60,8 @@ export class SleuthState {
   @observable public isDetailsVisible: boolean = false;
   @observable public isSidebarOpen: boolean = true;
   @observable public isSpotlightOpen: boolean = false;
+  @observable public bookmarks: Array<Bookmark> = [];
+  @observable public selectedIndex: number | undefined;
 
   // ** Settings **
   @observable public isDarkMode: boolean = !!this.retrieve('isDarkMode', true);
@@ -67,6 +72,9 @@ export class SleuthState {
   @observable public defaultEditor: string = this.retrieve<string>('defaultEditor', false)!;
   @observable public defaultSort: SORT_DIRECTION = this.retrieve('defaultSort', false) as SORT_DIRECTION || SORT_DIRECTION.DESC;
   @observable public isMarkIcon: boolean = !!this.retrieve('isMarkIcon', true);
+
+  // ** Giant non-observable arrays **
+  public mergedLogFiles?: MergedLogFiles;
 
   // ** Internal settings **
   private didOpenMostRecent = false;
@@ -126,6 +134,8 @@ export class SleuthState {
     this.toggleDarkMode = this.toggleDarkMode.bind(this);
     this.toggleSidebar = this.toggleSidebar.bind(this);
     this.toggleSpotlight = this.toggleSpotlight.bind(this);
+    this.selectLogFile = this.selectLogFile.bind(this);
+    this.setMergedFile = this.setMergedFile.bind(this);
 
     ipcRenderer.on('spotlight', this.toggleSpotlight);
   }
@@ -201,6 +211,47 @@ export class SleuthState {
   }
 
   /**
+   * Select a log file. This is a more complex operation than one might think -
+   * mostly because we might need to create a merged file on-the-fly.
+   *
+   * @param {ProcessedLogFile} logFile
+   * @param {string} [logType]
+   */
+  @action
+  public selectLogFile(logFile: ProcessedLogFile | UnzippedFile | null, logType?: string): void {
+    this.selectedEntry = undefined;
+
+    if (!logFile && logType) {
+      debug(`Selecting log type ${logType}`);
+
+      // If our "logtype" is actually a tool (like Cache), we'll set it
+      if (logType in Tool) {
+        this.selectedLogFile = logType as Tool;
+      } else if (this.mergedLogFiles && this.mergedLogFiles[logType]) {
+        this.selectedLogFile = this.mergedLogFiles[logType];
+      }
+    } else if (logFile) {
+      const name = isProcessedLogFile(logFile) ? logFile.logType : logFile.fileName;
+      debug(`Selecting log file ${name}`);
+
+      this.selectedLogFile = logFile;
+    }
+  }
+
+  /**
+   * Update this component's status with a merged logfile
+   *
+   * @param {MergedLogFile} mergedFile
+   */
+  public setMergedFile(mergedFile: MergedLogFile) {
+    const newMergedLogFiles = { ...this.mergedLogFiles as MergedLogFiles };
+
+    debug(`Merged log file for ${mergedFile.logType} now created!`);
+    newMergedLogFiles[mergedFile.logType] = mergedFile;
+    this.mergedLogFiles = newMergedLogFiles;
+  }
+
+  /**
    * Return the default icon path
    *
    * @returns {string}
@@ -210,6 +261,26 @@ export class SleuthState {
       return getIconPath(ICON_NAMES.mark);
     } else {
       return getIconPath(ICON_NAMES.default);
+    }
+  }
+
+  /**
+   * Return the file name of the currently selected file.
+   *
+   * @returns {string}
+   */
+  @computed
+  public get selectedFileName(): string {
+    if (isProcessedLogFile(this.selectedLogFile)) {
+      return this.selectedLogFile.logFile.fileName;
+    } else if (isMergedLogFile(this.selectedLogFile)) {
+      return this.selectedLogFile.logType;
+    } else if (isUnzippedFile(this.selectedLogFile)) {
+      return this.selectedLogFile.fileName;
+    } else if (isTool(this.selectedLogFile)) {
+      return capitalize(this.selectedLogFile);
+    } else {
+      return '';
     }
   }
 
