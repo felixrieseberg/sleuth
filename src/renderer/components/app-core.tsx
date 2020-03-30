@@ -22,6 +22,7 @@ import { LogContent } from './log-content';
 import { flushLogPerformance } from '../processor/performance';
 import { Spotlight } from './spotlight';
 import { sendShowMessageBox } from '../ipc';
+import { rehydrateBookmarks } from '../state/bookmarks';
 
 export interface CoreAppProps {
   state: SleuthState;
@@ -132,6 +133,9 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
 
     const { processedLogFiles } = this.state;
     const { selectedLogFile } = this.props.state;
+
+    this.props.state.processedLogFiles = processedLogFiles;
+
     if (!selectedLogFile && processedLogFiles) {
       this.props.state.selectedLogFile = getFirstLogFile(processedLogFiles);
     }
@@ -139,6 +143,8 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
 
     // We're done processing the files, so let's get started on the merge files.
     await this.processMergeFiles();
+
+    rehydrateBookmarks(this.props.state);
     flushLogPerformance();
   }
 
@@ -203,21 +209,18 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
    * @returns {JSX.Element}
    */
   private renderSidebarSpotlight(): JSX.Element {
-    const { processedLogFiles } = this.state;
     const { selectedFileName } = this.props.state;
     const mergedFilesStatus = this.getMergedFilesStatus();
 
     return (
       <>
         <Sidebar
-          logFiles={processedLogFiles as ProcessedLogFiles}
           mergedFilesStatus={mergedFilesStatus}
           selectedLogFileName={selectedFileName}
           state={this.props.state}
         />
         <Spotlight
           state={this.props.state}
-          logFiles={processedLogFiles as ProcessedLogFiles}
         />
       </>
     );

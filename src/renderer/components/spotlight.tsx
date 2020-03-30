@@ -6,7 +6,7 @@ import { Omnibar, ItemRenderer, ItemPredicate } from '@blueprintjs/select';
 import { MenuItem } from '@blueprintjs/core';
 
 import { SleuthState } from '../state/sleuth';
-import { ProcessedLogFiles, ProcessedLogFile, UnzippedFile } from '../interfaces';
+import { ProcessedLogFile, UnzippedFile } from '../interfaces';
 import { isProcessedLogFile } from '../../utils/is-logfile';
 import { highlightText } from '../../utils/highlight-text';
 
@@ -48,7 +48,6 @@ export interface SpotlightState {
 
 export interface SpotlightProps {
   state: SleuthState;
-  logFiles: ProcessedLogFiles;
 }
 
 @observer
@@ -85,7 +84,7 @@ export class Spotlight extends React.Component<SpotlightProps, Partial<Spotlight
 
   private getItems(): Array<SpotlightItem> {
     const { suggestions } = this.props.state;
-    const { logFiles } = this.props;
+    const { processedLogFiles } = this.props.state;
 
     const spotSuggestions: Array<SpotlightItem> = Object.keys(suggestions)
       .map((filePath) => ({
@@ -99,8 +98,8 @@ export class Spotlight extends React.Component<SpotlightProps, Partial<Spotlight
 
     const logFileSuggestions: Array<SpotlightItem> = [];
 
-    Object.keys(logFiles).forEach((key) => {
-      const keyFiles: Array<ProcessedLogFile | UnzippedFile> = logFiles[key];
+    Object.keys(processedLogFiles || {}).forEach((key) => {
+      const keyFiles: Array<ProcessedLogFile | UnzippedFile> = processedLogFiles![key];
       keyFiles.forEach((logFile) => {
         if (isProcessedLogFile(logFile)) {
           logFileSuggestions.push({

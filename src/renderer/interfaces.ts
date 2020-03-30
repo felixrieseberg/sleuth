@@ -2,9 +2,9 @@ import fs from 'fs-extra';
 
 // Anything that's valid as a "selected" log file. We started with just
 // actual files  and have since added the "Tool" enum for, well, tools.
-export type SelectableLogFile = LogFile | Tool;
+export type SelectableLogFile = LogFile | Tool | UnzippedFile;
 
-export type LogFile = UnzippedFile | MergedLogFile | ProcessedLogFile;
+export type LogFile = MergedLogFile | ProcessedLogFile;
 
 export const enum LogType {
   BROWSER = 'browser',
@@ -41,6 +41,17 @@ export const LOG_TYPES_TO_PROCESS = [
 export interface Bookmark {
   logEntry: LogEntry;
   logFile: LogFile;
+}
+
+export interface SerializedBookmark {
+  logEntry: {
+    line: number;
+    index: number;
+  };
+  logFile: {
+    id: string;
+    type: string;
+  };
 }
 
 export interface ProcessorPerformanceInfo {
@@ -80,12 +91,14 @@ export interface MatchResult {
 
 export interface BaseFile {
   id: string;
+  type: string;
 }
 
 export interface UnzippedFile extends BaseFile {
   fileName: string;
   size: number;
   fullPath: string;
+  type: 'UnzippedFile';
 }
 
 export interface UnzippedFiles extends Array<UnzippedFile> { }

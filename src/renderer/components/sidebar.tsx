@@ -3,13 +3,12 @@ import classNames from 'classnames';
 import { ITreeNode, Tree, Icon, Position, Tooltip, Intent } from '@blueprintjs/core';
 import { observer } from 'mobx-react';
 
-import { MergedFilesLoadStatus, ProcessedLogFile, ProcessedLogFiles, UnzippedFile } from '../interfaces';
+import { MergedFilesLoadStatus, ProcessedLogFile, UnzippedFile } from '../interfaces';
 import { levelsHave } from '../../utils/level-counts';
 import { SleuthState } from '../state/sleuth';
 import { isProcessedLogFile } from '../../utils/is-logfile';
 
 export interface SidebarProps {
-  logFiles: ProcessedLogFiles;
   selectedLogFileName: string;
   mergedFilesStatus: MergedFilesLoadStatus;
   state: SleuthState;
@@ -111,16 +110,18 @@ const DEFAULT_NODES: Array<ITreeNode> = [
 @observer
 export class Sidebar extends React.Component<SidebarProps, SidebarState> {
   public static getDerivedStateFromProps(props: SidebarProps, state: SidebarState) {
-    const { logFiles } = props;
+    const { processedLogFiles } = props.state;
 
-    Sidebar.setChildNodes(NODE_ID.STATE, state, logFiles.state.map((file) => Sidebar.getStateFileNode(file, props)));
-    Sidebar.setChildNodes(NODE_ID.BROWSER, state, logFiles.browser.map((file) => Sidebar.getFileNode(file, props)));
-    Sidebar.setChildNodes(NODE_ID.RENDERER, state, logFiles.renderer.map((file) => Sidebar.getFileNode(file, props)));
-    Sidebar.setChildNodes(NODE_ID.PRELOAD, state, logFiles.preload.map((file) => Sidebar.getFileNode(file, props)));
-    Sidebar.setChildNodes(NODE_ID.WEBAPP, state, logFiles.webapp.map((file) => Sidebar.getFileNode(file, props)));
-    Sidebar.setChildNodes(NODE_ID.CALLS, state, logFiles.call.map((file) => Sidebar.getFileNode(file, props)));
-    Sidebar.setChildNodes(NODE_ID.INSTALLER, state, logFiles.installer.map((file) => Sidebar.getInstallerFileNode(file, props)));
-    Sidebar.setChildNodes(NODE_ID.NETWORK, state, logFiles.netlog.map((file, i) => Sidebar.getNetlogFileNode(file, props, i)));
+    if (!processedLogFiles) return {};
+
+    Sidebar.setChildNodes(NODE_ID.STATE, state, processedLogFiles.state.map((file) => Sidebar.getStateFileNode(file, props)));
+    Sidebar.setChildNodes(NODE_ID.BROWSER, state, processedLogFiles.browser.map((file) => Sidebar.getFileNode(file, props)));
+    Sidebar.setChildNodes(NODE_ID.RENDERER, state, processedLogFiles.renderer.map((file) => Sidebar.getFileNode(file, props)));
+    Sidebar.setChildNodes(NODE_ID.PRELOAD, state, processedLogFiles.preload.map((file) => Sidebar.getFileNode(file, props)));
+    Sidebar.setChildNodes(NODE_ID.WEBAPP, state, processedLogFiles.webapp.map((file) => Sidebar.getFileNode(file, props)));
+    Sidebar.setChildNodes(NODE_ID.CALLS, state, processedLogFiles.call.map((file) => Sidebar.getFileNode(file, props)));
+    Sidebar.setChildNodes(NODE_ID.INSTALLER, state, processedLogFiles.installer.map((file) => Sidebar.getInstallerFileNode(file, props)));
+    Sidebar.setChildNodes(NODE_ID.NETWORK, state, processedLogFiles.netlog.map((file, i) => Sidebar.getNetlogFileNode(file, props, i)));
 
     return { nodes: state.nodes };
   }
@@ -171,7 +172,7 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
    * @returns {ITreeNode}
    */
   public static getStateFileNode(file: UnzippedFile, props: SidebarProps): ITreeNode {
-    const {  selectedLogFileName } = props;
+    const { selectedLogFileName } = props;
     const isSelected = (selectedLogFileName === file.fileName);
 
     let label;

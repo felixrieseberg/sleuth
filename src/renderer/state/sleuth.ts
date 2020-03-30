@@ -20,8 +20,11 @@ import {
   Bookmark,
   MergedLogFiles,
   UnzippedFile,
-  SelectableLogFile
+  SelectableLogFile,
+  ProcessedLogFiles,
+  SerializedBookmark
 } from '../interfaces';
+import { rehydrateBookmarks } from './bookmarks';
 
 const debug = require('debug')('sleuth:state');
 export const defaults = {
@@ -73,7 +76,9 @@ export class SleuthState {
   @observable public isDetailsVisible: boolean = false;
   @observable public isSidebarOpen: boolean = true;
   @observable public isSpotlightOpen: boolean = false;
-  @observable public bookmarks: Array<Bookmark> = [];
+  @observable.shallow public bookmarks: Array<Bookmark> = [];
+  @observable public serializedBookmarks: Record<string, Array<SerializedBookmark>>
+    = this.retrieve('serializedBookmarks', true) as Record<string, Array<SerializedBookmark>> || {};
 
   // ** Settings **
   @observable public isDarkMode: boolean = !!this.retrieve('isDarkMode', true);
@@ -87,6 +92,7 @@ export class SleuthState {
 
   // ** Giant non-observable arrays **
   public mergedLogFiles?: MergedLogFiles;
+  public processedLogFiles?: ProcessedLogFiles;
 
   // ** Internal settings **
   private didOpenMostRecent = false;
@@ -103,6 +109,7 @@ export class SleuthState {
     autorun(() => this.save('isOpenMostRecent', this.isOpenMostRecent));
     autorun(() => this.save('defaultEditor', this.defaultEditor));
     autorun(() => this.save('defaultSort', this.defaultSort));
+    autorun(() => this.save('serializedBookmarks', this.serializedBookmarks));
     autorun(() => {
       this.save('isDarkMode', this.isDarkMode);
 
@@ -217,6 +224,8 @@ export class SleuthState {
 
   @action
   public reset(goBackToHome: boolean = false) {
+    this.processedLogFiles = undefined;
+    this.mergedLogFiles = undefined;
     this.selectedEntry = undefined;
     this.selectedIndex = undefined;
     this.selectedLogFile = undefined;
@@ -279,6 +288,9 @@ export class SleuthState {
     debug(`Merged log file for ${mergedFile.logType} now created!`);
     newMergedLogFiles[mergedFile.logType] = mergedFile;
     this.mergedLogFiles = newMergedLogFiles;
+
+    // Recalculate bookmarks
+    rehydrateBookmarks(this);
   }
 
   /**

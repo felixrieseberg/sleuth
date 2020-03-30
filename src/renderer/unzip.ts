@@ -94,7 +94,8 @@ export class Unzipper {
             fileName: entry.fileName,
             size: entry.uncompressedSize || 0,
             fullPath: targetPath,
-            id: targetPath
+            id: targetPath,
+            type: 'UnzippedFile'
           });
 
           debug(`Successfully unzipped ${entry.fileName} to ${targetPath}`);

@@ -107,7 +107,8 @@ export class App extends React.Component<{}, Partial<AppState>> {
       fileName: path.basename(url),
       fullPath: url,
       size: stats.size,
-      id: url
+      id: url,
+      type: 'UnzippedFile'
     };
 
     this.sleuthState.setSource(url);
@@ -141,7 +142,7 @@ export class App extends React.Component<{}, Partial<AppState>> {
         if (!shouldIgnoreFile(fileName)) {
           const fullPath = path.join(url, fileName);
           const stats = fs.statSync(fullPath);
-          const file: UnzippedFile = { fileName, fullPath, size: stats.size, id: fullPath };
+          const file: UnzippedFile = { fileName, fullPath, size: stats.size, id: fullPath, type: 'UnzippedFile' };
 
           debug('Found file, adding to result.', file);
           unzippedFiles.push(file);

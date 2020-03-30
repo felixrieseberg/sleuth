@@ -1,5 +1,5 @@
-import { Bookmark } from '../interfaces';
-import { isTool } from '../../utils/is-logfile';
+import { Bookmark, SerializedBookmark, ProcessedLogFile, LogFile, LogEntry } from '../interfaces';
+import { isTool, isUnzippedFile } from '../../utils/is-logfile';
 import { SleuthState } from './sleuth';
 
 /**
@@ -26,8 +26,8 @@ export function getBookmark(state: SleuthState): Bookmark | undefined {
     return;
   }
 
-  // Don't bookmark tools
-  if (isTool(state.selectedLogFile)) {
+  // Don't bookmark tools and unzipped files
+  if (isTool(state.selectedLogFile) || isUnzippedFile(state.selectedLogFile)) {
     return;
   }
 
@@ -64,6 +64,10 @@ export function saveBookmark(state: SleuthState, bookmark: Bookmark | undefined 
   if (bookmark && !hasBookmark) {
     state.bookmarks.push(bookmark);
   }
+
+  (window as any).requestIdleCallback(() => {
+    saveBookmarks(state);
+  }, { timeout: 2000 });
 }
 
 /**
@@ -104,4 +108,110 @@ export function getBookmarkIndex(state: SleuthState, bookmark: Bookmark | undefi
     return v.logFile.id === bookmark.logFile.id &&
       v.logEntry.line === bookmark.logEntry.line;
   });
+}
+
+export function saveBookmarks(state: SleuthState) {
+  const serialized = state.bookmarks.map(serializeBookmark);
+  const { source } = state;
+
+  if (!source) {
+    console.warn(`Tried to save bookmarks, but no "source" available`);
+    return;
+  }
+
+  state.serializedBookmarks[source] = serialized;
+}
+
+export function rehydrateBookmarks(state: SleuthState) {
+  const { source, serializedBookmarks } = state;
+
+  if (!source) {
+    console.warn(`Tried to rehydrate bookmarks, but no "source" available`);
+    return;
+  }
+
+  if (!serializedBookmarks) {
+    console.warn(`Tried to rehydrate bookmarks, but no "serializedBookmarks" available`);
+    return;
+  }
+
+  if (Object.keys(serializedBookmarks).length === 0) {
+    console.log(`Tried to rehydrate bookmarks, but "serializedBookmarks" is empty`);
+    return;
+  }
+
+  const serialized = (serializedBookmarks[source] || [])
+    .map((v) => deserializeBookmark(state, v))
+    .filter((v) => !!v);
+
+  state.bookmarks = serialized as Array<Bookmark>;
+}
+
+export function serializeBookmark(bookmark: Bookmark): SerializedBookmark {
+  return {
+    logEntry: {
+      line: bookmark.logEntry.line,
+      index: bookmark.logEntry.index
+    },
+    logFile: {
+      id: bookmark.logFile.id,
+      type: bookmark.logFile.type
+    }
+  };
+}
+
+export function deserializeBookmark(state: SleuthState, serialized: SerializedBookmark): Bookmark | undefined {
+  let logFile: LogFile | undefined;
+  let logEntry: LogEntry | undefined;
+
+  // Let's find the file
+  if (serialized.logFile.type === 'ProcessedLogFile') {
+    if (!state.processedLogFiles) return;
+
+    Object.keys(state.processedLogFiles).some((key) => {
+      const files = state.processedLogFiles![key];
+      const foundFile = files.find((file: ProcessedLogFile) => file.id === serialized.logFile.id);
+
+      if (foundFile) {
+        logFile = foundFile;
+        return true;
+      }
+
+      return false;
+    });
+  } else if (serialized.logFile.type === 'MergedLogFile') {
+      if (!state.mergedLogFiles) return;
+
+    Object.keys(state.mergedLogFiles).some((key) => {
+      const file = state.mergedLogFiles![key];
+
+      if (file.id === serialized.logFile.id) {
+        logFile = file;
+        return true;
+      }
+
+      return false;
+    });
+  }
+
+
+  // If we didn't find the file, stop here
+  if (!logFile) {
+    return;
+  }
+
+  // Let's find the entry. Start with the index.
+  const entryCandidate = logFile.logEntries[serialized.logEntry.index];
+
+  // Do we have a candidate?
+  if (entryCandidate && entryCandidate.line === serialized.logEntry.line) {
+    logEntry = entryCandidate;
+  } else {
+    return;
+  }
+
+  return {
+    logFile,
+    logEntry
+  };
 }

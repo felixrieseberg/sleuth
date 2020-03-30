@@ -252,7 +252,7 @@ export async function processLogFile(
     logType,
     type: 'ProcessedLogFile',
     levelCounts,
-    id: logFile.fullPath
+    id: logFile.fileName
   };
 
   logPerformance({
