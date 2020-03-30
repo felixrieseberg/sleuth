@@ -41,7 +41,6 @@ export const LOG_TYPES_TO_PROCESS = [
 export interface Bookmark {
   logEntry: LogEntry;
   logFile: LogFile;
-  index: number;
 }
 
 export interface ProcessorPerformanceInfo {

@@ -10,7 +10,6 @@ import { SleuthState } from './sleuth';
 export function goToBookmark(state: SleuthState, bookmark: Bookmark) {
   state.selectedLogFile = bookmark.logFile;
   state.selectedEntry = bookmark.logEntry;
-  state.selectedIndex = bookmark.index;
 }
 
 /**
@@ -34,8 +33,7 @@ export function getBookmark(state: SleuthState): Bookmark | undefined {
 
   const bookmark: Bookmark = {
     logEntry: state.selectedEntry,
-    logFile: state.selectedLogFile,
-    index: state.selectedIndex
+    logFile: state.selectedLogFile
   };
 
   return bookmark;
@@ -103,8 +101,7 @@ export function getBookmarkIndex(state: SleuthState, bookmark: Bookmark | undefi
   if (!bookmark) return -1;
 
   return state.bookmarks.findIndex((v) => {
-    return v.index === bookmark.index &&
-      v.logFile.id === bookmark.logFile.id &&
+    return v.logFile.id === bookmark.logFile.id &&
       v.logEntry.line === bookmark.logEntry.line;
   });
 }

@@ -29,7 +29,7 @@ export interface LogTableProps {
   showOnlySearchResults: boolean | undefined;
   searchIndex: number;
   dateRange?: DateRange;
-  selectedIndex?: number;
+  selectedEntry?: LogEntry;
 }
 
 export interface LogTableState {

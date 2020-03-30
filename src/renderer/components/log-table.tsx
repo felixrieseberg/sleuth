@@ -108,10 +108,10 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     const nextFile = nextProps.logFile;
     const nextLevelFilter = nextProps.levelFilter;
     const nextSearch = nextProps.search;
-    const nextIndex = nextProps.selectedIndex;
+    const nextEntry = nextProps.selectedEntry;
 
     // Filter or search changed
-    const indexChanged = nextIndex !== this.state.selectedIndex;
+    const entryChanged = nextEntry !== this.state.selectedEntry;
     const filterChanged = didFilterChange(levelFilter, nextLevelFilter);
     const searchChanged = search !== nextProps.search || showOnlySearchResults !== nextShowOnlySearchResults;
     const fileChanged = ((!logFile && nextFile)
@@ -123,15 +123,14 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     const nextRange = nextProps.dateRange;
 
     // This should only happen if a bookmark was activated
-    if (indexChanged) {
+    if (entryChanged) {
       this.setState({
         selectedEntry: this.props.state.selectedEntry,
-        selectedIndex: this.props.state.selectedIndex,
         scrollToSelection: true
       });
     }
 
-    if (filterChanged || searchChanged || fileChanged || rangeChanged) {
+    if (filterChanged || searchChanged || fileChanged || rangeChanged || entryChanged) {
       const sortOptions: SortFilterListOptions = {
         showOnlySearchResults: nextShowOnlySearchResults,
         filter: nextLevelFilter,
