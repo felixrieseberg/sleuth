@@ -28,7 +28,6 @@ const { DOWN } = Keys;
  * information. This is also the class that could most easily destroy performance, so be careful
  * here!
  */
-
 export class LogTable extends React.Component<LogTableProps, Partial<LogTableState>> {
   private changeSelectedEntry: any = null;
 
@@ -162,7 +161,18 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    * React's componentDidMount
    */
   public componentDidMount() {
-    this.setState({ sortedList: this.sortFilterList() });
+    const sortedList = this.sortFilterList();
+    const { selectedEntry, selectedIndex } = this.props.state;
+    const update: Partial<LogTableState> = {
+      sortedList
+    };
+
+    if (selectedEntry) {
+      update.selectedIndex = selectedIndex;
+      update.scrollToSelection = true;
+    }
+
+    this.setState(update);
   }
 
   /**
@@ -207,8 +217,6 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
         return v.line === selectedEntry.line;
       });
 
-      console.log(foundIndex);
-
       return foundIndex;
     }
 
@@ -226,6 +234,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     console.debug(selectedEntry);
 
     this.props.state.selectedEntry = selectedEntry;
+    this.props.state.selectedIndex = index;
     this.props.state.isDetailsVisible = true;
     this.setState({
       selectedIndex: index,
@@ -273,6 +282,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
         }
         this.changeSelectedEntry = debounce(() => {
           this.props.state.selectedEntry = nextEntry;
+          this.props.state.selectedIndex = nextIndex;
         }, 100);
         this.changeSelectedEntry();
 

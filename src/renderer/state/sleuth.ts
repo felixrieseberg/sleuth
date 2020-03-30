@@ -2,7 +2,7 @@ import { observable, action, autorun, computed } from 'mobx';
 import { ipcRenderer } from 'electron';
 
 import { UnzippedFile } from '../unzip';
-import { LevelFilter, LogEntry, MergedLogFile, ProcessedLogFile, DateRange, Suggestions, Tool, Bookmark, MergedLogFiles } from '../interfaces';
+import { LevelFilter, LogEntry, MergedLogFile, ProcessedLogFile, DateRange, Suggestions, Tool, Bookmark, MergedLogFiles, LogFile } from '../interfaces';
 import { getItemsInSuggestionFolders } from '../suggestions';
 import { testDateTimeFormat } from '../../utils/test-date-time';
 import { SORT_DIRECTION } from '../components/log-table-constants';
@@ -28,10 +28,11 @@ export class SleuthState {
   // ** Log file selection **
   // The selected log entry (single log message plus meta data)
   @observable public selectedEntry?: LogEntry;
+  @observable public selectedIndex?: number;
   // Path to the source directory (zip file, folder path, etc)
   @observable public source?: string;
   // A reference to the selected log file
-  @observable.ref public selectedLogFile?: ProcessedLogFile | MergedLogFile | UnzippedFile | Tool;
+  @observable.ref public selectedLogFile?: LogFile;
 
   //** Cachetool **
   // When looking at the cache using cachetool, we'll keep the selected
@@ -60,8 +61,7 @@ export class SleuthState {
   @observable public isDetailsVisible: boolean = false;
   @observable public isSidebarOpen: boolean = true;
   @observable public isSpotlightOpen: boolean = false;
-  @observable public bookmarks: Array<Bookmark> = [];
-  @observable public selectedIndex: number | undefined;
+  @observable public bookmarks: Set<Bookmark> = new Set();
 
   // ** Settings **
   @observable public isDarkMode: boolean = !!this.retrieve('isDarkMode', true);
@@ -138,6 +138,31 @@ export class SleuthState {
     this.setMergedFile = this.setMergedFile.bind(this);
 
     ipcRenderer.on('spotlight', this.toggleSpotlight);
+
+    // Debug
+    if (window) {
+      (window as any).sleuthState = this;
+    }
+  }
+
+  /**
+   * Return the file name of the currently selected file.
+   *
+   * @returns {string}
+   */
+  @computed
+  public get selectedFileName(): string {
+    if (isProcessedLogFile(this.selectedLogFile)) {
+      return this.selectedLogFile.logFile.fileName;
+    } else if (isMergedLogFile(this.selectedLogFile)) {
+      return this.selectedLogFile.logType;
+    } else if (isUnzippedFile(this.selectedLogFile)) {
+      return this.selectedLogFile.fileName;
+    } else if (isTool(this.selectedLogFile)) {
+      return capitalize(this.selectedLogFile);
+    } else {
+      return '';
+    }
   }
 
   @action
@@ -190,7 +215,9 @@ export class SleuthState {
   @action
   public reset(goBackToHome: boolean = false) {
     this.selectedEntry = undefined;
+    this.selectedIndex = undefined;
     this.selectedLogFile = undefined;
+    this.bookmarks = new Set();
     this.levelFilter.debug = false;
     this.levelFilter.error = false;
     this.levelFilter.info = false;
@@ -264,24 +291,25 @@ export class SleuthState {
     }
   }
 
-  /**
-   * Return the file name of the currently selected file.
-   *
-   * @returns {string}
-   */
-  @computed
-  public get selectedFileName(): string {
-    if (isProcessedLogFile(this.selectedLogFile)) {
-      return this.selectedLogFile.logFile.fileName;
-    } else if (isMergedLogFile(this.selectedLogFile)) {
-      return this.selectedLogFile.logType;
-    } else if (isUnzippedFile(this.selectedLogFile)) {
-      return this.selectedLogFile.fileName;
-    } else if (isTool(this.selectedLogFile)) {
-      return capitalize(this.selectedLogFile);
-    } else {
-      return '';
+  public saveBookmark() {
+    // No point in saving a bookmark unless we have
+    // a path
+    if (!this.selectedEntry || !this.selectedLogFile) {
+      return;
     }
+
+    const bookmark: Bookmark = {
+      logEntry: this.selectedEntry,
+      logFile: this.selectedLogFile,
+    };
+
+    this.bookmarks.add(bookmark);
+  }
+
+  @action
+  public gotoBookmark(bookmark: Bookmark) {
+    this.selectedLogFile = bookmark.logFile;
+    this.selectedEntry = bookmark.logEntry;
   }
 
   /**

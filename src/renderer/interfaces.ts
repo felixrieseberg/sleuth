@@ -1,7 +1,7 @@
 import { UnzippedFile } from './unzip';
 import fs from 'fs-extra';
 
-export type LogFile = UnzippedFile | MergedLogFile | ProcessedLogFile;
+export type LogFile = UnzippedFile | MergedLogFile | ProcessedLogFile | Tool;
 
 export const enum LogType {
   BROWSER = 'browser',
@@ -38,7 +38,6 @@ export const LOG_TYPES_TO_PROCESS = [
 export interface Bookmark {
   logEntry: LogEntry;
   logFile: LogFile;
-  index: number;
 }
 
 export interface ProcessorPerformanceInfo {
