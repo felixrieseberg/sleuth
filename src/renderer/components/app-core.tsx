@@ -4,7 +4,6 @@ import classNames from 'classnames';
 
 import { getFirstLogFile } from '../../utils/get-first-logfile';
 import { SleuthState } from '../state/sleuth';
-import { UnzippedFiles } from '../unzip';
 import { getTypesForFiles, mergeLogFiles, processLogFiles } from '../processor';
 import {
   LevelFilter,
@@ -14,6 +13,7 @@ import {
   LogType,
   LOG_TYPES_TO_PROCESS,
   SortedUnzippedFiles,
+  UnzippedFiles,
 } from '../interfaces';
 import { AppCoreHeader } from './app-core-header';
 import { Sidebar } from './sidebar';

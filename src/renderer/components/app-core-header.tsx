@@ -4,6 +4,7 @@ import React from 'react';
 import { Alignment, Button, ButtonGroup, Navbar, NavbarGroup } from '@blueprintjs/core';
 
 import { Filter } from './app-core-header-filter';
+import { Bookmarks } from './app-core-header-bookmarks';
 
 export interface AppCoreHeaderProps {
   state: SleuthState;
@@ -32,6 +33,7 @@ export class AppCoreHeader extends React.Component<AppCoreHeaderProps, AppCoreHe
             <Button onClick={() => reset(true)} icon='home' />
             <Button active={!isSidebarOpen} onClick={toggleSidebar} icon={sidebarIcon} />
             <Button active={isDarkMode} onClick={toggleDarkMode} icon='moon' />
+            <Bookmarks state={this.props.state} />
             <Button active={isSpotlightOpen} onClick={toggleSpotlight} icon='geosearch' />
           </ButtonGroup>
         </NavbarGroup>

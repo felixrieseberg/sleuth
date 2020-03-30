@@ -1,7 +1,10 @@
-import { UnzippedFile } from './unzip';
 import fs from 'fs-extra';
 
-export type LogFile = UnzippedFile | MergedLogFile | ProcessedLogFile | Tool;
+// Anything that's valid as a "selected" log file. We started with just
+// actual files  and have since added the "Tool" enum for, well, tools.
+export type SelectableLogFile = LogFile | Tool;
+
+export type LogFile = UnzippedFile | MergedLogFile | ProcessedLogFile;
 
 export const enum LogType {
   BROWSER = 'browser',
@@ -38,6 +41,7 @@ export const LOG_TYPES_TO_PROCESS = [
 export interface Bookmark {
   logEntry: LogEntry;
   logFile: LogFile;
+  index: number;
 }
 
 export interface ProcessorPerformanceInfo {
@@ -75,6 +79,18 @@ export interface MatchResult {
   momentValue?: number;
 }
 
+export interface BaseFile {
+  id: string;
+}
+
+export interface UnzippedFile extends BaseFile {
+  fileName: string;
+  size: number;
+  fullPath: string;
+}
+
+export interface UnzippedFiles extends Array<UnzippedFile> { }
+
 export interface MergedLogFiles {
   all: MergedLogFile;
   browser: MergedLogFile;
@@ -85,7 +101,7 @@ export interface MergedLogFiles {
   type: 'MergedLogFiles';
 }
 
-export interface ProcessedLogFile {
+export interface ProcessedLogFile extends BaseFile {
   levelCounts: Record<string, number>;
   logEntries: Array<LogEntry>;
   logFile: UnzippedFile;
@@ -104,7 +120,7 @@ export interface ProcessedLogFiles {
   installer: Array<UnzippedFile>;
 }
 
-export interface MergedLogFile {
+export interface MergedLogFile extends BaseFile {
   logFiles: Array<ProcessedLogFile>;
   logEntries: Array<LogEntry>;
   logType: LogType;
@@ -145,8 +161,6 @@ export interface Suggestion extends fs.Stats {
 }
 
 export type Suggestions = Array<Suggestion>;
-
-export type SelectLogFileFn = (logFile: ProcessedLogFile | UnzippedFile | null, logType?: string) => void;
 
 export enum Tool {
   cache = 'cache'

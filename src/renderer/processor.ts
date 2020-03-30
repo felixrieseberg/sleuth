@@ -3,8 +3,8 @@ import readline from 'readline';
 import path from 'path';
 
 import { logPerformance } from './processor/performance';
-import { UnzippedFile, UnzippedFiles } from './unzip';
-import { LogEntry, LogType, MatchResult, MergedLogFile, ProcessedLogFile, SortedUnzippedFiles } from './interfaces';
+import { LogEntry, LogType, MatchResult, MergedLogFile, ProcessedLogFile, SortedUnzippedFiles, UnzippedFile, UnzippedFiles } from './interfaces';
+import { getIdForLogFiles } from '../utils/id-for-logfiles';
 
 const debug = require('debug')('sleuth:processor');
 
@@ -69,7 +69,9 @@ export function mergeLogFiles(
         logFiles: logFiles as Array<ProcessedLogFile>,
         logEntries: logFiles[0].logEntries,
         type: 'MergedLogFile',
-        logType
+        logType,
+        // The id just needs to be unique
+        id: (logFiles as Array<ProcessedLogFile>).map(({ id }) => id).join(',')
       };
 
       logPerformance({
@@ -101,7 +103,8 @@ export function mergeLogFiles(
           logFiles: logFiles as Array<ProcessedLogFile>,
           logEntries: sortedLogEntries,
           logType,
-          type: 'MergedLogFile'
+          type: 'MergedLogFile',
+          id: getIdForLogFiles(logFiles)
         };
 
         logPerformance({
@@ -243,7 +246,14 @@ export async function processLogFile(
 
   const timeStart = performance.now();
   const { entries, lines, levelCounts } = await readFile(logFile, logType, progressCb);
-  const result = { logFile, logEntries: entries, logType, type: 'ProcessedLogFile', levelCounts };
+  const result: ProcessedLogFile = {
+    logFile,
+    logEntries: entries,
+    logType,
+    type: 'ProcessedLogFile',
+    levelCounts,
+    id: logFile.fullPath
+  };
 
   logPerformance({
     name: logFile.fileName,
@@ -253,7 +263,7 @@ export async function processLogFile(
     processingTime: performance.now() - timeStart
   });
 
-  return result as ProcessedLogFile;
+  return result;
 }
 
 /**

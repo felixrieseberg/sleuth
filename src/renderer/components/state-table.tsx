@@ -3,13 +3,12 @@ import fs from 'fs-extra';
 import { shell } from 'electron';
 import { Card, Elevation } from '@blueprintjs/core';
 
-import { MergedLogFile, ProcessedLogFile, Tool } from '../interfaces';
+import { SelectableLogFile, UnzippedFile } from '../interfaces';
 import { SleuthState } from '../state/sleuth';
 import { getSettingsInfo } from '../analytics/settings-analytics';
 import { getEnvInfo } from '../analytics/environment-analytics';
 import { getLocalSettingsInfo } from '../analytics/local-settings-analytics';
 import { getNotifWarningsInfo } from '../analytics/notification-warning-analytics';
-import { UnzippedFile } from '../unzip';
 import { JSONView } from './json-view';
 import { parseJSON } from '../../utils/parse-json';
 import { getFontForCSS } from './preferences-font';
@@ -97,7 +96,9 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
   private getFileType(): StateFileType {
     const { selectedLogFile } = this.props.state;
 
-    if (!this.isStateFile(selectedLogFile)) throw new Error('StateTable: No file');
+    if (!this.isStateFile(selectedLogFile)) {
+      throw new Error('StateTable: No file');
+    }
 
     if (this.isHtmlFile(selectedLogFile)) {
       return 'html' as StateFileType;
@@ -325,7 +326,7 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
     return null;
   }
 
-  private isStateFile(file?: ProcessedLogFile | MergedLogFile | UnzippedFile | Tool): file is UnzippedFile {
+  private isStateFile(file?: SelectableLogFile): file is UnzippedFile {
     const _file = file as UnzippedFile;
     return !!_file.fullPath;
   }

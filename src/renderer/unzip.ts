@@ -1,9 +1,11 @@
-import { shouldIgnoreFile } from '../utils/should-ignore-file';
 import yauzl from 'yauzl';
 import fs from 'fs-extra';
 import path from 'path';
 import tmp from 'tmp';
 import { promisify } from 'util';
+
+import { shouldIgnoreFile } from '../utils/should-ignore-file';
+import { UnzippedFile } from './interfaces';
 
 const debug = require('debug')('sleuth:unzip');
 
@@ -27,15 +29,6 @@ export interface YauzlZipEntry {
   externalFileAttributes: number;
   relativeOffsetOfLocalHeader: number;
 }
-
-export interface UnzippedFile {
-  fileName: string;
-  size: number;
-  fullPath: string;
-}
-
-export interface UnzippedFiles extends Array<UnzippedFile> { }
-
 export class Unzipper {
   public readonly url: string;
   public output: string;
@@ -97,7 +90,13 @@ export class Unzipper {
 
         readStream.pipe(fs.createWriteStream(targetPath));
         readStream.once('end', () => {
-          this.files.push({ fileName: entry.fileName, size: entry.uncompressedSize || 0, fullPath: targetPath });
+          this.files.push({
+            fileName: entry.fileName,
+            size: entry.uncompressedSize || 0,
+            fullPath: targetPath,
+            id: targetPath
+          });
+
           debug(`Successfully unzipped ${entry.fileName} to ${targetPath}`);
           resolve();
         });

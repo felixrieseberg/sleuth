@@ -6,8 +6,7 @@ import { Omnibar, ItemRenderer, ItemPredicate } from '@blueprintjs/select';
 import { MenuItem } from '@blueprintjs/core';
 
 import { SleuthState } from '../state/sleuth';
-import { ProcessedLogFiles, ProcessedLogFile } from '../interfaces';
-import { UnzippedFile } from '../unzip';
+import { ProcessedLogFiles, ProcessedLogFile, UnzippedFile } from '../interfaces';
 import { isProcessedLogFile } from '../../utils/is-logfile';
 import { highlightText } from '../../utils/highlight-text';
 

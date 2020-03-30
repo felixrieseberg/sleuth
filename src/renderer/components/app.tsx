@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import fs from 'fs-extra';
 import path from 'path';
 
-import { UnzippedFile, UnzippedFiles, Unzipper } from '../unzip';
+import { Unzipper } from '../unzip';
 import { Welcome } from './welcome';
 import { CoreApplication } from './app-core';
 import { MacTitlebar } from './mac-titlebar';
@@ -15,6 +15,7 @@ import { openBacktrace } from '../backtrace';
 import { SleuthState } from '../state/sleuth';
 import { shouldIgnoreFile } from '../../utils/should-ignore-file';
 import { isCacheDir } from '../../utils/is-cache';
+import { UnzippedFiles, UnzippedFile } from '../interfaces';
 
 const debug = require('debug')('sleuth:app');
 
@@ -105,7 +106,8 @@ export class App extends React.Component<{}, Partial<AppState>> {
     const file: UnzippedFile = {
       fileName: path.basename(url),
       fullPath: url,
-      size: stats.size
+      size: stats.size,
+      id: url
     };
 
     this.sleuthState.setSource(url);
@@ -139,7 +141,7 @@ export class App extends React.Component<{}, Partial<AppState>> {
         if (!shouldIgnoreFile(fileName)) {
           const fullPath = path.join(url, fileName);
           const stats = fs.statSync(fullPath);
-          const file: UnzippedFile = { fileName, fullPath, size: stats.size };
+          const file: UnzippedFile = { fileName, fullPath, size: stats.size, id: fullPath };
 
           debug('Found file, adding to result.', file);
           unzippedFiles.push(file);

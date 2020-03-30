@@ -29,6 +29,7 @@ export interface LogTableProps {
   showOnlySearchResults: boolean;
   searchIndex: number;
   dateRange?: DateRange;
+  selectedIndex?: number;
 }
 
 export interface LogTableState {

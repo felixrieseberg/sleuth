@@ -1,7 +1,6 @@
-import { MergedLogFile, ProcessedLogFile, Tool } from '../renderer/interfaces';
-import { UnzippedFile } from '../renderer/unzip';
+import { Tool, SelectableLogFile, UnzippedFile, ProcessedLogFile, MergedLogFile } from '../renderer/interfaces';
 
-export function isProcessedLogFile(file?: UnzippedFile | MergedLogFile | ProcessedLogFile | Tool): file is ProcessedLogFile {
+export function isProcessedLogFile(file?: SelectableLogFile): file is ProcessedLogFile {
   if (file && (file as ProcessedLogFile).type) {
     return (file as ProcessedLogFile).type && (file as ProcessedLogFile).type === 'ProcessedLogFile';
   }
@@ -9,7 +8,7 @@ export function isProcessedLogFile(file?: UnzippedFile | MergedLogFile | Process
   return false;
 }
 
-export function isMergedLogFile(file?: UnzippedFile | MergedLogFile | ProcessedLogFile | Tool): file is MergedLogFile {
+export function isMergedLogFile(file?: SelectableLogFile): file is MergedLogFile {
   if (file && (file as MergedLogFile).type) {
     return (file as MergedLogFile).type && (file as MergedLogFile).type === 'MergedLogFile';
   }
@@ -17,7 +16,7 @@ export function isMergedLogFile(file?: UnzippedFile | MergedLogFile | ProcessedL
   return false;
 }
 
-export function isUnzippedFile(file?: UnzippedFile | MergedLogFile | ProcessedLogFile | Tool): file is UnzippedFile {
+export function isUnzippedFile(file?: SelectableLogFile): file is UnzippedFile {
   if (file && (file as UnzippedFile).fullPath) {
     return !!((file as UnzippedFile).fileName !== undefined && (file as UnzippedFile).fullPath !== undefined);
   }
@@ -25,10 +24,10 @@ export function isUnzippedFile(file?: UnzippedFile | MergedLogFile | ProcessedLo
   return false;
 }
 
-export function isTool(file?: UnzippedFile | MergedLogFile | ProcessedLogFile | Tool): file is Tool {
+export function isTool(file?: SelectableLogFile): file is Tool {
   return !!(file && (file in Tool));
 }
 
-export function isLogFile(file?: UnzippedFile | MergedLogFile | ProcessedLogFile | Tool): file is (MergedLogFile | ProcessedLogFile) {
+export function isLogFile(file?: SelectableLogFile): file is (MergedLogFile | ProcessedLogFile) {
   return !!(isProcessedLogFile(file) || isMergedLogFile(file));
 }

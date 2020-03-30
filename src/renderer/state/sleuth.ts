@@ -1,15 +1,27 @@
 import { observable, action, autorun, computed } from 'mobx';
 import { ipcRenderer } from 'electron';
 
-import { UnzippedFile } from '../unzip';
-import { LevelFilter, LogEntry, MergedLogFile, ProcessedLogFile, DateRange, Suggestions, Tool, Bookmark, MergedLogFiles, LogFile } from '../interfaces';
 import { getItemsInSuggestionFolders } from '../suggestions';
 import { testDateTimeFormat } from '../../utils/test-date-time';
 import { SORT_DIRECTION } from '../components/log-table-constants';
 import { changeIcon, ICON_NAMES, getIconPath } from '../../utils/app-icon';
 import { setSetting } from '../settings';
-import { isProcessedLogFile, isMergedLogFile, isUnzippedFile, isTool } from '../../utils/is-logfile';
-import { capitalize } from 'lodash';
+import { isProcessedLogFile } from '../../utils/is-logfile';
+import { getFileName } from '../../utils/get-file-name';
+
+import {
+  LevelFilter,
+  LogEntry,
+  MergedLogFile,
+  ProcessedLogFile,
+  DateRange,
+  Suggestions,
+  Tool,
+  Bookmark,
+  MergedLogFiles,
+  UnzippedFile,
+  SelectableLogFile
+} from '../interfaces';
 
 const debug = require('debug')('sleuth:state');
 export const defaults = {
@@ -32,7 +44,7 @@ export class SleuthState {
   // Path to the source directory (zip file, folder path, etc)
   @observable public source?: string;
   // A reference to the selected log file
-  @observable.ref public selectedLogFile?: LogFile;
+  @observable.ref public selectedLogFile?: SelectableLogFile;
 
   //** Cachetool **
   // When looking at the cache using cachetool, we'll keep the selected
@@ -61,7 +73,7 @@ export class SleuthState {
   @observable public isDetailsVisible: boolean = false;
   @observable public isSidebarOpen: boolean = true;
   @observable public isSpotlightOpen: boolean = false;
-  @observable public bookmarks: Set<Bookmark> = new Set();
+  @observable public bookmarks: Array<Bookmark> = [];
 
   // ** Settings **
   @observable public isDarkMode: boolean = !!this.retrieve('isDarkMode', true);
@@ -112,22 +124,21 @@ export class SleuthState {
       changeIcon(this.isMarkIcon ? ICON_NAMES.mark : ICON_NAMES.default);
     });
     autorun(async () => {
-      if (process.platform !== 'darwin') return;
+      if (process.platform === 'darwin') {
+        this.isLoadingCacheKeys = true;
+        if (!this.cachePath) return;
 
-      this.isLoadingCacheKeys = true;
+        const { listKeys } = await import('cachetool');
+        const keys = await listKeys({ cachePath: this.cachePath });
 
-      if (!this.cachePath) return [];
+        // Last entry is sometimes empty
+        if (keys.length > 0 && !keys[keys.length - 1]) {
+          keys.splice(keys.length - 1, 1);
+        }
 
-      const { listKeys } = await import('cachetool');
-      const keys = await listKeys({ cachePath: this.cachePath });
-
-      // Last entry is sometimes empty
-      if (keys.length > 0 && !keys[keys.length - 1]) {
-        keys.splice(keys.length - 1, 1);
+        this.cacheKeys = keys;
+        this.isLoadingCacheKeys = false;
       }
-
-      this.cacheKeys = keys;
-      this.isLoadingCacheKeys = false;
     });
 
     this.reset = this.reset.bind(this);
@@ -152,17 +163,9 @@ export class SleuthState {
    */
   @computed
   public get selectedFileName(): string {
-    if (isProcessedLogFile(this.selectedLogFile)) {
-      return this.selectedLogFile.logFile.fileName;
-    } else if (isMergedLogFile(this.selectedLogFile)) {
-      return this.selectedLogFile.logType;
-    } else if (isUnzippedFile(this.selectedLogFile)) {
-      return this.selectedLogFile.fileName;
-    } else if (isTool(this.selectedLogFile)) {
-      return capitalize(this.selectedLogFile);
-    } else {
-      return '';
-    }
+    return this.selectedLogFile
+      ? getFileName(this.selectedLogFile)
+      : '';
   }
 
   @action
@@ -217,7 +220,7 @@ export class SleuthState {
     this.selectedEntry = undefined;
     this.selectedIndex = undefined;
     this.selectedLogFile = undefined;
-    this.bookmarks = new Set();
+    this.bookmarks = [];
     this.levelFilter.debug = false;
     this.levelFilter.error = false;
     this.levelFilter.info = false;
@@ -289,27 +292,6 @@ export class SleuthState {
     } else {
       return getIconPath(ICON_NAMES.default);
     }
-  }
-
-  public saveBookmark() {
-    // No point in saving a bookmark unless we have
-    // a path
-    if (!this.selectedEntry || !this.selectedLogFile) {
-      return;
-    }
-
-    const bookmark: Bookmark = {
-      logEntry: this.selectedEntry,
-      logFile: this.selectedLogFile,
-    };
-
-    this.bookmarks.add(bookmark);
-  }
-
-  @action
-  public gotoBookmark(bookmark: Bookmark) {
-    this.selectedLogFile = bookmark.logFile;
-    this.selectedEntry = bookmark.logEntry;
   }
 
   /**

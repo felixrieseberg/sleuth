@@ -48,7 +48,8 @@ export class LogContent extends React.Component<LogContentProps, Partial<LogCont
       isDetailsVisible,
       showOnlySearchResults,
       searchIndex,
-      dateRange
+      dateRange,
+      selectedIndex
     } = this.props.state;
 
     if (!selectedLogFile) return null;
@@ -70,6 +71,7 @@ export class LogContent extends React.Component<LogContentProps, Partial<LogCont
               showOnlySearchResults={showOnlySearchResults}
               searchIndex={searchIndex}
               dateRange={dateRange}
+              selectedIndex={selectedIndex}
             />
           </div>
           {isDetailsVisible ? scrubber : null}

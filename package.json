@@ -5,7 +5,7 @@
   "description": "Slack Log Viewer",
   "main": "./dist/src/main/index",
   "scripts": {
-    "tsc": "tsc -p tsconfig.json",
+    "tsc": "tsc -p tsconfig.json --noEmit",
     "lint": "tslint -c tslint.json -p tsconfig.json",
     "package": "electron-forge package",
     "postinstall": "patch-package",
@@ -14,7 +14,6 @@
     "parcel:watch": "node ./tools/parcel-watch.js",
     "publish": "electron-forge publish",
     "start": "rimraf ./dist && electron-forge start",
-    "dev": "electron .",
     "test": "npm run lint && jest --config=jest.json --coverage",
     "update-snapshots": "jest --config=jest.json --updateSnapshot",
     "catapult:update": "git submodule foreach git pull origin master"
