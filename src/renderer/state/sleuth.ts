@@ -63,7 +63,7 @@ export class SleuthState {
   };
   @observable public searchIndex: number = 0;
   @observable public search: string = '';
-  @observable public showOnlySearchResults: boolean = false;
+  @observable public showOnlySearchResults: boolean | undefined;
 
   // ** Various "what are we showing" properties **
   @observable public suggestions: Suggestions = [];

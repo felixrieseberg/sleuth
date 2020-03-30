@@ -36,6 +36,10 @@ export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
   }
 
   public onSearchChange(value: string) {
+    if (this.props.state.showOnlySearchResults === undefined) {
+      this.props.state.showOnlySearchResults = true;
+    }
+
     this.props.state.search = value;
   }
 
