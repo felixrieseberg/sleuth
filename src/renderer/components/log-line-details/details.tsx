@@ -9,7 +9,7 @@ import { LogLineData } from './data';
 import { LogLineComments } from './comments';
 import { Timestamp } from './timestamp';
 import { shell } from 'electron';
-import { getIsBookmark, saveBookmark } from '../../state/bookmarks';
+import { getIsBookmark, saveBookmark, toggleBookmark } from '../../state/bookmarks';
 
 const debug = require('debug')('sleuth:details');
 
@@ -86,7 +86,7 @@ export class LogLineDetails extends React.Component<LogLineDetailsProps, LogLine
             <Tag large={true} icon='box'>{level}</Tag>
             <Tag large={true} icon='applications'>{type}</Tag>
             <ButtonGroup>
-              <Button icon='star' active={getIsBookmark(this.props.state)} onClick={() => saveBookmark(this.props.state)} />
+              <Button icon='star' active={getIsBookmark(this.props.state)} onClick={() => toggleBookmark(this.props.state)} />
               <Button icon='document-open' onClick={this.openSource} text='Open Source' />
               <Button icon='cross' onClick={this.toggle} text='Close' />
             </ButtonGroup>

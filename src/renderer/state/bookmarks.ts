@@ -42,19 +42,30 @@ export function getBookmark(state: SleuthState): Bookmark | undefined {
 }
 
 /**
+ * Delete or create a bookmark
+ *
+ * @param {SleuthState} state
+ * @param {(Bookmark | undefined)} [bookmark=getBookmark(state)]
+ */
+export function toggleBookmark(state: SleuthState, bookmark: Bookmark | undefined = getBookmark(state)): void {
+  if (getIsBookmark(state, bookmark)) {
+    deleteBookmark(state, bookmark);
+  } else {
+    saveBookmark(state, bookmark);
+  }
+}
+
+/**
  * Save the currently selected line as a bookmark.
  *
  * Returns undefined if no bookmark was created.
  */
-export function saveBookmark(state: SleuthState): Bookmark | undefined {
-  const bookmark = getBookmark(state);
-  const hasBookmark = getIsBookmark(state);
+export function saveBookmark(state: SleuthState, bookmark: Bookmark | undefined = getBookmark(state)): void {
+  const hasBookmark = getIsBookmark(state, bookmark);
 
   if (bookmark && !hasBookmark) {
     state.bookmarks.push(bookmark);
   }
-
-  return bookmark;
 }
 
 /**
