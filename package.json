@@ -6,7 +6,7 @@
   "main": "./dist/src/main/index",
   "scripts": {
     "tsc": "tsc -p tsconfig.json --noEmit",
-    "lint": "tslint -c tslint.json -p tsconfig.json",
+    "lint": "npm run tsc && tslint -c tslint.json -p tsconfig.json",
     "package": "electron-forge package",
     "postinstall": "patch-package",
     "make": "electron-forge make",

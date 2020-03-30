@@ -26,7 +26,7 @@ export interface LogTableProps {
   search?: string;
   dateTimeFormat: string;
   state: SleuthState;
-  showOnlySearchResults: boolean;
+  showOnlySearchResults: boolean | undefined;
   searchIndex: number;
   dateRange?: DateRange;
   selectedIndex?: number;

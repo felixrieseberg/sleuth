@@ -9,7 +9,7 @@ import { LogLineData } from './data';
 import { LogLineComments } from './comments';
 import { Timestamp } from './timestamp';
 import { shell } from 'electron';
-import { getIsBookmark, saveBookmark, toggleBookmark } from '../../state/bookmarks';
+import { getIsBookmark, toggleBookmark } from '../../state/bookmarks';
 
 const debug = require('debug')('sleuth:details');
 

@@ -15,7 +15,7 @@ const { DOWN } = Keys;
 export interface CachetoolTableProps {
   search?: string;
   state: SleuthState;
-  showOnlySearchResults: boolean;
+  showOnlySearchResults: boolean | undefined;
   searchIndex: number;
   keys?: Array<string>;
 }

@@ -226,7 +226,7 @@ export class SleuthState {
     this.levelFilter.info = false;
     this.levelFilter.warn = false;
     this.searchIndex = 0;
-    this.showOnlySearchResults = false;
+    this.showOnlySearchResults = undefined;
     this.isSpotlightOpen = false;
     this.isDetailsVisible = false;
     this.dateRange = { from: undefined, to: undefined };
