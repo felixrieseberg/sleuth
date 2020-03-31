@@ -3,11 +3,6 @@ import { ipcRenderer } from 'electron';
 // This file handles sending IPC events. Other classes might
 // listen to IPC events.
 
-export function sendShowMessageBox(
-  options: Electron.MessageBoxOptions
-): Promise<Electron.MessageBoxReturnValue> {
-  return ipcRenderer.invoke('message-box', options);
-}
 
 type name = 'home' | 'appData' | 'userData' | 'cache' | 'temp' | 'exe' | 'module' | 'desktop' | 'documents' | 'downloads' | 'music' | 'pictures' | 'videos' | 'logs' | 'pepperFlashSystemPlugin';
 export function getPath(
@@ -26,4 +21,10 @@ export function showOpenDialog(): Promise<Electron.OpenDialogReturnValue> {
 
 export function showSaveDialog(filename: string): Promise<Electron.SaveDialogReturnValue> {
   return ipcRenderer.invoke('show-save-dialog', filename);
+}
+
+export function showMessageBox(
+  options: Electron.MessageBoxOptions
+): Promise<Electron.MessageBoxReturnValue> {
+  return ipcRenderer.invoke('message-box', options);
 }

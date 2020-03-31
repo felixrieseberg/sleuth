@@ -4,7 +4,7 @@ import path from 'path';
 import { formatDistanceToNow } from 'date-fns';
 
 import { Suggestions, Suggestion } from './interfaces';
-import { getPath, sendShowMessageBox } from './ipc';
+import { getPath, showMessageBox } from './ipc';
 
 const debug = require('debug')('sleuth:suggestions');
 
@@ -39,7 +39,7 @@ export async function deleteSuggestion(filePath: string) {
     ? 'trash'
     : 'recycle bin';
 
-  const { response } = await sendShowMessageBox({
+  const { response } = await showMessageBox({
     title: 'Delete File?',
     message: `Do you want to move ${filePath} to the ${trashName}?`,
     type: 'question',
@@ -59,7 +59,7 @@ export async function deleteSuggestions(filePaths: Array<string>) {
     ? 'trash'
     : 'recycle bin';
 
-  const { response } = await sendShowMessageBox({
+  const { response } = await showMessageBox({
     title: 'Delete Files?',
     message: `Do you want to move all log files older than 48 hours to the ${trashName}?`,
     type: 'question',

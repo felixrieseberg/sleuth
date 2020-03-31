@@ -4,7 +4,7 @@ import { Card, FormGroup, Button, EditableText } from '@blueprintjs/core';
 
 import { cooperComments } from '../../cooper/comments';
 import { SleuthState } from '../../state/sleuth';
-import { sendShowMessageBox } from '../../ipc';
+import { showMessageBox } from '../../ipc';
 
 const debug = require('debug')('sleuth:cooper');
 
@@ -61,7 +61,7 @@ export class PostComment extends React.Component<PostCommentProps, Partial<PostC
       .catch((error) => {
         debug(`Tried to post comment to cooper, but failed`, error);
 
-        sendShowMessageBox({
+        showMessageBox({
           title: `Posting Failed`,
           type: 'error',
           message: `We could not reach the log service and failed to post your comment 😢`,

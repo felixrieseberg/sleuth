@@ -5,6 +5,8 @@ import { SleuthState } from './sleuth';
 import lzString from 'lz-string';
 import * as path from 'path';
 import { clipboard } from 'electron';
+import { showMessageBox } from '../ipc';
+import { plural } from '../../utils/pluralize';
 
 /**
  * Go to the given bookmark
@@ -312,11 +314,11 @@ export function exportBookmarks(state: SleuthState) {
  * @param {SleuthState} state
  * @param {string} input
  */
-export function importBookmarks(state: SleuthState, input: string) {
+export async function importBookmarks(state: SleuthState, input: string) {
   try {
     const raw = lzString.decompressFromEncodedURIComponent(input);
     const data = JSON.parse(raw);
-    const deserialized = data.b
+    const deserialized: Array<Bookmark> = data.b
       .map(decompressBookmark)
       .map((v: SerializedBookmark) => deserializeBookmark(state, v))
       .filter((v: Bookmark) => !!v);
@@ -325,9 +327,21 @@ export function importBookmarks(state: SleuthState, input: string) {
       throw new Error('We could parse the data, but we could not find any matching bookmarks.');
     }
 
-    alert(`We successfully imported the bookmarks. You can now find them in the bookmark menu.`);
+    // Let's first see if the user actually wants this
+    const { response } = await showMessageBox({
+      type: 'question',
+      title: 'Import bookmarks?',
+      message: `We're ready to import ${deserialized.length} ${plural('bookmark', deserialized.length)}.`,
+      buttons: [ 'Merge with my bookmarks', 'Replace my bookmarks', 'Cancel' ],
+      defaultId: 0,
+    });
 
-    state.bookmarks = deserialized;
+    // Merge
+    if (response === 0) {
+      deserialized.forEach((v) => saveBookmark(state, v));
+    } else if (response === 1) {
+      state.bookmarks = deserialized;
+    }
   } catch (error) {
     alert(`We tried to parse the bookmark data, but failed. The error was: ${error}`);
   }

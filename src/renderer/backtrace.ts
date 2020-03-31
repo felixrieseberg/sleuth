@@ -1,6 +1,6 @@
 import * as fs from 'fs-extra';
 
-import { sendShowMessageBox } from './ipc';
+import { showMessageBox } from './ipc';
 import { shell } from 'electron';
 
 const debug = require('debug')('sleuth:backtrace');
@@ -8,7 +8,7 @@ const debug = require('debug')('sleuth:backtrace');
 export async function openBacktrace(installationFilePath?: string): Promise<void> {
   // No file? Do nothing
   if (!installationFilePath) {
-    sendShowMessageBox({
+    showMessageBox({
       title: 'No installation id found',
       message: 'We did not find an installation id in this set of logs and can therefore not look for crashes for this user.',
     });

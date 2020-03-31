@@ -21,7 +21,7 @@ import { Loading } from './loading';
 import { LogContent } from './log-content';
 import { flushLogPerformance } from '../processor/performance';
 import { Spotlight } from './spotlight';
-import { sendShowMessageBox } from '../ipc';
+import { showMessageBox } from '../ipc';
 import { rehydrateBookmarks } from '../state/bookmarks';
 
 export interface CoreAppProps {
@@ -104,7 +104,7 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
     const noFiles = Object.keys(sortedUnzippedFiles).map((k) => sortedUnzippedFiles[k]).every((s) => s.length === 0);
 
     if (noFiles && !cachePath) {
-      sendShowMessageBox({
+      showMessageBox({
         title: 'Huh, weird logs!',
         message: 'Sorry, Sleuth does not understand the files. It seems like there are no Slack logs here.',
         type: 'error'
