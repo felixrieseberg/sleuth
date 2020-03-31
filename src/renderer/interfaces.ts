@@ -50,9 +50,12 @@ export interface SerializedBookmark {
   };
   logFile: {
     id: string;
-    type: string;
+    type: 'ProcessedLogFile' | 'MergedLogFile';
   };
 }
+
+// [ logEntry.line, logEntry.index, logFile.id, logFile.type ]
+export type CompressedBookmark = [ number, number, string, number ];
 
 export interface ProcessorPerformanceInfo {
   name: string;

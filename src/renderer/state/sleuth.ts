@@ -24,7 +24,7 @@ import {
   ProcessedLogFiles,
   SerializedBookmark
 } from '../interfaces';
-import { rehydrateBookmarks } from './bookmarks';
+import { rehydrateBookmarks, importBookmarks } from './bookmarks';
 
 const debug = require('debug')('sleuth:state');
 export const defaults = {
@@ -156,6 +156,7 @@ export class SleuthState {
     this.setMergedFile = this.setMergedFile.bind(this);
 
     ipcRenderer.on('spotlight', this.toggleSpotlight);
+    ipcRenderer.on('open-bookmarks', (_event, data) => importBookmarks(this, data));
 
     // Debug
     if (window) {

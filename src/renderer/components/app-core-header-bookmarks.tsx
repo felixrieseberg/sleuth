@@ -12,7 +12,7 @@ import { SleuthState } from '../state/sleuth';
 import { Bookmark } from '../interfaces';
 import { getFileName } from '../../utils/get-file-name';
 import { truncate } from '../../utils/truncate-string';
-import { saveBookmark, goToBookmark } from '../state/bookmarks';
+import { saveBookmark, goToBookmark, exportBookmarks, deleteAllBookmarks } from '../state/bookmarks';
 
 export interface BookmarksProps {
   state: SleuthState;
@@ -43,15 +43,33 @@ export class Bookmarks extends React.Component<BookmarksProps, Partial<Bookmarks
     const items = bookmarks.map(this.renderBookmark);
 
     if (items.length > 0) {
-      items.push(<Menu.Divider />);
+      items.push(
+        <Menu.Divider />,
+        (
+          <Menu.Item
+            icon='trash'
+            text='Delete all bookmarks'
+            onClick={() => deleteAllBookmarks(this.props.state)}
+          />
+        ),
+        (
+          <Menu.Item
+            icon='export'
+            text='Export bookmarks'
+            onClick={() => exportBookmarks(this.props.state)}
+          />
+        ),
+      );
     }
 
     items.push(
-      <Menu.Item
-        icon='star'
-        text='Add this log message to bookmarks'
-        onClick={() => saveBookmark(this.props.state)}
-      />
+      (
+        <Menu.Item
+          icon='star'
+          text='Add this log message to bookmarks'
+          onClick={() => saveBookmark(this.props.state)}
+        />
+      )
     );
 
     return items;

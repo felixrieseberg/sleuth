@@ -19,6 +19,12 @@ app.allowRendererProcessReuse = false;
 if (require('electron-squirrel-startup')) {
   // No-op, we're done here
 } else {
+  const gotTheLock = app.requestSingleInstanceLock();
+
+  if (!gotTheLock) {
+    app.quit();
+  }
+
   console.log(`Booting application (ready status: ${app.isReady()})`);
 
   // Whenever the app has finished launching

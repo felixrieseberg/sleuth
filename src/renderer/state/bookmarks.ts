@@ -1,6 +1,10 @@
-import { Bookmark, SerializedBookmark, ProcessedLogFile, LogFile, LogEntry } from '../interfaces';
+import { Bookmark, SerializedBookmark, ProcessedLogFile, LogFile, LogEntry, CompressedBookmark } from '../interfaces';
 import { isTool, isUnzippedFile } from '../../utils/is-logfile';
 import { SleuthState } from './sleuth';
+
+import lzString from 'lz-string';
+import * as path from 'path';
+import { clipboard } from 'electron';
 
 /**
  * Go to the given bookmark
@@ -85,6 +89,16 @@ export function deleteBookmark(state: SleuthState, bookmark: Bookmark | undefine
 }
 
 /**
+ * Drop all bookmarks
+ *
+ * @export
+ * @param {SleuthState} state
+ */
+export function deleteAllBookmarks(state: SleuthState) {
+  state.bookmarks = [];
+}
+
+/**
  * Is the currently selected line (or passed bookmark) a bookmark?
  *
  * @param {Bookmark} [bookmark=state.getBookmark()]
@@ -122,6 +136,14 @@ export function saveBookmarks(state: SleuthState) {
   state.serializedBookmarks[source] = serialized;
 }
 
+/**
+ * Takes serialized bookmarks (usually found in localStorage) and
+ * tries to get the corresponding logFile and logEntry objects
+ *
+ * @export
+ * @param {SleuthState} state
+ * @returns
+ */
 export function rehydrateBookmarks(state: SleuthState) {
   const { source, serializedBookmarks } = state;
 
@@ -215,3 +237,99 @@ export function deserializeBookmark(state: SleuthState, serialized: SerializedBo
     logEntry
   };
 }
+
+export const CompressedLogTypes = {
+  ProcessedLogFile: 0,
+  MergedLogFile: 1
+};
+
+/**
+ * Tries to get the SerializedBookmark down to a smaller size.
+ *
+ * @param {SerializedBookmark} input
+ * @returns {CompressedBookmark}
+ */
+export function compressBookmark(input: SerializedBookmark): CompressedBookmark {
+  return [input.logEntry.line, input.logEntry.index, input.logFile.id, CompressedLogTypes[input.logFile.type]];
+}
+
+/**
+ * Turn a compressed bookmark into a SerializedBookmark
+ *
+ * @param {CompressedBookmark} input
+ * @returns {SerializedBookmark}
+ */
+export function decompressBookmark(input: CompressedBookmark): SerializedBookmark {
+  const logFileType = Object.keys(CompressedLogTypes).find((key) => {
+    return input[3] === CompressedLogTypes[key];
+  }) as 'MergedLogFile' | 'ProcessedLogFile';
+
+  return {
+    logEntry: {
+      line: input[0],
+      index: input[1]
+    },
+    logFile: {
+      id: input[2],
+      type: logFileType
+    }
+  };
+}
+
+/**
+ * Export bookmarks to the clipboard
+ *
+ * @param {SleuthState} state
+ */
+export function exportBookmarks(state: SleuthState) {
+  const source = path.basename(state.source || '');
+  const serialized = state.bookmarks
+    .map(serializeBookmark)
+    .map(compressBookmark);
+
+  const data = JSON.stringify({
+    s: source,
+    b: serialized
+  });
+
+  const compressed = lzString.compressToEncodedURIComponent(data);
+  const link = `sleuth://bookmarks?data=${compressed}`;
+
+  console.group(`Exporting bookmarks`);
+  console.log(`Serialized`, serialized);
+  console.log(`Data`, data);
+  console.log(`Link`, link);
+  console.groupEnd();
+
+  clipboard.writeText(link);
+  alert(`A link containing the bookmarks has been written to your clipboard.`);
+}
+
+/**
+ * Import bookmarks
+ *
+ * @export
+ * @param {SleuthState} state
+ * @param {string} input
+ */
+export function importBookmarks(state: SleuthState, input: string) {
+  try {
+    const raw = lzString.decompressFromEncodedURIComponent(input);
+    const data = JSON.parse(raw);
+    const deserialized = data.b
+      .map(decompressBookmark)
+      .map((v: SerializedBookmark) => deserializeBookmark(state, v))
+      .filter((v: Bookmark) => !!v);
+
+    if (deserialized.length === 0) {
+      throw new Error('We could parse the data, but we could not find any matching bookmarks.');
+    }
+
+    alert(`We successfully imported the bookmarks. You can now find them in the bookmark menu.`);
+
+    state.bookmarks = deserialized;
+  } catch (error) {
+    alert(`We tried to parse the bookmark data, but failed. The error was: ${error}`);
+  }
+}
+
