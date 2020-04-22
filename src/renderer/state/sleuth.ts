@@ -25,6 +25,7 @@ import {
   SerializedBookmark
 } from '../interfaces';
 import { rehydrateBookmarks, importBookmarks } from './bookmarks';
+import { copy } from './copy';
 
 const debug = require('debug')('sleuth:state');
 export const defaults = {
@@ -163,6 +164,8 @@ export class SleuthState {
 
     ipcRenderer.on('spotlight', this.toggleSpotlight);
     ipcRenderer.on('open-bookmarks', (_event, data) => importBookmarks(this, data));
+    ipcRenderer.on('copy', () => copy(this));
+    document.oncopy = () => copy(this);
 
     // Debug
     if (window) {

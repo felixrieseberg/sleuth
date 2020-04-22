@@ -15,6 +15,7 @@ import {
 import { DateRangeInput } from '@blueprintjs/datetime';
 
 import { SleuthState } from '../state/sleuth';
+import { ipcRenderer } from 'electron';
 
 export interface FilterProps {
   state: SleuthState;
@@ -25,6 +26,8 @@ export interface FilterState {
 
 @observer
 export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
+  private searchRef = React.createRef<HTMLInputElement>();
+
   constructor(props: FilterProps) {
     super(props);
 
@@ -33,6 +36,19 @@ export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
     this.onSearchChange = debounce(this.onSearchChange.bind(this), 700);
     this.onDateRangeChange = this.onDateRangeChange.bind(this);
     this.renderFilter = this.renderFilter.bind(this);
+    this.focus = this.focus.bind(this);
+  }
+
+  public focus() {
+    this.searchRef.current?.focus();
+  }
+
+  public componentDidMount() {
+    ipcRenderer.on('find', this.focus);
+  }
+
+  public componentWillUnmount() {
+    ipcRenderer.off('find', this.focus);
   }
 
   public onSearchChange(value: string) {
@@ -143,6 +159,7 @@ export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
           <NavbarDivider />
           <InputGroup
             leftIcon='search'
+            inputRef={this.searchRef as any}
             placeholder='Search'
             rightElement={showOnlySearchResultsButton}
             onChange={(e: React.FormEvent) => this.onSearchChange((e.target as any).value)}

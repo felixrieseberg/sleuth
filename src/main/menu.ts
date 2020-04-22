@@ -224,6 +224,33 @@ export class AppMenu {
     }
   }
 
+  public getEditMenu(): Electron.MenuItemConstructorOptions {
+    return {
+      label: 'Edit',
+      submenu: [
+        {
+          role: 'cut',
+        }, {
+          label: 'Copy',
+          accelerator: 'CmdOrCtrl+C',
+          click(_item: Electron.MenuItem, browserWindow: BrowserWindow) {
+            browserWindow.webContents.send('copy');
+          }
+        }, {
+          role: 'paste'
+        }, {
+          type: 'separator'
+        }, {
+          label: 'Find',
+          accelerator: 'CmdOrCtrl+F',
+          click(_item: Electron.MenuItem, browserWindow: BrowserWindow) {
+            browserWindow.webContents.send('find');
+          }
+        }
+      ]
+    };
+  }
+
   /**
    * Actually creates the menu.
    */
@@ -253,12 +280,16 @@ export class AppMenu {
       ...this.getOpenItems()
     ];
 
+    const edit = this.getEditMenu();
+
     if (process.platform === 'darwin') {
       (this.menu[0].submenu as Array<any>).splice(1, 0, preferencesItem);
       this.menu.splice(1, 0, { label: 'File', submenu: newAndOpen });
+      this.menu.splice(2, 0, edit);
     } else {
       const windowsLinuxSubmenu = [ ...newAndOpen, { type: 'separator' }, preferencesItem ];
       this.menu.splice(0, 1, { label: 'File', submenu: windowsLinuxSubmenu });
+      this.menu.splice(1, 0, edit);
     }
 
     this.insertSpotlightItem();

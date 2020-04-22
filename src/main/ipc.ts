@@ -14,6 +14,7 @@ export class IpcManager {
     this.setupSettings();
     this.setupOpenDialog();
     this.setupSaveDialog();
+    this.setupCopy();
   }
 
   public openFile(pathName: string) {
@@ -123,6 +124,13 @@ export class IpcManager {
         defaultPath: path.join(app.getPath('downloads'), filename),
         properties: ['createDirectory']
       });
+    });
+  }
+
+  private setupCopy() {
+    ipcMain.handle('webcontents-copy', (event) => {
+      const window = BrowserWindow.fromWebContents(event.sender);
+      window?.webContents.copy();
     });
   }
 }
