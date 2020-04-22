@@ -18,7 +18,7 @@ import {
   RowClickEvent
 } from './log-table-constants';
 import { isMergedLogFile } from '../../utils/is-logfile';
-import { getRegExpSafe } from '../../utils/regexp';
+import { getRegExpMaybeSafe } from '../../utils/regexp';
 
 const debug = require('debug')('sleuth:logtable');
 const { DOWN } = Keys;
@@ -329,7 +329,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    * @returns Array<LogEntry>
    */
   private doSearchFilter(search: string, list: Array<LogEntry>): Array<LogEntry> {
-    let searchRegex = new RegExp(search || '', 'i');
+    let searchRegex = getRegExpMaybeSafe(search || '');
 
     function doSearch(a: LogEntry) { return (!search || searchRegex.test(a.message)); }
     function doExclude(a: LogEntry) { return (!search || !searchRegex.test(a.message)); }
@@ -338,7 +338,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     searchParams.forEach((param) => {
       if (param.startsWith('!') && param.length > 1) {
         debug(`Filter-Excluding ${param.slice(1)}`);
-        searchRegex = new RegExp(param.slice(1) || '', 'i');
+        searchRegex = getRegExpMaybeSafe(param.slice(1) || '');
         list = list.filter(doExclude);
       } else {
         debug(`Filter-Searching for ${param}`);
@@ -357,7 +357,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    * @returns Array<number>
    */
   private doSearchIndex(search: string, list: Array<LogEntry>): Array<number> {
-    let searchRegex = getRegExpSafe(search);
+    let searchRegex = getRegExpMaybeSafe(search);
 
     const foundIndices: Array<number> = [];
 
@@ -374,7 +374,7 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
     searchParams.forEach((param) => {
       if (param.startsWith('!') && param.length > 1) {
         debug(`Index-Excluding ${param.slice(1)}`);
-        searchRegex = getRegExpSafe(param.slice(1));
+        searchRegex = getRegExpMaybeSafe(param.slice(1));
         list.forEach(doExclude);
       } else {
         debug(`Index-Searching for ${param}`);

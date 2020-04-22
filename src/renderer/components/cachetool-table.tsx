@@ -7,7 +7,7 @@ import { Table, AutoSizer, Column } from 'react-virtualized';
 
 import { SleuthState } from '../state/sleuth';
 import { SORT_DIRECTION, LogTableColumnWidths, SortFilterListOptions, RowClickEvent } from './log-table-constants';
-import { getRegExpSafe } from '../../utils/regexp';
+import { getRegExpMaybeSafe } from '../../utils/regexp';
 
 const debug = require('debug')('sleuth:Cachetooltable');
 const { DOWN } = Keys;
@@ -256,7 +256,7 @@ export class CachetoolTable extends React.Component<CachetoolTableProps, Partial
    * @returns Array<string>
    */
   private doSearchFilter(search: string, list: Array<string>): Array<string> {
-    let searchRegex = new RegExp(search || '', 'i');
+    let searchRegex = getRegExpMaybeSafe(search || '');
 
     function doSearch(a: string) { return (!search || searchRegex.test(a)); }
     function doExclude(a: string) { return (!search || !searchRegex.test(a)); }
@@ -284,7 +284,7 @@ export class CachetoolTable extends React.Component<CachetoolTableProps, Partial
    * @returns Array<number>
    */
   private doSearchIndex(search: string, list: Array<string>): Array<number> {
-    let searchRegex = getRegExpSafe(search);
+    let searchRegex = getRegExpMaybeSafe(search);
 
     const foundIndices: Array<number> = [];
 
@@ -301,7 +301,7 @@ export class CachetoolTable extends React.Component<CachetoolTableProps, Partial
     searchParams.forEach((param) => {
       if (param.startsWith('!') && param.length > 1) {
         debug(`Index-Excluding ${param.slice(1)}`);
-        searchRegex = getRegExpSafe(param.slice(1));
+        searchRegex = getRegExpMaybeSafe(param.slice(1));
         list.forEach(doExclude);
       } else {
         debug(`Index-Searching for ${param}`);
