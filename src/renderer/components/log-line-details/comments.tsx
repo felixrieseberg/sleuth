@@ -114,13 +114,24 @@ export class LogLineComments extends React.Component<LogLineCommentsProps, Parti
     );
   }
 
+  public renderRangeError() {
+    return (
+      <div className='Comments'>
+        <h4>Log Intelligence</h4>
+        <p>We can't search the database for multiple log lines. Select a single line for comments from fellow Slack employees!</p>
+        <CooperSignInOutButton state={this.props.state} />
+      </div>
+    );
+  }
+
   public render() {
-    const { isCooperSignedIn } = this.props.state;
+    const { isCooperSignedIn, selectedRangeEntries } = this.props.state;
     const { comments, line, lineId, searchLine } = this.state;
     const renderedComments = comments!.map(this.renderComment);
 
     if (!line) return null;
     if (!isCooperSignedIn) return this.renderSignInNeccessary();
+    if (selectedRangeEntries && selectedRangeEntries.length > 1) return this.renderRangeError();
 
     return (
       <div className='Comments'>

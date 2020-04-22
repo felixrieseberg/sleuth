@@ -19,6 +19,8 @@ import {
 } from './log-table-constants';
 import { isMergedLogFile } from '../../utils/is-logfile';
 import { getRegExpMaybeSafe } from '../../utils/regexp';
+import { between } from '../../utils/is-between';
+import { getRangeEntries } from '../../utils/get-range-from-array';
 
 const debug = require('debug')('sleuth:logtable');
 const { DOWN } = Keys;
@@ -54,10 +56,11 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    */
   public shouldComponentUpdate(nextProps: LogTableProps, nextState: LogTableState): boolean {
     const { dateTimeFormat, levelFilter, logFile, searchIndex, dateRange } = this.props;
-    const { sortBy, sortDirection, sortedList, searchList, selectedIndex } = this.state;
+    const { sortBy, sortDirection, sortedList, searchList, selectedIndex, selectedRangeIndex } = this.state;
 
     // Selected row changed
     if (selectedIndex !== nextState.selectedIndex) return true;
+    if (selectedRangeIndex !== nextState.selectedRangeIndex) return true;
 
     // DateTimeFormat changed
     if (dateTimeFormat !== nextProps.dateTimeFormat) return true;
@@ -158,6 +161,10 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
       });
     }
 
+    if (fileChanged) {
+      this.setState({ selectedRangeIndex: undefined });
+    }
+
     if (isMergedLogFile(nextFile) && this.state.sortBy === 'index') {
       this.setState({ sortBy: 'momentValue' });
     }
@@ -239,16 +246,33 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    *
    * @param {RowClickEvent} { index }
    */
-  private onRowClick({ index }: RowClickEvent) {
-    const selectedEntry = this.state.sortedList![index] || null;
+  private onRowClick({ index, event }: RowClickEvent) {
+    const { sortedList } = this.state;
 
-    console.debug(selectedEntry);
+    // If the user held shift, we want to do a "from-to" selection
+    const isFromToSelection = !!(event as any).shiftKey;
 
+    const selectedIndex = isFromToSelection
+      ? this.props.state.selectedIndex
+      : index;
+    const selectedRangeIndex = isFromToSelection
+      ? index
+      : undefined;
+    const selectedRange = isFromToSelection
+      && selectedIndex !== undefined && selectedRangeIndex !== undefined
+        ? getRangeEntries(selectedRangeIndex, selectedIndex, sortedList!)
+        : undefined;
+    const selectedEntry = sortedList![selectedIndex!] || null;
+
+    this.props.state.selectedRangeEntries = selectedRange;
     this.props.state.selectedEntry = selectedEntry;
-    this.props.state.selectedIndex = index;
+    this.props.state.selectedIndex = selectedIndex;
+    this.props.state.selectedRangeIndex = selectedRangeIndex;
     this.props.state.isDetailsVisible = true;
+
     this.setState({
-      selectedIndex: index,
+      selectedIndex,
+      selectedRangeIndex,
       ignoreSearchIndex: true,
       scrollToSelection: false
     });
@@ -602,11 +626,13 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    * @returns {string}
    */
   private rowClassNameGetter({ index }: { index: number }): string {
-    const { searchList, selectedIndex, ignoreSearchIndex } = this.state;
+    const { searchList, selectedIndex, selectedRangeIndex, ignoreSearchIndex } = this.state;
     const isSearchIndex = !ignoreSearchIndex
       && index === (searchList || [])[this.props.searchIndex];
+    const isRangeActive = selectedIndex !== undefined && selectedRangeIndex !== undefined
+      && between(index, selectedIndex, selectedRangeIndex);
 
-    if (isSearchIndex || selectedIndex === index) {
+    if (isSearchIndex || selectedIndex === index || isRangeActive) {
       return 'ActiveRow';
     }
 

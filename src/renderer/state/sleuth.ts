@@ -44,6 +44,12 @@ export class SleuthState {
   // The selected log entry (single log message plus meta data)
   @observable public selectedEntry?: LogEntry;
   @observable public selectedIndex?: number;
+  // If not undefined, the user selected a range. If defined,
+  // it's the previous selected index
+  @observable public selectedRangeIndex?: number;
+  // All the entries in the range. Let's hope this isn't horribly slow.
+  // We should only over change the whole array.
+  @observable.ref public selectedRangeEntries?: Array<LogEntry>;
   // Path to the source directory (zip file, folder path, etc)
   @observable public source?: string;
   // A reference to the selected log file
@@ -260,6 +266,9 @@ export class SleuthState {
   @action
   public selectLogFile(logFile: ProcessedLogFile | UnzippedFile | null, logType?: string): void {
     this.selectedEntry = undefined;
+    this.selectedRangeEntries = undefined;
+    this.selectedRangeIndex = undefined;
+    this.selectedIndex = undefined;
 
     if (!logFile && logType) {
       debug(`Selecting log type ${logType}`);

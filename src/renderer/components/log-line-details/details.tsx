@@ -3,6 +3,7 @@ import { SleuthState } from '../../state/sleuth';
 import React from 'react';
 import classNames from 'classnames';
 import { Card, Button, ButtonGroup, Tag, Elevation } from '@blueprintjs/core';
+import { uniq, capitalize } from 'lodash';
 
 import { LogEntry } from '../../interfaces';
 import { LogLineData } from './data';
@@ -26,6 +27,7 @@ export class LogLineDetails extends React.Component<LogLineDetailsProps, LogLine
 
     this.toggle = this.toggle.bind(this);
     this.openSource = this.openSource.bind(this);
+    this.renderLogEntry = this.renderLogEntry.bind(this);
 
     if (process.platform !== 'win32') {
       process.env.PATH = process.env.PATH + ':/usr/local/bin';
@@ -66,25 +68,43 @@ export class LogLineDetails extends React.Component<LogLineDetailsProps, LogLine
     }
   }
 
+  public render(): JSX.Element | null {
+    const { isDetailsVisible } = this.props.state;
+
+    if (!isDetailsVisible) return null;
+
+    const className = classNames('Details', { IsVisible: isDetailsVisible });
+
+    return (
+      <div className={className}>
+        {this.renderLogEntry()}
+        {this.renderLogLineData()}
+        <LogLineComments state={this.props.state} />
+      </div>
+    );
+  }
+
   /**
    * Renders a single log entry, ensuring that people can scroll around and still now what log entry they're looking at.
    *
-   * @param {LogEntry} logEntry
    * @returns {(JSX.Element | null)}
    */
-  public renderLogEntry(logEntry: LogEntry): JSX.Element | null {
-    const { level, logType, message, timestamp, momentValue } = logEntry;
-    const type = `${logType.charAt(0).toUpperCase() + logType.slice(1)} Process`;
+  private renderLogEntry(): JSX.Element | null {
+    const { selectedEntry } = this.props.state;
+    if (!selectedEntry) return null;
 
     return (
       <div className='Details-LogEntry'>
         <div className='MetaInfo'>
           <div className='Details-Moment'>
-            <Timestamp timestamp={timestamp} momentValue={momentValue} />
+            <Timestamp
+              timestamps={this.getProperties('timestamp')}
+              momentValues={this.getProperties('momentValue')}
+            />
           </div>
           <div className='Details-LogType'>
-            <Tag large={true} icon='box'>{level}</Tag>
-            <Tag large={true} icon='applications'>{type}</Tag>
+            {this.renderLevel()}
+            {this.renderType()}
             <ButtonGroup>
               <Button icon='star' active={getIsBookmark(this.props.state)} onClick={() => toggleBookmark(this.props.state)} />
               <Button icon='document-open' onClick={this.openSource} text='Open Source' />
@@ -92,26 +112,65 @@ export class LogLineDetails extends React.Component<LogLineDetailsProps, LogLine
             </ButtonGroup>
           </div>
         </div>
-        <Card className='Message Monospace' elevation={Elevation.THREE}>{message}</Card>
+        {this.renderMessage()}
       </div>
     );
   }
 
-  public render(): JSX.Element | null {
-    const { selectedEntry } = this.props.state;
-    const { isDetailsVisible } = this.props.state;
+  private renderLogLineData(): JSX.Element | null {
+    const { selectedEntry, selectedRangeEntries } = this.props.state;
+    if (!selectedEntry) return null;
 
-    if (!isDetailsVisible) return null;
-
-    const className = classNames('Details', { IsVisible: isDetailsVisible });
-    const logEntryInfo = selectedEntry ? this.renderLogEntry(selectedEntry) : null;
+    // Don't show data for multiple entries
+    if (selectedRangeEntries && selectedRangeEntries.length > 1) {
+      return null;
+    }
 
     return (
-      <div className={className}>
-        {logEntryInfo}
-        <LogLineData state={this.props.state} raw={selectedEntry ? selectedEntry.meta : ''} />
-        <LogLineComments state={this.props.state} />
-      </div>
+      <LogLineData state={this.props.state} raw={selectedEntry?.meta || ''} />
     );
+  }
+
+  private renderMessage(): JSX.Element {
+    const message = this.getProperties('message').join('\n');
+
+    return (
+      <Card className='Message Monospace' elevation={Elevation.THREE}>{message}</Card>
+    );
+  }
+
+  private renderLevel(): JSX.Element {
+    const levels = uniq(this.getProperties('level')).join(', ');
+
+    return (
+      <Tag large={true} icon='box'>{levels}</Tag>
+    );
+  }
+
+  private renderType(): JSX.Element {
+    const logTypes = uniq(this.getProperties('logType')).map(capitalize);
+    const type = `${logTypes.join(', ')} Process${logTypes.length > 1 ? 'es' : ''}`;
+
+    return (
+      <Tag large={true} icon='applications'>{type}</Tag>
+    );
+  }
+
+  /**
+   * Get an array of all the details for the currently selected entries.
+   *
+   * @param {keyof LogEntry} key
+   * @memberof LogLineDetails
+   */
+  private getProperties<T>(key: keyof LogEntry): Array<T> {
+    const { selectedEntry, selectedRangeEntries } = this.props.state;
+
+    if (selectedRangeEntries && selectedRangeEntries.length > 0) {
+      return selectedRangeEntries.map((v) => v[key]);
+    } else  if (selectedEntry) {
+      return [ selectedEntry[key] ];
+    }
+
+    return [];
   }
 }
