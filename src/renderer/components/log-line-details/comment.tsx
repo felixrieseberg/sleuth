@@ -130,7 +130,7 @@ export class Comment extends React.Component<CommentProps, Partial<CommentState>
   public render(): JSX.Element {
     const { name, comment, avatar, timestamp } = this.props;
     const { isEditing } = this.state;
-    const time = format(timestamp, 'MMMM Do y');
+    const time = format(timestamp, 'MMMM do y, h:mm:ss a');
     const avatarStyle = { backgroundImage: `url(${avatar})` };
     const editBtn = this.renderEditButton();
 
