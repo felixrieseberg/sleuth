@@ -625,7 +625,8 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
    * @param {number} rowIndex
    * @returns {string}
    */
-  private rowClassNameGetter({ index }: { index: number }): string {
+  private rowClassNameGetter(input: { index: number }): string {
+    const { index } = input;
     const { searchList, selectedIndex, selectedRangeIndex, ignoreSearchIndex } = this.state;
     const isSearchIndex = !ignoreSearchIndex
       && index === (searchList || [])[this.props.searchIndex];
@@ -638,6 +639,13 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
 
     if (searchList && searchList.includes(index)) {
       return 'HighlightRow';
+    }
+
+    const level = this.rowGetter(input)?.level;
+    if (level === 'error') {
+      return 'ErrorRow';
+    } else if (level === 'warn') {
+      return 'WarnRow';
     }
 
     return '';
