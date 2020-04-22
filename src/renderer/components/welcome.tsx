@@ -2,18 +2,15 @@ import React from 'react';
 import path from 'path';
 
 import { ControlGroup, Button, InputGroup } from '@blueprintjs/core';
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import { observer } from 'mobx-react';
 
 import { getSleuth } from '../sleuth';
-import { getUpdateAvailable, defaultUrls } from '../update-check';
 import { deleteSuggestion, deleteSuggestions } from '../suggestions';
 import { SleuthState } from '../state/sleuth';
 import { isBefore } from 'date-fns';
 
 export interface WelcomeState {
   sleuth: string;
-  isUpdateAvailable: boolean | string;
 }
 
 export interface WelcomeProps {
@@ -27,13 +24,8 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
     super(props);
 
     this.state = {
-      sleuth: props.sleuth || getSleuth(),
-      isUpdateAvailable: false,
+      sleuth: props.sleuth || getSleuth()
     };
-
-    getUpdateAvailable().then((isUpdateAvailable: boolean | string) => {
-      return this.setState({ isUpdateAvailable });
-    });
   }
 
   public async deleteSuggestion(filePath: string) {
@@ -44,26 +36,6 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
   public async deleteSuggestions(filePaths: Array<string>) {
     await deleteSuggestions(filePaths);
     await this.props.state.getSuggestions();
-  }
-
-  public renderUpdateAvailable() {
-    const { isUpdateAvailable } = this.state;
-
-    if (isUpdateAvailable) {
-      return (
-        <ReactCSSTransitionGroup
-          transitionName='filter'
-          transitionEnterTimeout={250}
-          transitionLeaveTimeout={250}
-        >
-          <p className='UpdateAvailable'>
-            <a href={defaultUrls.downloadUpdate}>By the way, a new version is available!</a>
-          </p>
-        </ReactCSSTransitionGroup>
-      );
-    } else {
-      return null;
-    }
   }
 
   public renderSuggestions(): JSX.Element | null {
@@ -157,7 +129,6 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
             <span>Sleuth</span>
           </h1>
           <h4>Drop a logs zip file or folder anywhere on this window to open it.</h4>
-          {this.renderUpdateAvailable()}
         </div>
 
         <div style={scrollStyle}>
