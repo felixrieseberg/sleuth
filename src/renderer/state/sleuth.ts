@@ -96,6 +96,7 @@ export class SleuthState {
   @observable public defaultEditor: string = this.retrieve<string>('defaultEditor', false)!;
   @observable public defaultSort: SORT_DIRECTION = this.retrieve('defaultSort', false) as SORT_DIRECTION || SORT_DIRECTION.DESC;
   @observable public isMarkIcon: boolean = !!this.retrieve('isMarkIcon', true);
+  @observable public isSmartCopy: boolean = !!this.retrieve('isSmartCopy', true);
 
   // ** Giant non-observable arrays **
   public mergedLogFiles?: MergedLogFiles;
@@ -114,6 +115,7 @@ export class SleuthState {
     autorun(() => this.save('dateTimeFormat_v3', this.dateTimeFormat));
     autorun(() => this.save('font', this.font));
     autorun(() => this.save('isOpenMostRecent', this.isOpenMostRecent));
+    autorun(() => this.save('isSmartCopy', this.isSmartCopy));
     autorun(() => this.save('defaultEditor', this.defaultEditor));
     autorun(() => this.save('defaultSort', this.defaultSort));
     autorun(() => this.save('serializedBookmarks', this.serializedBookmarks));
@@ -165,7 +167,11 @@ export class SleuthState {
     ipcRenderer.on('spotlight', this.toggleSpotlight);
     ipcRenderer.on('open-bookmarks', (_event, data) => importBookmarks(this, data));
     ipcRenderer.on('copy', () => copy(this));
-    document.oncopy = () => copy(this);
+
+    document.oncopy = (event) => {
+      event.preventDefault();
+      copy(this);
+    };
 
     // Debug
     if (window) {
