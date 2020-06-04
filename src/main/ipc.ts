@@ -130,7 +130,7 @@ export class IpcManager {
   private setupCopy() {
     ipcMain.handle('webcontents-copy', (event) => {
       const window = BrowserWindow.fromWebContents(event.sender);
-      window?.webContents.copy();
+      window?.webContents?.copy();
     });
   }
 }

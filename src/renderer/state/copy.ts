@@ -2,16 +2,29 @@ import { clipboard, ipcRenderer } from 'electron';
 import { SleuthState } from './sleuth';
 import { LogEntry } from '../interfaces';
 
-export function copy(state: SleuthState) {
-  const { selectedRangeEntries, selectedEntry } = state;
+/**
+ * Performs a copy operation. Returns true if it did something,
+ * false if it didn't.
+ *
+ * @export
+ * @param {SleuthState} state
+ * @returns {boolean}
+ */
+export function copy(state: SleuthState): boolean {
+  const { selectedRangeEntries, selectedEntry, isSmartCopy } = state;
 
   if (!!window.getSelection()?.toString()) {
     ipcRenderer.invoke('webcontents-copy');
-  } else if (selectedRangeEntries && selectedRangeEntries?.length > 1) {
+    return true;
+  } else if (isSmartCopy && selectedRangeEntries && selectedRangeEntries?.length > 1) {
     clipboard.writeText(selectedRangeEntries.map(getCopyText).join('\n'));
-  } else if (selectedEntry) {
+    return true;
+  } else if (isSmartCopy && selectedEntry) {
     clipboard.writeText(getCopyText(selectedEntry));
+    return true;
   }
+
+  return false;
 }
 
 function getCopyText(entry: LogEntry) {

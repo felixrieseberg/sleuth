@@ -34,6 +34,7 @@ export const defaults = {
   font: process.platform === 'darwin' ? 'San Francisco' : 'Segoe UI',
   isDarkMode: true,
   isOpenMostRecent: false,
+  isSmartCopy: true
 };
 
 export class SleuthState {
@@ -169,8 +170,9 @@ export class SleuthState {
     ipcRenderer.on('copy', () => copy(this));
 
     document.oncopy = (event) => {
-      event.preventDefault();
-      copy(this);
+      if (copy(this)) {
+        event.preventDefault();
+      }
     };
 
     // Debug
@@ -356,10 +358,10 @@ export class SleuthState {
   private retrieve<T>(
     key: string, parse: boolean
   ): T | string | null {
-    const value = localStorage.getItem(key);
+    let value: T | string | null = localStorage.getItem(key);
 
     if (parse) {
-      return JSON.parse(value || 'null') as T;
+      value = JSON.parse(value || 'null') as T;
     }
 
     if (value === null && defaults[key]) {

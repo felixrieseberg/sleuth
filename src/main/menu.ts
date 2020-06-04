@@ -231,11 +231,7 @@ export class AppMenu {
         {
           role: 'cut',
         }, {
-          label: 'Copy',
-          accelerator: 'CmdOrCtrl+C',
-          click(_item: Electron.MenuItem, browserWindow: BrowserWindow) {
-            browserWindow.webContents.send('copy');
-          }
+          role: 'copy'
         }, {
           role: 'paste'
         }, {

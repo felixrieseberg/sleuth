@@ -117,8 +117,8 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
           <Divider />
           <FormGroup
             inline={true}
-            label='Enable "smart copy", copying whole log lines'
-            helperText="Disable this if you're having trouble with copy & paste in Sleuth"
+            label='Enable "smart copy"'
+            helperText="Copy whole log lines. Disable this if you're having trouble with copy & paste in Sleuth"
           >
             <Checkbox
               checked={this.props.state.isSmartCopy}
