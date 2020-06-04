@@ -3,14 +3,28 @@ const path = require('path');
 
 module.exports = {
   async copyCatapult() {
-    const copyOps = [
+    const hasSubmodules = fs.existsSync(path.join(__dirname, '../catapult/netlog_viewer/netlog_viewer'));
+    const isCI = process.env.CI;
+
+    if (!hasSubmodules && isCI) {
+      throw new Error('Catapult missing');
+    } else {
+      console.warn(`Building WITHOUT catapult!`);
+    }
+
+    const gitSubmodules = hasSubmodules ? [
       {
         source: path.join(__dirname, '../catapult/netlog_viewer/netlog_viewer'),
         target: path.join(__dirname, '../dist/catapult')
       }, {
         source: path.join(__dirname, '../catapult/third_party/polymer/components/polymer'),
         target: path.join(__dirname, '../dist/catapult/polymer')
-      }, {
+      }
+    ] : []
+
+    const copyOps = [
+      ...gitSubmodules,
+      {
         source: path.join(__dirname, '../static/catapult.html'),
         target: path.join(__dirname, '../dist/static/catapult.html')
       }, {
