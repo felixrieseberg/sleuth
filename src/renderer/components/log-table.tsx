@@ -25,6 +25,12 @@ import { getRangeEntries } from '../../utils/get-range-from-array';
 const debug = require('debug')('sleuth:logtable');
 const { DOWN } = Keys;
 
+const enum RepeatedLevels {
+  NOTIFY = 10,
+  WARNING = 100,
+  ERROR = 500
+}
+
 /**
  * Welcome! This is the biggest class in this application - it's the table that displays logging
  * information. This is also the class that could most easily destroy performance, so be careful
@@ -508,7 +514,18 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
         </span>
       );
     } else if (entry && entry.repeated) {
-      return `(Repeated ${entry.repeated.length} times) ${entry.message}`;
+      const count = entry.repeated.length;
+      let emoji = '';
+
+      if (count > RepeatedLevels.NOTIFY) {
+        emoji = '🛑 ';
+      } else if (count > RepeatedLevels.WARNING) {
+        emoji = '🌶 ';
+      } else if (count > RepeatedLevels.ERROR) {
+        emoji = '🔥 ';
+      }
+
+      return `(${emoji}Repeated ${entry.repeated.length} times) ${entry.message}`;
     } else {
       return entry.message;
     }
@@ -641,10 +658,10 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
       return 'HighlightRow';
     }
 
-    const level = this.rowGetter(input)?.level;
-    if (level === 'error') {
+    const row = this.rowGetter(input);
+    if (row?.level === 'error' || (row?.repeated?.length || 0) > RepeatedLevels.ERROR) {
       return 'ErrorRow';
-    } else if (level === 'warn') {
+    } else if (row?.level === 'warn' || (row?.repeated?.length || 0) > RepeatedLevels.WARNING) {
       return 'WarnRow';
     }
 
