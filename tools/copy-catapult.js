@@ -8,7 +8,7 @@ module.exports = {
 
     if (!hasSubmodules && isCI) {
       throw new Error('Catapult missing');
-    } else {
+    } else if (!hasSubmodules) {
       console.warn(`Building WITHOUT catapult!`);
     }
 
