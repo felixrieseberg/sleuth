@@ -238,7 +238,8 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
 
     if (selectedEntry && sortedList) {
       const foundIndex = sortedList.findIndex((v) => {
-        return v.line === selectedEntry.line;
+        return v.line === selectedEntry.line &&
+          v.momentValue === selectedEntry.momentValue;
       });
 
       return foundIndex;
