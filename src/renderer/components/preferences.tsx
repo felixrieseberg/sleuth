@@ -52,7 +52,11 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
       >
         <div className={classes}>
           <h2>Preferences</h2>
-          <Callout>You're running Sleuth {packageInfo.version} {getSleuth()}</Callout>
+          <Callout>
+            You're running Sleuth {packageInfo.version} {getSleuth()} with
+            Electron {process.versions.electron} and
+            Chrome {process.versions.chrome}.
+          </Callout>
           <Divider style={{ marginTop: '15px' }} />
           <FormGroup
             inline={true}
