@@ -69,7 +69,7 @@ export async function createWindow(): Promise<BrowserWindow> {
     width: mainWindowState.width,
     height: mainWindowState.height,
     show: !!config.isDevMode,
-    icon,
+    icon: process.platform !== 'darwin' ? icon : undefined,
     minHeight: 500,
     minWidth: 1170,
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : undefined,
