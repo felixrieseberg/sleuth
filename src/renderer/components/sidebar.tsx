@@ -7,6 +7,8 @@ import { MergedFilesLoadStatus, ProcessedLogFile, UnzippedFile } from '../interf
 import { levelsHave } from '../../utils/level-counts';
 import { SleuthState } from '../state/sleuth';
 import { isProcessedLogFile } from '../../utils/is-logfile';
+import { countExcessiveRepeats } from '../../utils/count-excessive-repeats';
+import { plural } from '../../utils/pluralize';
 
 export interface SidebarProps {
   selectedLogFileName: string;
@@ -251,16 +253,35 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
    * @returns {(JSX.Element | null)}
    */
   public static getNodeHint(file: ProcessedLogFile): JSX.Element | null {
-    const { levelCounts } = file;
+    const { levelCounts, repeatedCounts } = file;
+    const hasErrors = levelsHave('error', levelCounts);
+    const hasWarnings = levelsHave('warn', levelCounts);
+    const excessiveRepeats = countExcessiveRepeats(repeatedCounts);
 
-    if (!levelsHave('error', levelCounts)) return null;
+    if (!hasErrors && !hasWarnings && !excessiveRepeats) {
+      return null;
+    }
 
-    let content = `This file contains ${levelCounts.error} errors`;
+    // Check for errors
+    let content = hasErrors
+      ? `This file contains ${levelCounts.error} errors`
+      : '';
 
     if (levelsHave('warn', levelCounts)) {
-      content += ` and ${levelCounts.warn} warnings.`;
-    } else {
-      content += `.`;
+      content += hasErrors
+        ? ` and ${levelCounts.warn} warnings.`
+        : `This file contains ${levelCounts.warn} warnings.`;
+    }
+
+    // Check for excessive repeats
+    if (excessiveRepeats) {
+      // Not empty? Add a space
+      if (content) content += ` `;
+
+      const line = plural('lines', excessiveRepeats);
+      const has = plural('has', excessiveRepeats, 'have');
+
+      content += `${excessiveRepeats} log ${line} ${has} been excessively repeated.`;
     }
 
     return (

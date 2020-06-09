@@ -6,6 +6,8 @@ export type SelectableLogFile = LogFile | Tool | UnzippedFile;
 
 export type LogFile = MergedLogFile | ProcessedLogFile;
 
+export type RepeatedCounts = Record<string, number>;
+
 export const enum LogType {
   BROWSER = 'browser',
   RENDERER = 'renderer',
@@ -118,6 +120,7 @@ export interface MergedLogFiles {
 
 export interface ProcessedLogFile extends BaseFile {
   levelCounts: Record<string, number>;
+  repeatedCounts: RepeatedCounts;
   logEntries: Array<LogEntry>;
   logFile: UnzippedFile;
   logType: LogType;

@@ -245,13 +245,14 @@ export async function processLogFile(
   if (progressCb) progressCb(`Processing file ${logFile.fileName}...`);
 
   const timeStart = performance.now();
-  const { entries, lines, levelCounts } = await readFile(logFile, logType, progressCb);
+  const { entries, lines, levelCounts, repeatedCounts } = await readFile(logFile, logType, progressCb);
   const result: ProcessedLogFile = {
     logFile,
     logEntries: entries,
     logType,
     type: 'ProcessedLogFile',
     levelCounts,
+    repeatedCounts,
     id: logFile.fileName
   };
 
@@ -291,6 +292,7 @@ export interface ReadFileResult {
   entries: Array<LogEntry>;
   lines: number;
   levelCounts: Record<string, number>;
+  repeatedCounts: Record<string, number>;
 }
 
 /**
@@ -319,6 +321,7 @@ export function readFile(
     let toParse = '';
 
     const levelCounts = {};
+    const repeatedCounts = {};
 
     function pushEntry(entry: LogEntry | null) {
       if (entry) {
@@ -329,6 +332,8 @@ export function readFile(
         if (previous && previous.message === entry.message && previous.meta === entry.meta) {
           entries[lastIndex].repeated = entries[lastIndex].repeated || [];
           entries[lastIndex].repeated!.push(entry.timestamp);
+
+          repeatedCounts[entry.message] = (repeatedCounts[entry.message] || 0) + 1;
         } else {
           entry.index = entries.length;
 
@@ -383,7 +388,7 @@ export function readFile(
     readInterface.on('line', readLine);
     readInterface.on('close', () => {
       pushEntry(current);
-      resolve({ entries, lines, levelCounts });
+      resolve({ entries, lines, levelCounts, repeatedCounts });
     });
   });
 }

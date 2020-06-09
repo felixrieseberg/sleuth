@@ -21,15 +21,10 @@ import { isMergedLogFile } from '../../utils/is-logfile';
 import { getRegExpMaybeSafe } from '../../utils/regexp';
 import { between } from '../../utils/is-between';
 import { getRangeEntries } from '../../utils/get-range-from-array';
+import { RepeatedLevels } from '../../shared-constants';
 
 const debug = require('debug')('sleuth:logtable');
 const { DOWN } = Keys;
-
-const enum RepeatedLevels {
-  NOTIFY = 10,
-  WARNING = 100,
-  ERROR = 500
-}
 
 /**
  * Welcome! This is the biggest class in this application - it's the table that displays logging
