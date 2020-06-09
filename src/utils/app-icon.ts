@@ -7,7 +7,7 @@ export const enum ICON_NAMES {
 }
 
 export function getIconPath(iconName: ICON_NAMES) {
-  return path.resolve('dist/static/img', `${iconName}.${getExtension()}`);
+  return path.join(__dirname, 'img', `${iconName}.${getExtension()}`);
 }
 
 export async function changeIcon(iconName: ICON_NAMES) {

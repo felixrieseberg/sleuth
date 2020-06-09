@@ -105,7 +105,7 @@ function notarizeMaybe() {
     return;
   }
 
-  if (!process.env.CI) {
+  if (!process.env.CI && !process.env.APPLE_ID || !process.env.APPLE_ID_PASSWORD) {
     console.log(`Not in CI, skipping notarization`);
     return;
   }
