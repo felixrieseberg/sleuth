@@ -72,10 +72,10 @@ export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
     this.props.state.searchIndex = this.props.state.searchIndex + change;
   }
 
-  public onDateRangeChange(range: [ Date?, Date? ]) {
+  public onDateRangeChange(range: [ Date | null, Date | null ]) {
     this.props.state.dateRange = {
-      from: range[0],
-      to: range[1]
+      from: range[0] || null,
+      to: range[1] || null
     };
   }
 
@@ -154,7 +154,7 @@ export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
           <Button
             icon='cross'
             style={{ marginLeft: '5px' }}
-            onClick={() => this.onDateRangeChange([])}
+            onClick={() => this.onDateRangeChange([ null, null ])}
           />
           <NavbarDivider />
           <InputGroup

@@ -317,7 +317,7 @@ export function exportBookmarks(state: SleuthState) {
 export async function importBookmarks(state: SleuthState, input: string) {
   try {
     const raw = lzString.decompressFromEncodedURIComponent(input);
-    const data = JSON.parse(raw);
+    const data = JSON.parse(raw || '');
     const deserialized: Array<Bookmark> = data.b
       .map(decompressBookmark)
       .map((v: SerializedBookmark) => deserializeBookmark(state, v))

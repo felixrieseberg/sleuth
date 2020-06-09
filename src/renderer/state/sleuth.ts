@@ -80,7 +80,7 @@ export class SleuthState {
   @observable public suggestions: Suggestions = [];
   @observable public webAppLogsWarningDismissed: boolean = false;
   @observable public opened: number = 0;
-  @observable public dateRange: DateRange = { from: undefined, to: undefined };
+  @observable public dateRange: DateRange = { from: null, to: null };
   @observable public isDetailsVisible: boolean = false;
   @observable public isSidebarOpen: boolean = true;
   @observable public isSpotlightOpen: boolean = false;
@@ -256,7 +256,7 @@ export class SleuthState {
     this.showOnlySearchResults = undefined;
     this.isSpotlightOpen = false;
     this.isDetailsVisible = false;
-    this.dateRange = { from: undefined, to: undefined };
+    this.dateRange = { from: null, to: null };
     this.cacheKeys = [];
     this.cachePath = undefined;
     this.selectedCacheKey = undefined;

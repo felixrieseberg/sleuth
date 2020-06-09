@@ -1,4 +1,4 @@
-import { clipboard, ipcRenderer } from 'electron';
+import { clipboard } from 'electron';
 import { SleuthState } from './sleuth';
 import { LogEntry } from '../interfaces';
 

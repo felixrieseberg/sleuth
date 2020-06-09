@@ -1,4 +1,4 @@
-import * as fs from 'fs-extra';
+import fs from 'fs-extra';
 
 import { showMessageBox } from './ipc';
 import { shell } from 'electron';

@@ -2,7 +2,7 @@ import { observer } from 'mobx-react';
 import React from 'react';
 import * as path from 'path';
 import classNames from 'classnames';
-import * as fs from 'fs-extra';
+import fs from 'fs-extra';
 import autoBind from 'react-autobind';
 import { Card, Elevation, Tabs, Tab, Callout, Intent, Button, ButtonGroup } from '@blueprintjs/core';
 import { autorun, IReactionDisposer } from 'mobx';

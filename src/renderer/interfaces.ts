@@ -68,8 +68,8 @@ export interface ProcessorPerformanceInfo {
 }
 
 export interface DateRange {
-  from?: Date;
-  to?: Date;
+  from: Date | null;
+  to: Date | null;
 }
 
 export interface LogEntry {

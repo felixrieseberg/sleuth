@@ -1,6 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import * as fs from 'fs-extra';
+import fs from 'fs-extra';
 
 import { SleuthState } from '../state/sleuth';
 import { autorun, IReactionDisposer } from 'mobx';
