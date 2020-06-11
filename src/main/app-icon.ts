@@ -2,10 +2,7 @@ import { app } from 'electron';
 import * as path from 'path';
 import fs from 'fs-extra';
 
-export const enum ICON_NAMES {
-  default = 'sleuth-icon',
-  mark = 'sleuth-icon-mark'
-}
+import { ICON_NAMES } from '../shared-constants';
 
 export function getIconPath(iconName: ICON_NAMES): string | undefined {
   const icon = `${iconName}.${getExtension()}`;

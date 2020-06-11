@@ -1,4 +1,5 @@
 import { ipcRenderer } from 'electron';
+import { ICON_NAMES } from '../shared-constants';
 
 // This file handles sending IPC events. Other classes might
 // listen to IPC events.
@@ -27,4 +28,8 @@ export function showMessageBox(
   options: Electron.MessageBoxOptions
 ): Promise<Electron.MessageBoxReturnValue> {
   return ipcRenderer.invoke('message-box', options);
+}
+
+export function changeIcon(iconName: ICON_NAMES) {
+  return ipcRenderer.invoke('change-icon', iconName);
 }

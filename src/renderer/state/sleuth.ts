@@ -4,7 +4,6 @@ import { ipcRenderer } from 'electron';
 import { getItemsInSuggestionFolders } from '../suggestions';
 import { testDateTimeFormat } from '../../utils/test-date-time';
 import { SORT_DIRECTION } from '../components/log-table-constants';
-import { changeIcon, ICON_NAMES } from '../../main/app-icon';
 import { setSetting } from '../settings';
 import { isProcessedLogFile } from '../../utils/is-logfile';
 import { getFileName } from '../../utils/get-file-name';
@@ -26,6 +25,8 @@ import {
 } from '../interfaces';
 import { rehydrateBookmarks, importBookmarks } from './bookmarks';
 import { copy } from './copy';
+import { changeIcon } from '../ipc';
+import { ICON_NAMES } from '../../shared-constants';
 
 const debug = require('debug')('sleuth:state');
 export const defaults = {

@@ -3,6 +3,8 @@ import * as path from 'path';
 
 import { createWindow } from './windows';
 import { settingsFileManager } from './settings';
+import { changeIcon } from './app-icon';
+import { ICON_NAMES } from '../shared-constants';
 
 export class IpcManager {
   constructor() {
@@ -95,6 +97,7 @@ export class IpcManager {
   private setupSettings() {
     ipcMain.handle('get-settings', (_event, key: string) => settingsFileManager.getItem(key));
     ipcMain.handle('set-settings', (_event, key: string, value: any) => settingsFileManager.setItem(key, value));
+    ipcMain.handle('change-icon', (_event, iconName: ICON_NAMES) => changeIcon(iconName));
   }
 
   private setupOpenDialog() {
