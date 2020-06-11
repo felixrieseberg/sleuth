@@ -4,7 +4,7 @@ import { ipcRenderer } from 'electron';
 import { getItemsInSuggestionFolders } from '../suggestions';
 import { testDateTimeFormat } from '../../utils/test-date-time';
 import { SORT_DIRECTION } from '../components/log-table-constants';
-import { changeIcon, ICON_NAMES, getIconPath } from '../../utils/app-icon';
+import { changeIcon, ICON_NAMES } from '../../main/app-icon';
 import { setSetting } from '../settings';
 import { isProcessedLogFile } from '../../utils/is-logfile';
 import { getFileName } from '../../utils/get-file-name';
@@ -312,19 +312,6 @@ export class SleuthState {
 
     // Recalculate bookmarks
     rehydrateBookmarks(this);
-  }
-
-  /**
-   * Return the default icon path
-   *
-   * @returns {string}
-   */
-  public getIconPath(): string {
-    if (this.isMarkIcon) {
-      return getIconPath(ICON_NAMES.mark);
-    } else {
-      return getIconPath(ICON_NAMES.default);
-    }
   }
 
   /**

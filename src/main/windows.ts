@@ -4,7 +4,7 @@ import windowStateKeeper from 'electron-window-state';
 
 import { settingsFileManager } from './settings';
 import { config } from '../config';
-import { getIconPath, ICON_NAMES } from '../utils/app-icon';
+import { getIconPath, ICON_NAMES } from './app-icon';
 
 export let windows: Array<Electron.BrowserWindow> = [];
 
