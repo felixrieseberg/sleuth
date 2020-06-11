@@ -33,6 +33,7 @@ function changeIconDarwin(iconName: ICON_NAMES) {
   const iconPath = getIconPath(iconName);
 
   if (iconPath) {
+    console.log(`Replacing icon: Copying from ${iconPath} to ${destPath}`);
     return fs.copyFile(iconPath, destPath);
   }
 
