@@ -12,16 +12,7 @@ export function getIconPath(iconName: ICON_NAMES): string | undefined {
   const iconPath = path.join(app.getAppPath(), 'dist/static/img', icon);
 
   // Protect against missing icon
-  if (!fs.existsSync(icon)) {
-    try {
-      console.log(fs.readdirSync(path.join(app.getAppPath())));
-      console.log(fs.readdirSync(path.join(app.getAppPath(), 'dist')));
-      console.log(fs.readdirSync(path.join(app.getAppPath(), 'dist/static/')));
-      console.log(fs.readdirSync(path.join(app.getAppPath(), 'dist/static/img')));
-    } catch (error) {
-      //noop
-    }
-
+  if (!fs.existsSync(iconPath)) {
     console.error(`Could not find icon in path ${iconPath}`);
     return undefined;
   }
