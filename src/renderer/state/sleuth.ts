@@ -166,6 +166,7 @@ export class SleuthState {
     this.toggleSpotlight = this.toggleSpotlight.bind(this);
     this.selectLogFile = this.selectLogFile.bind(this);
     this.setMergedFile = this.setMergedFile.bind(this);
+    this.onFilterToggle = this.onFilterToggle.bind(this);
 
     setupTouchBarAutoruns(this);
     ipcRenderer.on(STATE_IPC.TOGGLE_SIDEBAR, this.toggleSidebar);
