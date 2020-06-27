@@ -5,7 +5,7 @@ import tmp from 'tmp';
 import { promisify } from 'util';
 
 import { shouldIgnoreFile } from '../utils/should-ignore-file';
-import { UnzippedFile } from './interfaces';
+import { UnzippedFile } from '../interfaces';
 
 const debug = require('debug')('sleuth:unzip');
 

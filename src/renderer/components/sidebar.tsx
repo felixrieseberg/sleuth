@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { ITreeNode, Tree, Icon, Position, Tooltip, Intent } from '@blueprintjs/core';
 import { observer } from 'mobx-react';
 
-import { MergedFilesLoadStatus, ProcessedLogFile, UnzippedFile } from '../interfaces';
+import { MergedFilesLoadStatus, ProcessedLogFile, UnzippedFile } from '../../interfaces';
 import { levelsHave } from '../../utils/level-counts';
 import { SleuthState } from '../state/sleuth';
 import { isProcessedLogFile } from '../../utils/is-logfile';

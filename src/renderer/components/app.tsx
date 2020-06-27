@@ -9,13 +9,12 @@ import { Welcome } from './welcome';
 import { CoreApplication } from './app-core';
 import { MacTitlebar } from './mac-titlebar';
 import { Preferences } from './preferences';
-import { TouchBarManager } from '../touch-bar-manager';
 import { sendWindowReady } from '../ipc';
 import { openBacktrace } from '../backtrace';
 import { SleuthState } from '../state/sleuth';
 import { shouldIgnoreFile } from '../../utils/should-ignore-file';
 import { isCacheDir } from '../../utils/is-cache';
-import { UnzippedFiles, UnzippedFile } from '../interfaces';
+import { UnzippedFiles, UnzippedFile } from '../../interfaces';
 
 const debug = require('debug')('sleuth:app');
 
@@ -26,7 +25,6 @@ export interface AppState {
 
 export class App extends React.Component<{}, Partial<AppState>> {
   public readonly sleuthState: SleuthState;
-  public touchBarManager: TouchBarManager | undefined;
 
   constructor(props: {}) {
     super(props);
@@ -42,10 +40,6 @@ export class App extends React.Component<{}, Partial<AppState>> {
     this.resetApp = this.resetApp.bind(this);
 
     this.sleuthState = new SleuthState(this.openFile, this.resetApp);
-
-    if (process.platform === 'darwin') {
-      this.touchBarManager = new TouchBarManager(this.sleuthState);
-    }
   }
 
   /**

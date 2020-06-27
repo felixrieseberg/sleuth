@@ -3,7 +3,7 @@ import fs from 'fs-extra';
 import { shell } from 'electron';
 import { Card, Elevation } from '@blueprintjs/core';
 
-import { SelectableLogFile, UnzippedFile } from '../interfaces';
+import { SelectableLogFile, UnzippedFile } from '../../interfaces';
 import { SleuthState } from '../state/sleuth';
 import { getSettingsInfo } from '../analytics/settings-analytics';
 import { getEnvInfo } from '../analytics/environment-analytics';

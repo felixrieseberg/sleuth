@@ -17,6 +17,7 @@ export class IpcManager {
     this.setupOpenDialog();
     this.setupSaveDialog();
     this.setupCopy();
+    this.setupQuit();
   }
 
   public openFile(pathName: string) {
@@ -135,6 +136,10 @@ export class IpcManager {
       const window = BrowserWindow.fromWebContents(event.sender);
       window?.webContents?.copy();
     });
+  }
+
+  private setupQuit() {
+    ipcMain.handle('quit', () => app.quit());
   }
 }
 

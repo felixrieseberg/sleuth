@@ -3,7 +3,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import { formatDistanceToNow } from 'date-fns';
 
-import { Suggestions, Suggestion } from './interfaces';
+import { Suggestions, Suggestion } from '../interfaces';
 import { getPath, showMessageBox } from './ipc';
 
 const debug = require('debug')('sleuth:suggestions');

@@ -1,4 +1,4 @@
-import { LevelFilter, ProcessedLogFile, MergedLogFile, LogEntry, DateRange } from '../interfaces';
+import { LevelFilter, ProcessedLogFile, MergedLogFile, LogEntry, DateRange } from '../../interfaces';
 import { SleuthState } from '../state/sleuth';
 
 export enum SORT_DIRECTION {

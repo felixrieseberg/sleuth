@@ -1,5 +1,5 @@
 import { isProcessedLogFile, isUnzippedFile, isTool, isMergedLogFile } from './is-logfile';
-import { SelectableLogFile } from '../renderer/interfaces';
+import { SelectableLogFile } from '../interfaces';
 
 import { capitalize } from 'lodash';
 

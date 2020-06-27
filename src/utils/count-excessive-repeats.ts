@@ -1,4 +1,4 @@
-import { RepeatedCounts } from '../renderer/interfaces';
+import { RepeatedCounts } from '../interfaces';
 import { RepeatedLevels } from '../shared-constants';
 
 /**

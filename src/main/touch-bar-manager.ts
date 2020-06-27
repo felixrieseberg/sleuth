@@ -1,17 +1,17 @@
 import {
-  remote,
   TouchBarButtonConstructorOptions,
   TouchBarPopoverConstructorOptions,
+  BrowserWindow,
+  ipcMain,
+  TouchBar
 } from 'electron';
 
 import { getNiceGreeting } from '../utils/get-nice-greeting';
-import { SleuthState } from './state/sleuth';
-import { autorun } from 'mobx';
-import { isLogFile, isProcessedLogFile } from '../utils/is-logfile';
 import { levelsHave } from '../utils/level-counts';
 import { plural } from '../utils/pluralize';
+import { TOUCHBAR_IPC, STATE_IPC } from '../shared-constants';
+import { LevelFilter, TouchBarLogFileUpdate } from '../interfaces';
 
-const { TouchBar } = remote;
 const {
   TouchBarButton,
   TouchBarGroup,
@@ -21,7 +21,6 @@ const {
 } = TouchBar;
 
 export class TouchBarManager {
-  public browserWindow: Electron.BrowserWindow;
   public touchBar: Electron.TouchBar;
 
   public homeBtn = new TouchBarButton(this.getHomeBtnOptions());
@@ -44,19 +43,19 @@ export class TouchBarManager {
   public toggleFilterBtns = {
     error: new TouchBarButton({
       label: '🚨 Error',
-      click: () => this.onFilterToggle('error'),
+      click: () => this.send(STATE_IPC.TOGGLE_FILTER, 'error'),
     }),
     warn: new TouchBarButton({
       label: '⚠️ Warning',
-      click: () => this.onFilterToggle('warn')
+      click: () => this.send(STATE_IPC.TOGGLE_FILTER, 'warn')
     }),
     info: new TouchBarButton({
       label: 'ℹ️ Info',
-      click: () => this.onFilterToggle('info')
+      click: () => this.send(STATE_IPC.TOGGLE_FILTER, 'info')
     }),
     debug: new TouchBarButton({
       label: '🐛 Debug',
-      click: () => this.onFilterToggle('debug')
+      click: () => this.send(STATE_IPC.TOGGLE_FILTER, 'debug')
     })
   };
 
@@ -74,9 +73,8 @@ export class TouchBarManager {
     | Electron.TouchBarSpacer>
     | undefined;
 
-  constructor(public readonly sleuthState: SleuthState) {
+  constructor(public readonly browserWindow: BrowserWindow) {
     this.setLogFileItems = this.setLogFileItems.bind(this);
-
     this.setupTouchBar();
   }
 
@@ -89,19 +87,27 @@ export class TouchBarManager {
     // First, the welcome
     this.setWelcomeItems();
 
-    autorun(() => {
-      this.setFilterBtnBgColors();
+    // All these things are state-relevant and require that
+    // we communicate with the window
+    ipcMain.on(TOUCHBAR_IPC.LEVEL_FILTER_UPDATE, (event, update: LevelFilter) => {
+      if (this.isRightSender(event)) {
+        this.setFilterBtnBgColors(update);
+      }
     });
 
-    autorun(() => this.setDarkModeBtn());
+    ipcMain.on(TOUCHBAR_IPC.DARK_MODE_UPDATE, (event, update: boolean) => {
+      if (this.isRightSender(event)) {
+        this.setDarkModeBtn(update);
+      }
+    });
 
-    autorun(() => {
-      const { selectedLogFile } = this.sleuthState;
+    ipcMain.on(TOUCHBAR_IPC.LOG_FILE_UPDATE, (event, update: TouchBarLogFileUpdate) => {
+      if (this.isRightSender(event)) {
+        this.setWarningLabel(update.levelCounts);
 
-      this.setWarningLabel();
-
-      if (isLogFile(selectedLogFile)) {
-        this.setLogFileItems();
+        if (update.isLogFile) {
+          this.setLogFileItems();
+        }
       }
     });
   }
@@ -115,7 +121,6 @@ export class TouchBarManager {
     try {
       this.items = options.items;
       this.touchBar = new TouchBar(options as Electron.TouchBarConstructorOptions);
-      this.browserWindow = this.browserWindow || remote.getCurrentWindow();
       this.browserWindow.setTouchBar(this.touchBar);
     } catch (error) {
       console.warn(`Could not set touch bar`, { error });
@@ -173,10 +178,10 @@ export class TouchBarManager {
    * @returns {TouchBarButtonConstructorOptions}
    */
   public getHomeBtnOptions(): TouchBarButtonConstructorOptions {
-    const label = '🏠';
-    const click = () => this.sleuthState.reset(true);
-
-    return { label, click };
+    return {
+      label: '🏠',
+      click: () => this.send(STATE_IPC.RESET)
+    };
   }
 
   /**
@@ -185,10 +190,10 @@ export class TouchBarManager {
    * @returns {TouchBarButtonConstructorOptions}
    */
   public getDarkModeBtnOptions(): TouchBarButtonConstructorOptions {
-    const label = '🌙';
-    const click = () => this.sleuthState.toggleDarkMode();
-
-    return { label, click };
+    return {
+      label: '🌙',
+      click: () => this.send(STATE_IPC.TOGGLE_DARKMODE)
+    };
   }
 
   /**
@@ -197,10 +202,10 @@ export class TouchBarManager {
    * @returns {TouchBarButtonConstructorOptions}
    */
   public getSpotlightBtnOptions(): TouchBarButtonConstructorOptions {
-    const label = '🔍';
-    const click = () => this.sleuthState.toggleSpotlight();
-
-    return { label, click };
+    return {
+      label: '🔍',
+      click: () => this.send(STATE_IPC.TOGGLE_SPOTLIGHT)
+    };
   }
 
   /**
@@ -209,38 +214,31 @@ export class TouchBarManager {
    * @returns {TouchBarButtonConstructorOptions}
    */
   public getSidebarBtnOptions(): TouchBarButtonConstructorOptions {
-    const label = '🗂';
-    const click = () => this.sleuthState.toggleSidebar();
-
-    return { label, click };
+    return {
+      label: '🗂',
+      click: () => this.send(STATE_IPC.TOGGLE_SIDEBAR)
+    };
   }
 
-  public setFilterBtnBgColors() {
-    Object.keys(this.sleuthState.levelFilter)
+  public setFilterBtnBgColors(levelFilter: LevelFilter) {
+    Object.keys(levelFilter)
       .forEach((key) => {
-        this.toggleFilterBtns[key].backgroundColor = this.sleuthState.levelFilter[key]
+        this.toggleFilterBtns[key].backgroundColor = levelFilter[key]
           ? '#ffffff'
           : '#4d5a68';
       });
   }
 
-  public setDarkModeBtn() {
-    this.darkModeBtn.label = this.sleuthState.isDarkMode
+  public setDarkModeBtn(isDarkMode: boolean) {
+    this.darkModeBtn.label = isDarkMode
       ? '🌙'
       : '☀️';
   }
 
-  public setSpotlightBtn() {
-    this.darkModeBtn.label = this.sleuthState.isSpotlightOpen
-      ? '👀'
-      : '🔍';
-  }
+  public setWarningLabel(levelCounts: Record<string, number>) {
+    const hasCounts = Object.keys(levelCounts).length > 0;
 
-  public setWarningLabel() {
-    const { selectedLogFile } = this.sleuthState;
-
-    if (isProcessedLogFile(selectedLogFile)) {
-      const { levelCounts } = selectedLogFile;
+    if (hasCounts) {
       const { error, warn } = levelCounts;
 
       const errorCount = levelsHave('error', levelCounts);
@@ -266,12 +264,19 @@ export class TouchBarManager {
     }
   }
 
-  public onFilterToggle(level: string) {
-    if (this.sleuthState.levelFilter![level] !== undefined) {
-      const filter = {...this.sleuthState.levelFilter};
-      filter[level] = !filter[level];
+  /**
+   * Is this IPC event coming from the window this manager was setup for?
+   *
+   * @private
+   * @param {Electron.IpcMainInvokeEvent} event
+   * @returns
+   * @memberof TouchBarManager
+   */
+  private isRightSender(event: Electron.IpcMainInvokeEvent) {
+    return event.sender.id === this.browserWindow.webContents?.id;
+  }
 
-      this.sleuthState.levelFilter = filter;
-    }
+  private send(channel: string, ...args: Array<any>) {
+    this.browserWindow.webContents?.send(channel, ...args);
   }
 }

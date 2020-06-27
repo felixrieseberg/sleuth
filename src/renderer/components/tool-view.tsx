@@ -2,7 +2,7 @@ import { observer } from 'mobx-react';
 import React from 'react';
 
 import { SleuthState } from '../state/sleuth';
-import { Tool } from '../interfaces';
+import { Tool } from '../../interfaces';
 import { Cachetool } from './cachetool';
 
 export interface ToolViewState {

@@ -1,4 +1,4 @@
-import { Bookmark, SerializedBookmark, ProcessedLogFile, LogFile, LogEntry, CompressedBookmark } from '../interfaces';
+import { Bookmark, SerializedBookmark, ProcessedLogFile, LogFile, LogEntry, CompressedBookmark } from '../../interfaces';
 import { isTool, isUnzippedFile } from '../../utils/is-logfile';
 import { SleuthState } from './sleuth';
 

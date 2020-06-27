@@ -31,7 +31,7 @@ export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
   constructor(props: FilterProps) {
     super(props);
 
-    this.onFilterToggle = this.onFilterToggle.bind(this);
+    this.props.state.onFilterToggle = this.props.state.onFilterToggle.bind(this);
     this.toggleSearchResultVisibility = this.toggleSearchResultVisibility.bind(this);
     this.onSearchChange = debounce(this.onSearchChange.bind(this), 700);
     this.onDateRangeChange = this.onDateRangeChange.bind(this);
@@ -59,15 +59,6 @@ export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
     this.props.state.search = value;
   }
 
-  public onFilterToggle(level: string) {
-    if (this.props.state.levelFilter![level] !== undefined) {
-      const filter = {...this.props.state.levelFilter};
-      filter[level] = !filter[level];
-
-      this.props.state.levelFilter = filter;
-    }
-  }
-
   public onSearchIndexChange(change: number) {
     this.props.state.searchIndex = this.props.state.searchIndex + change;
   }
@@ -90,28 +81,28 @@ export class Filter extends React.Component<FilterProps, Partial<FilterState>> {
       <Menu>
         <Menu.Item
           active={warn}
-          onClick={() => this.onFilterToggle('warn')}
+          onClick={() => this.props.state.onFilterToggle('warn')}
           icon='warning-sign'
           shouldDismissPopover={false}
           text='Warning'
         />
         <Menu.Item
           active={info}
-          onClick={() => this.onFilterToggle('info')}
+          onClick={() => this.props.state.onFilterToggle('info')}
           icon='info-sign'
           shouldDismissPopover={false}
           text='Info'
         />
         <Menu.Item
           active={error}
-          onClick={() => this.onFilterToggle('error')}
+          onClick={() => this.props.state.onFilterToggle('error')}
           icon='error'
           shouldDismissPopover={false}
           text='Error'
         />
         <Menu.Item
           active={debug}
-          onClick={() => this.onFilterToggle('debug')}
+          onClick={() => this.props.state.onFilterToggle('debug')}
           icon='code'
           shouldDismissPopover={false}
           text='Debug'

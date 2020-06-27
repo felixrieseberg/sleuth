@@ -4,9 +4,10 @@ import path from 'path';
 import { observer } from 'mobx-react';
 import { Omnibar, ItemRenderer, ItemPredicate } from '@blueprintjs/select';
 import { MenuItem } from '@blueprintjs/core';
+import { ipcRenderer } from 'electron';
 
 import { SleuthState } from '../state/sleuth';
-import { ProcessedLogFile, UnzippedFile } from '../interfaces';
+import { ProcessedLogFile, UnzippedFile } from '../../interfaces';
 import { isProcessedLogFile } from '../../utils/is-logfile';
 import { highlightText } from '../../utils/highlight-text';
 
@@ -127,9 +128,7 @@ export class Spotlight extends React.Component<SpotlightProps, Partial<Spotlight
       {
         text: 'Quit Sleuth',
         icon: 'power',
-        click: () => {
-          require('electron').remote.app.quit();
-        }
+        click: () => ipcRenderer.invoke('quit')
       },
       {
         text: 'Go Home',

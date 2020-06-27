@@ -1,4 +1,4 @@
-import { ProcessedLogFiles, Tool, SelectableLogFile } from '../renderer/interfaces';
+import { ProcessedLogFiles, Tool, SelectableLogFile } from '../interfaces';
 
 export function getFirstLogFile(files: ProcessedLogFiles | undefined): SelectableLogFile {
   if (files) {

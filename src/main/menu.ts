@@ -6,6 +6,7 @@ import path from 'path';
 import tmp from 'tmp';
 import { promisify } from 'util';
 import { getCurrentWindow, createWindow } from './windows';
+import { STATE_IPC } from '../shared-constants';
 
 const debug = require('debug')('sleuth:menu');
 
@@ -218,7 +219,7 @@ export class AppMenu {
         label: 'Show Omnibar',
         accelerator: 'CmdOrCtrl+K',
         click(_item: Electron.MenuItem, browserWindow: BrowserWindow) {
-          browserWindow.webContents.send('spotlight');
+          browserWindow.webContents.send(STATE_IPC.TOGGLE_SPOTLIGHT);
         }
       });
     }

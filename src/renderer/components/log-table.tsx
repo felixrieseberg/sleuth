@@ -7,7 +7,7 @@ import autoBind from 'react-autobind';
 import { Table, AutoSizer, Column, TableCellProps } from 'react-virtualized';
 import { Icon } from '@blueprintjs/core';
 
-import { LevelFilter, LogEntry, DateRange } from '../interfaces';
+import { LevelFilter, LogEntry, DateRange } from '../../interfaces';
 import { didFilterChange } from '../../utils/did-filter-change';
 import { isReduxAction } from '../../utils/is-redux-action';
 import {

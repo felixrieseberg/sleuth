@@ -1,4 +1,4 @@
-import { Tool, SelectableLogFile, UnzippedFile, ProcessedLogFile, MergedLogFile } from '../renderer/interfaces';
+import { Tool, SelectableLogFile, UnzippedFile, ProcessedLogFile, MergedLogFile } from '../interfaces';
 
 export function isProcessedLogFile(file?: SelectableLogFile): file is ProcessedLogFile {
   if (file && (file as ProcessedLogFile).type) {

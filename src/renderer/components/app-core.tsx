@@ -14,7 +14,7 @@ import {
   LOG_TYPES_TO_PROCESS,
   SortedUnzippedFiles,
   UnzippedFiles,
-} from '../interfaces';
+} from '../../interfaces';
 import { AppCoreHeader } from './app-core-header';
 import { Sidebar } from './sidebar';
 import { Loading } from './loading';

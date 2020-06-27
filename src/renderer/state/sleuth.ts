@@ -22,11 +22,12 @@ import {
   SelectableLogFile,
   ProcessedLogFiles,
   SerializedBookmark
-} from '../interfaces';
+} from '../../interfaces';
 import { rehydrateBookmarks, importBookmarks } from './bookmarks';
 import { copy } from './copy';
 import { changeIcon } from '../ipc';
-import { ICON_NAMES } from '../../shared-constants';
+import { ICON_NAMES, STATE_IPC, TOUCHBAR_IPC } from '../../shared-constants';
+import { setupTouchBarAutoruns } from './touchbar';
 
 const debug = require('debug')('sleuth:state');
 export const defaults = {
@@ -166,9 +167,16 @@ export class SleuthState {
     this.selectLogFile = this.selectLogFile.bind(this);
     this.setMergedFile = this.setMergedFile.bind(this);
 
-    ipcRenderer.on('spotlight', this.toggleSpotlight);
-    ipcRenderer.on('open-bookmarks', (_event, data) => importBookmarks(this, data));
-    ipcRenderer.on('copy', () => copy(this));
+    setupTouchBarAutoruns(this);
+    ipcRenderer.on(STATE_IPC.TOGGLE_SIDEBAR, this.toggleSidebar);
+    ipcRenderer.on(STATE_IPC.TOGGLE_SPOTLIGHT, this.toggleSpotlight);
+    ipcRenderer.on(STATE_IPC.OPEN_BOOKMARKS, (_event, data) => importBookmarks(this, data));
+    ipcRenderer.on(STATE_IPC.COPY, () => copy(this));
+    ipcRenderer.on(STATE_IPC.RESET, () => this.reset(true));
+    ipcRenderer.on(STATE_IPC.TOGGLE_DARKMODE, () => this.toggleDarkMode());
+    ipcRenderer.on(STATE_IPC.TOGGLE_FILTER, (_event, level: string) => {
+      this.onFilterToggle(level);
+    });
 
     document.oncopy = (event) => {
       if (copy(this)) {
@@ -296,6 +304,22 @@ export class SleuthState {
       debug(`Selecting log file ${name}`);
 
       this.selectedLogFile = logFile;
+    }
+  }
+
+  /**
+   * Handle the click of a single "filter toggle" button
+   *
+   * @param {string} level
+   * @memberof SleuthState
+   */
+  @action
+  public onFilterToggle(level: string) {
+    if (this.levelFilter![level] !== undefined) {
+      const filter = {...this.levelFilter};
+      filter[level] = !filter[level];
+
+      this.levelFilter = filter;
     }
   }
 

@@ -1,6 +1,6 @@
 import { clipboard } from 'electron';
 import { SleuthState } from './sleuth';
-import { LogEntry } from '../interfaces';
+import { LogEntry } from '../../interfaces';
 
 /**
  * Performs a copy operation. Returns true if it did something,

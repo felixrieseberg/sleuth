@@ -1,4 +1,4 @@
-import { LevelFilter } from '../renderer/interfaces';
+import { LevelFilter } from '../interfaces';
 
 export function didFilterChange(oldFilter: LevelFilter, newFilter: LevelFilter) {
   return (oldFilter.error !== newFilter.error ||

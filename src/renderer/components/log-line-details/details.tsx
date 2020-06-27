@@ -5,7 +5,7 @@ import classNames from 'classnames';
 import { Card, Button, ButtonGroup, Tag, Elevation } from '@blueprintjs/core';
 import { uniq, capitalize } from 'lodash';
 
-import { LogEntry } from '../../interfaces';
+import { LogEntry } from '../../../interfaces';
 import { LogLineData } from './data';
 import { LogLineComments } from './comments';
 import { Timestamp } from './timestamp';

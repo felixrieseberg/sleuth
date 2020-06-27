@@ -1,5 +1,5 @@
 import { isLogFile, isUnzippedFile, isTool } from '../../utils/is-logfile';
-import { ProcessedLogFile, LogType } from '../interfaces';
+import { ProcessedLogFile, LogType } from '../../interfaces';
 import { StateTable } from './state-table';
 import { SleuthState } from '../state/sleuth';
 import { LogTable } from './log-table';

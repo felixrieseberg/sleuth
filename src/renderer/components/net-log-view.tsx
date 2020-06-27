@@ -4,7 +4,7 @@ import fs from 'fs-extra';
 
 import { SleuthState } from '../state/sleuth';
 import { autorun, IReactionDisposer } from 'mobx';
-import { UnzippedFile } from '../interfaces';
+import { UnzippedFile } from '../../interfaces';
 
 export interface NetLogViewProps {
   state: SleuthState;

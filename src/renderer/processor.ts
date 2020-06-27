@@ -3,7 +3,7 @@ import readline from 'readline';
 import path from 'path';
 
 import { logPerformance } from './processor/performance';
-import { LogEntry, LogType, MatchResult, MergedLogFile, ProcessedLogFile, SortedUnzippedFiles, UnzippedFile, UnzippedFiles } from './interfaces';
+import { LogEntry, LogType, MatchResult, MergedLogFile, ProcessedLogFile, SortedUnzippedFiles, UnzippedFile, UnzippedFiles } from '../interfaces';
 import { getIdForLogFiles } from '../utils/id-for-logfiles';
 
 const debug = require('debug')('sleuth:processor');

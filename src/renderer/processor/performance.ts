@@ -1,4 +1,4 @@
-import { ProcessorPerformanceInfo, LogType, ALL_LOG_TYPES } from '../interfaces';
+import { ProcessorPerformanceInfo, LogType, ALL_LOG_TYPES } from '../../interfaces';
 
 let logBuffer: Array<ProcessorPerformanceInfo> = [];
 

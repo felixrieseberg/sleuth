@@ -1,4 +1,4 @@
-import { SelectableLogFile } from '../renderer/interfaces';
+import { SelectableLogFile } from '../interfaces';
 import { isTool } from './is-logfile';
 
 export function getIdForLogFiles(input: Array<SelectableLogFile>): string {

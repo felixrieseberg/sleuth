@@ -9,7 +9,7 @@ import {
 import autoBind from 'react-autobind';
 
 import { SleuthState } from '../state/sleuth';
-import { Bookmark } from '../interfaces';
+import { Bookmark } from '../../interfaces';
 import { getFileName } from '../../utils/get-file-name';
 import { truncate } from '../../utils/truncate-string';
 import { saveBookmark, goToBookmark, exportBookmarks, deleteAllBookmarks } from '../state/bookmarks';
