@@ -96,7 +96,7 @@
     "jest": "^26.1.0",
     "less": "^3.11.3",
     "node-abi": "^2.18.0",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "parcel-bundler": "^1.12.4",
     "patch-package": "^6.2.2",
     "react-addons-test-utils": "^15.6.2",
