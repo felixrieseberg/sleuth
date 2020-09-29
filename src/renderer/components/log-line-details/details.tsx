@@ -148,7 +148,7 @@ export class LogLineDetails extends React.Component<LogLineDetailsProps, LogLine
   }
 
   private renderType(): JSX.Element {
-    const logTypes = uniq(this.getProperties('logType')).map(capitalize);
+    const logTypes = Array.from(new Set(this.getProperties('logType'))).map(capitalize);
     const type = `${logTypes.join(', ')} Process${logTypes.length > 1 ? 'es' : ''}`;
 
     return (
