@@ -74,8 +74,16 @@ export class TouchBarManager {
     | undefined;
 
   constructor(public readonly browserWindow: BrowserWindow) {
+    this.handleFilterUpdate = this.handleFilterUpdate.bind(this);
+    this.handleDarkModeUpdate = this.handleDarkModeUpdate.bind(this);
+    this.handleLogFileUpdate = this.handleLogFileUpdate.bind(this);
+    this.teardown = this.teardown.bind(this);
     this.setLogFileItems = this.setLogFileItems.bind(this);
+
     this.setupTouchBar();
+
+    // Make sure we unsubscribe from Touchbar events
+    browserWindow.once('close', this.teardown);
   }
 
   /**
@@ -89,27 +97,15 @@ export class TouchBarManager {
 
     // All these things are state-relevant and require that
     // we communicate with the window
-    ipcMain.on(TOUCHBAR_IPC.LEVEL_FILTER_UPDATE, (event, update: LevelFilter) => {
-      if (this.isRightSender(event)) {
-        this.setFilterBtnBgColors(update);
-      }
-    });
+    ipcMain.on(TOUCHBAR_IPC.LEVEL_FILTER_UPDATE, this.handleFilterUpdate);
+    ipcMain.on(TOUCHBAR_IPC.DARK_MODE_UPDATE, this.handleDarkModeUpdate);
+    ipcMain.on(TOUCHBAR_IPC.LOG_FILE_UPDATE, this.handleLogFileUpdate);
+  }
 
-    ipcMain.on(TOUCHBAR_IPC.DARK_MODE_UPDATE, (event, update: boolean) => {
-      if (this.isRightSender(event)) {
-        this.setDarkModeBtn(update);
-      }
-    });
-
-    ipcMain.on(TOUCHBAR_IPC.LOG_FILE_UPDATE, (event, update: TouchBarLogFileUpdate) => {
-      if (this.isRightSender(event)) {
-        this.setWarningLabel(update.levelCounts);
-
-        if (update.isLogFile) {
-          this.setLogFileItems();
-        }
-      }
-    });
+  public teardown() {
+    ipcMain.off(TOUCHBAR_IPC.LEVEL_FILTER_UPDATE, this.handleFilterUpdate);
+    ipcMain.off(TOUCHBAR_IPC.DARK_MODE_UPDATE, this.handleDarkModeUpdate);
+    ipcMain.off(TOUCHBAR_IPC.LOG_FILE_UPDATE, this.handleLogFileUpdate);
   }
 
   /**
@@ -220,7 +216,9 @@ export class TouchBarManager {
     };
   }
 
-  public setFilterBtnBgColors(levelFilter: LevelFilter) {
+  public handleFilterUpdate(event: Electron.IpcMainEvent, levelFilter: LevelFilter) {
+    if (!this.isRightSender(event)) return;
+
     Object.keys(levelFilter)
       .forEach((key) => {
         this.toggleFilterBtns[key].backgroundColor = levelFilter[key]
@@ -229,10 +227,22 @@ export class TouchBarManager {
       });
   }
 
-  public setDarkModeBtn(isDarkMode: boolean) {
+  public handleDarkModeUpdate(event: Electron.IpcMainEvent, isDarkMode: boolean) {
+    if (!this.isRightSender(event)) return;
+
     this.darkModeBtn.label = isDarkMode
       ? '🌙'
       : '☀️';
+  }
+
+  public handleLogFileUpdate(event: Electron.IpcMainEvent, update: TouchBarLogFileUpdate) {
+    if (this.isRightSender(event)) {
+      this.setWarningLabel(update.levelCounts);
+
+      if (update.isLogFile) {
+        this.setLogFileItems();
+      }
+    }
   }
 
   public setWarningLabel(levelCounts: Record<string, number>) {
