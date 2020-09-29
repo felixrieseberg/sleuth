@@ -7,6 +7,7 @@ import tmp from 'tmp';
 import { promisify } from 'util';
 import { getCurrentWindow, createWindow } from './windows';
 import { STATE_IPC } from '../shared-constants';
+import { getMenuTemplate } from './menu-template';
 
 const debug = require('debug')('sleuth:menu');
 
@@ -205,104 +206,15 @@ export class AppMenu {
     return result;
   }
 
-  public insertSpotlightItem() {
-    if (!this.menu) return;
-
-    const viewItem = this.menu.find((item) => item.label === 'View');
-
-    if (viewItem && viewItem.submenu) {
-      (viewItem.submenu as Array<Electron.MenuItemConstructorOptions>).push({
-        type: 'separator'
-      });
-
-      (viewItem.submenu as Array<Electron.MenuItemConstructorOptions>).push({
-        label: 'Show Omnibar',
-        accelerator: 'CmdOrCtrl+K',
-        click(_item: Electron.MenuItem, browserWindow: BrowserWindow) {
-          browserWindow.webContents.send(STATE_IPC.TOGGLE_SPOTLIGHT);
-        }
-      });
-    }
-  }
-
-  public getEditMenu(): Electron.MenuItemConstructorOptions {
-    return {
-      label: 'Edit',
-      submenu: [
-        {
-          role: 'cut',
-        }, {
-          role: 'copy'
-        }, {
-          role: 'paste'
-        }, {
-          type: 'separator'
-        }, {
-          label: 'Find',
-          accelerator: 'CmdOrCtrl+F',
-          click(_item: Electron.MenuItem, browserWindow: BrowserWindow) {
-            browserWindow.webContents.send('find');
-          }
-        }
-      ]
-    };
-  }
-
   /**
    * Actually creates the menu.
    */
   public setupMenu() {
     require('electron-context-menu')();
 
-    this.menu = defaultMenu(app, shell) as Array<any>;
-
-    const preferencesItem = {
-      label: 'Preferences',
-      accelerator: 'CmdOrCtrl+,',
-      click: async () => {
-        const { webContents } = await getCurrentWindow();
-        webContents.send('preferences-show');
-      }
-    };
-
-    const newWindowItem = {
-      label: 'New Window',
-      accelerator: 'CmdOrCtrl+N',
-      click: () => createWindow()
-    };
-
-    const newAndOpen = [
-      newWindowItem,
-      { type: 'separator' },
-      ...this.getOpenItems()
-    ];
-
-    const edit = this.getEditMenu();
-
-    if (process.platform === 'darwin') {
-      (this.menu[0].submenu as Array<any>).splice(1, 0, preferencesItem);
-      this.menu.splice(1, 0, { label: 'File', submenu: newAndOpen });
-      this.menu.splice(2, 0, edit);
-    } else {
-      const windowsLinuxSubmenu = [ ...newAndOpen, { type: 'separator' }, preferencesItem ];
-      this.menu.splice(0, 1, { label: 'File', submenu: windowsLinuxSubmenu });
-      this.menu.splice(1, 0, edit);
-    }
-
-    this.insertSpotlightItem();
-
-    this.menu.push({
-      label: 'Utilities',
-      submenu: [
-        {
-          label: 'Open Backtrace',
-          click(_item: Electron.MenuItem, browserWindow: BrowserWindow) {
-            browserWindow.webContents.send('open-backtrace');
-          }
-        },
-        { type: 'separator' },
-        ...this.getPruneItems()
-      ]
+    this.menu = getMenuTemplate({
+      openItems: this.getOpenItems(),
+      pruneItems: this.getPruneItems()
     });
 
     Menu.setApplicationMenu(Menu.buildFromTemplate(this.menu));
