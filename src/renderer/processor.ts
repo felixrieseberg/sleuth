@@ -134,6 +134,10 @@ export function getTypeForFile(logFile: UnzippedFile): LogType {
     return LogType.PRELOAD;
   } else if (fileName.startsWith('renderer')
     || fileName === 'epics-renderer.log'
+    || fileName.startsWith('google')
+    || fileName.startsWith('onedrive')
+    || fileName.startsWith('box')
+    || fileName.startsWith('dropbox')
     || fileName.endsWith('window-console.log')) {
     return LogType.RENDERER;
   } else if (fileName.startsWith('webapp')) {
