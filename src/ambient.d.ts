@@ -11,6 +11,7 @@ declare module 'debounce';
 declare module 'markdown-it';
 declare module 'markdown-it-highlightjs';
 declare module 'markdown-it-emoji';
+declare module 'cachetool';
 
 // https://github.com/Microsoft/TypeScript/wiki/What's-new-in-TypeScript#wildcard-character-in-module-name
 declare module '*/package.json';
