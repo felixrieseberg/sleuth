@@ -3,7 +3,6 @@ import { SleuthState } from '../../state/sleuth';
 import React from 'react';
 import classNames from 'classnames';
 import { Card, Button, ButtonGroup, Tag, Elevation } from '@blueprintjs/core';
-import { uniq, capitalize } from 'lodash';
 
 import { LogEntry } from '../../../interfaces';
 import { LogLineData } from './data';
@@ -11,6 +10,7 @@ import { LogLineComments } from './comments';
 import { Timestamp } from './timestamp';
 import { shell } from 'electron';
 import { getIsBookmark, toggleBookmark } from '../../state/bookmarks';
+import { capitalize } from '../../../utils/capitalize';
 
 const debug = require('debug')('sleuth:details');
 
@@ -140,7 +140,7 @@ export class LogLineDetails extends React.Component<LogLineDetailsProps, LogLine
   }
 
   private renderLevel(): JSX.Element {
-    const levels = uniq(this.getProperties('level')).join(', ');
+    const levels = Array.from(new Set(this.getProperties('level'))).join(', ');
 
     return (
       <Tag large={true} icon='box'>{levels}</Tag>
