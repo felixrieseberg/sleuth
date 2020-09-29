@@ -25,7 +25,7 @@ export function isUnzippedFile(file?: SelectableLogFile): file is UnzippedFile {
 }
 
 export function isTool(file?: SelectableLogFile): file is Tool {
-  return !!(file && (file in Tool));
+  return !!(file && (file.toString() in Tool));
 }
 
 export function isLogFile(file?: SelectableLogFile): file is (MergedLogFile | ProcessedLogFile) {
