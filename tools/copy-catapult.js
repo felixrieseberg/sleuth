@@ -19,6 +19,9 @@ module.exports = {
       }, {
         source: path.join(__dirname, '../catapult/third_party/polymer/components/polymer'),
         target: path.join(__dirname, '../dist/catapult/polymer')
+      }, {
+        source: path.join(__dirname, '../catapult/third_party/polymer/components/webcomponentsjs'),
+        target: path.join(__dirname, '../dist/catapult/webcomponentsjs')
       }
     ] : []
 

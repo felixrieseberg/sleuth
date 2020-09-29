@@ -2,6 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
+    <script src="../catapult/webcomponentsjs/webcomponents.js"></script>
     <link rel="import" href="../catapult/polymer/polymer.html">
 
     <link type="text/css" rel="stylesheet" href="../catapult/main.css">
@@ -16,6 +17,16 @@
     <link rel="import" href="../catapult/netlog_viewer.html">
 
     <script>
+      function load(payload) {
+        try {
+          console.log(`Attempting to load`, payload);
+          return LogUtil.loadLogFile(payload.content, payload.fileName);
+        } catch (error) {
+          console.log(`Tried to load, but failed. Deferring.`);
+          setTimeout(() => load(payload), 250);
+        }
+      }
+
       // Since we're on a file:// protocol, we can't just
       // call window.myMethod() from Sleuth and have to send
       // it as a cross-origin message. This will help.
@@ -25,8 +36,7 @@
         const { instruction, payload } = data;
 
         if (instruction === 'load') {
-          console.log(`Attempting to load`, payload);
-          return LogUtil.loadLogFile(payload.content, payload.fileName);
+          return load(payload);
         }
 
         if (instruction === 'dark-mode') {
