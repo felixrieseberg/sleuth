@@ -71,6 +71,19 @@ export function getMenuTemplate(options: MenuTemplateOptions) {
           type: 'separator'
         },
         {
+          role: 'zoomIn',
+          accelerator: 'CmdOrCtrl+Plus'
+        },
+        {
+          role: 'zoomOut',
+        },
+        {
+          role: 'resetZoom'
+        },
+        {
+          type: 'separator'
+        },
+        {
           label: 'Show Omnibar',
           accelerator: 'CmdOrCtrl+K',
           click(_item: Electron.MenuItem, browserWindow: BrowserWindow) {
