@@ -1,12 +1,10 @@
-import defaultMenu from 'electron-default-menu';
-import { shell, app, dialog, BrowserWindow, Menu } from 'electron';
-
+import { app, dialog, Menu } from 'electron';
 import fs from 'fs-extra';
 import path from 'path';
 import tmp from 'tmp';
 import { promisify } from 'util';
-import { getCurrentWindow, createWindow } from './windows';
-import { STATE_IPC } from '../shared-constants';
+
+import { getCurrentWindow } from './windows';
 import { getMenuTemplate } from './menu-template';
 
 const debug = require('debug')('sleuth:menu');

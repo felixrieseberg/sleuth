@@ -113,11 +113,18 @@ export function getMenuTemplate(options: MenuTemplateOptions) {
       role: 'help',
       submenu: [
         {
-          label: 'Learn More',
+          label: 'Slack Channel',
           click() {
-            shell.openExternal('http://electron.atom.io');
+            shell.openExternal('https://slack-pde.slack.com/archives/C8EH27UDT');
           }
-        },
+        }, {
+          type: 'separator'
+        }, {
+          label: 'GitHub Repository',
+          click() {
+            shell.openExternal('https://github.com/felixrieseberg/sleuth');
+          }
+        }
       ]
     },
   ];
