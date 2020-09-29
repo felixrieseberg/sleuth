@@ -1,4 +1,4 @@
-import { observable, action, autorun, computed } from 'mobx';
+import { observable, action, autorun, computed, toJS } from 'mobx';
 import { ipcRenderer } from 'electron';
 
 import { getItemsInSuggestionFolders } from '../suggestions';
@@ -26,7 +26,7 @@ import {
 import { rehydrateBookmarks, importBookmarks } from './bookmarks';
 import { copy } from './copy';
 import { changeIcon } from '../ipc';
-import { ICON_NAMES, STATE_IPC, TOUCHBAR_IPC } from '../../shared-constants';
+import { ICON_NAMES, STATE_IPC } from '../../shared-constants';
 import { setupTouchBarAutoruns } from './touchbar';
 
 const debug = require('debug')('sleuth:state');
@@ -347,7 +347,7 @@ export class SleuthState {
    * @param {(string | number | object)} [value]
    */
   private save(key: string, value?: string | number | object | null | boolean) {
-    if (value) {
+    if (value !== undefined) {
       const _value = typeof value === 'object'
         ? JSON.stringify(value)
         : value.toString();
@@ -357,7 +357,7 @@ export class SleuthState {
       localStorage.removeItem(key);
     }
 
-    setSetting(key, value);
+    setSetting(key, toJS(value));
   }
 
   /**
