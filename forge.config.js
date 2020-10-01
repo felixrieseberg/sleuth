@@ -6,6 +6,15 @@ const fs = require('fs');
 const iconDir = path.join(__dirname, 'static/img');
 const version = require('./package.json').version;
 
+if (process.env['WINDOWS_CODESIGN_FILE']) {
+  const certPath = path.join(__dirname, 'win-certificate.pfx');
+  const certExists = fs.existsSync(certPath);
+
+  if (certExists) {
+    process.env['WINDOWS_CODESIGN_FILE'] = certPath;
+  }
+}
+
 const options = {
   hooks: {
     generateAssets: require('./tools/generateAssets')
@@ -51,26 +60,16 @@ const options = {
     {
       name: '@electron-forge/maker-squirrel',
       platforms: ['win32'],
-      config: (arch) => {
-        const certificateFile = process.env.CI
-          ? path.join(__dirname, 'cert.p12')
-          : process.env.WINDOWS_CERTIFICATE_FILE;
-
-        if (!certificateFile || !fs.existsSync(certificateFile)) {
-          console.warn(`Warning: Could not find certificate file at ${certificateFile}`)
-        }
-
-        return {
+      config: {
           name: 'sleuth',
           authors: 'Felix Rieseberg',
           exe: 'sleuth.exe',
           noMsi: true,
-          remoteReleases: '',
+          remoteReleases: 'http://update.electronjs.org/felixrieseberg/sleuth/win32/1.0.0/RELEASES',
           setupExe: `sleuth-${version}-${arch}-setup.exe`,
           setupIcon: path.resolve(iconDir, 'sleuth-icon.ico'),
-          certificatePassword: process.env.WINDOWS_CERTIFICATE_PASSWORD,
-          certificateFile
-        }
+          certificateFile: process.env['WINDOWS_CODESIGN_FILE'],
+          certificatePassword: process.env['WINDOWS_CODESIGN_PASSWORD'],
       }
     },
     {
