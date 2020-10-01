@@ -60,7 +60,8 @@ const options = {
     {
       name: '@electron-forge/maker-squirrel',
       platforms: ['win32'],
-      config: {
+      config: (arch) => {
+        return {
           name: 'sleuth',
           authors: 'Felix Rieseberg',
           exe: 'sleuth.exe',
@@ -70,6 +71,7 @@ const options = {
           setupIcon: path.resolve(iconDir, 'sleuth-icon.ico'),
           certificateFile: process.env['WINDOWS_CODESIGN_FILE'],
           certificatePassword: process.env['WINDOWS_CODESIGN_PASSWORD'],
+        }
       }
     },
     {
