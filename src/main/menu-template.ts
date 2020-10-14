@@ -75,7 +75,14 @@ export function getMenuTemplate(options: MenuTemplateOptions) {
           accelerator: 'CmdOrCtrl+Plus'
         },
         {
+          role: 'zoomIn',
+          accelerator: 'CmdOrCtrl+=',
+          acceleratorWorksWhenHidden: true,
+          visible: false
+        },
+        {
           role: 'zoomOut',
+          accelerator: 'CmdOrCtrl+-'
         },
         {
           role: 'resetZoom'
