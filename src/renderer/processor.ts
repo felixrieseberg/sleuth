@@ -138,6 +138,7 @@ export function getTypeForFile(logFile: UnzippedFile): LogType {
     || fileName.startsWith('onedrive')
     || fileName.startsWith('box')
     || fileName.startsWith('dropbox')
+    || fileName.startsWith('unknown')
     || fileName.endsWith('window-console.log')) {
     return LogType.RENDERER;
   } else if (fileName.startsWith('webapp')) {
