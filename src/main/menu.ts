@@ -3,6 +3,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import tmp from 'tmp';
 import { promisify } from 'util';
+import { format } from 'date-fns';
 
 import { getCurrentWindow } from './windows';
 import { getMenuTemplate } from './menu-template';
@@ -64,7 +65,9 @@ export class AppMenu {
 
         if (files && files.length > 0) {
           const { webContents } = await getCurrentWindow();
-          const tmpdir = await (promisify(tmp.dir) as any)({ unsafeCleanup: true });
+          const name = `Local Slack${type} Logs - ${format(Date.now(), `MMM d, y HH.mm.SSSS`)}`;
+          const tmpOptions: tmp.DirOptions = { unsafeCleanup: true, name };
+          const tmpdir = await (promisify(tmp.dir) as any)(tmpOptions);
 
           await fs.copy(logsPath, tmpdir);
           await fs.copy(storagePath, tmpdir);

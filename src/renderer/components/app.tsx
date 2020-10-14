@@ -15,6 +15,7 @@ import { SleuthState } from '../state/sleuth';
 import { shouldIgnoreFile } from '../../utils/should-ignore-file';
 import { isCacheDir } from '../../utils/is-cache';
 import { UnzippedFiles, UnzippedFile } from '../../interfaces';
+import { autorun } from 'mobx';
 
 const debug = require('debug')('sleuth:app');
 
@@ -51,6 +52,7 @@ export class App extends React.Component<{}, Partial<AppState>> {
     this.setupFileDrop();
     this.setupBusyResponse();
     this.setupOpenBacktrace();
+    this.setupWindowTitle();
   }
 
   /**
@@ -196,6 +198,17 @@ export class App extends React.Component<{}, Partial<AppState>> {
         {content}
       </div>
     );
+  }
+
+  /**
+   * Automatically update the Window title
+   */
+  private setupWindowTitle() {
+    autorun(() => {
+      document.title = this.sleuthState.source
+        ? `${path.basename(this.sleuthState.source)} - Sleuth`
+        : `Sleuth`;
+    });
   }
 
   /**
