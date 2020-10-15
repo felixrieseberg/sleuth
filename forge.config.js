@@ -66,7 +66,7 @@ const options = {
           authors: 'Felix Rieseberg',
           exe: 'sleuth.exe',
           noMsi: true,
-          remoteReleases: 'http://update.electronjs.org/felixrieseberg/sleuth/win32/1.0.0/RELEASES',
+          remoteReleases: 'https://github.com/felixrieseberg/sleuth',
           setupExe: `sleuth-${version}-${arch}-setup.exe`,
           setupIcon: path.resolve(iconDir, 'sleuth-icon.ico'),
           certificateFile: process.env['WINDOWS_CODESIGN_FILE'],
