@@ -9,6 +9,7 @@ import { SleuthState } from '../state/sleuth';
 import { isProcessedLogFile } from '../../utils/is-logfile';
 import { countExcessiveRepeats } from '../../utils/count-excessive-repeats';
 import { plural } from '../../utils/pluralize';
+import { getRootStateWarnings } from '../analytics/root-state-analytics';
 
 export interface SidebarProps {
   selectedLogFileName: string;
@@ -191,7 +192,9 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
       label = nameMatch && nameMatch.length > 1 ? nameMatch[1] : file.fileName;
     }
 
-    return Sidebar.getNode(label, { file }, isSelected);
+    const options: Partial<ITreeNode> = { secondaryLabel: this.getStateFileHint(file) };
+
+    return Sidebar.getNode(label, { file }, isSelected, options);
   }
 
   /**
@@ -239,9 +242,33 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
   public static getLogFileNode(file: ProcessedLogFile, props: SidebarProps): ITreeNode {
     const { selectedLogFileName } = props;
     const isSelected = (selectedLogFileName === file.logFile.fileName);
-    const options: Partial<ITreeNode> = { secondaryLabel: this.getNodeHint(file) };
+    const options: Partial<ITreeNode> = { secondaryLabel: this.getLogNodeHint(file) };
 
     return Sidebar.getNode(file.logFile.fileName, { file }, isSelected, options);
+  }
+
+  /**
+   * Get potential warnings for state files
+   *
+   * @static
+   * @param {ProcessedLogFile} file
+   * @returns {(JSX.Element | null)}
+   */
+  public static getStateFileHint(file: UnzippedFile): JSX.Element | null {
+    if (file.fileName.endsWith('root-state.json')) {
+      const warnings = getRootStateWarnings(file);
+
+      if (warnings && warnings.length > 0) {
+        const content = warnings.join('\n');
+        return (
+          <Tooltip content={content} position={Position.RIGHT} boundary='viewport'>
+            <Icon icon='error' intent={Intent.WARNING} />
+          </Tooltip>
+        );
+      }
+    }
+
+    return null;
   }
 
   /**
@@ -252,7 +279,7 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
    * @param {ProcessedLogFile} file
    * @returns {(JSX.Element | null)}
    */
-  public static getNodeHint(file: ProcessedLogFile): JSX.Element | null {
+  public static getLogNodeHint(file: ProcessedLogFile): JSX.Element | null {
     const { levelCounts, repeatedCounts } = file;
     const hasErrors = levelsHave('error', levelCounts);
     const hasWarnings = levelsHave('warn', levelCounts);
