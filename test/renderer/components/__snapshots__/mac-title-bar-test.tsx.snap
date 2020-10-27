@@ -3,5 +3,9 @@
 exports[`mac-titlebar renders correctly 1`] = `
 <div
   className="MacTitlebar"
-/>
+>
+  <span>
+    Sleuth
+  </span>
+</div>
 `;
