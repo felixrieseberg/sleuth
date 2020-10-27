@@ -16,6 +16,7 @@ import { shouldIgnoreFile } from '../../utils/should-ignore-file';
 import { isCacheDir } from '../../utils/is-cache';
 import { UnzippedFiles, UnzippedFile } from '../../interfaces';
 import { autorun } from 'mobx';
+import { getWindowTitle } from '../../utils/get-window-title';
 
 const debug = require('debug')('sleuth:app');
 
@@ -205,9 +206,7 @@ export class App extends React.Component<{}, Partial<AppState>> {
    */
   private setupWindowTitle() {
     autorun(() => {
-      document.title = this.sleuthState.source
-        ? `${path.basename(this.sleuthState.source)} - Sleuth`
-        : `Sleuth`;
+      document.title = getWindowTitle(this.sleuthState.source);
     });
   }
 
