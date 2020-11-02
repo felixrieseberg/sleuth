@@ -1,4 +1,4 @@
-import { app } from 'electron';
+import { app, BrowserWindow } from 'electron';
 
 console.log(`Welcome to Sleuth ${app.getVersion()}`);
 
@@ -33,7 +33,7 @@ if (require('electron-squirrel-startup')) {
       event.preventDefault();
 
       function openWhenReady() {
-        if (ipcManager) {
+        if (ipcManager && BrowserWindow.getAllWindows().length > 0) {
           ipcManager.openFile(path);
         } else {
           setTimeout(openWhenReady, 500);
