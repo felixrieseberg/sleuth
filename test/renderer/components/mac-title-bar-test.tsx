@@ -4,7 +4,7 @@ import renderer from 'react-test-renderer';
 
 it('mac-titlebar renders correctly', () => {
   const tree = renderer.create(
-    <MacTitlebar />
+    <MacTitlebar state={{} as any} />
   ).toJSON();
 
   expect(tree).toMatchSnapshot();
