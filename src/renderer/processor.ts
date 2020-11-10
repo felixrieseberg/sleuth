@@ -13,6 +13,8 @@ const DESKTOP_RGX = /^\s*\[([\d\/\,\s\:]{22})\] ([A-Za-z]{0,20})\: (.*)$/g;
 const WEBAPP_A_RGX = /^(\w*): (.{3}-\d{1,2} \d{2}:\d{2}:\d{2}.\d{0,3}) (.*)$/;
 const WEBAPP_B_RGX = /^(\w*): (\d{4}\/\d{1,2}\/\d{1,2} \d{2}:\d{2}:\d{2}.\d{0,3}) (.*)$/;
 
+const IOS_RGX = /^\s*\[((?:[0-9]{1,2}\/?){3}, [0-9]{1,2}:[0-9]{2}:[0-9]{2}\s?(?:AM|PM)?)\] (-|.{0,2}<\w+>)(.+)$/;
+
 // Mar-26 09:29:38.460 []
 const WEBAPP_NEW_TIMESTAMP_RGX = /^\w{3}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} .*$/;
 
@@ -120,7 +122,7 @@ export function mergeLogFiles(
 }
 
 /**
- * Takes a logfile and returns the file's type (browser/renderer/webapp/preload).
+ * Takes a logfile and returns the file's type (browser/renderer/webapp/preload/mobile).
  *
  * @param {UnzippedFile} logFile
  * @returns {LogType}
@@ -149,6 +151,8 @@ export function getTypeForFile(logFile: UnzippedFile): LogType {
     return LogType.NETLOG;
   } else if (fileName.startsWith('ShipIt') || fileName.includes('SquirrelSetup')) {
     return LogType.INSTALLER;
+  } else if (fileName.includes('Default_logs')) {
+    return LogType.IOS;
   }
 
   return LogType.UNKNOWN;
@@ -173,7 +177,8 @@ export function getTypesForFiles(logFiles: UnzippedFiles): SortedUnzippedFiles {
     preload: [],
     state: [],
     installer: [],
-    netlog: []
+    netlog: [],
+    mobile: []
   };
 
   logFiles.forEach((logFile) => {
@@ -570,6 +575,44 @@ export function matchLineElectron(line: string): MatchResult | undefined {
 }
 
 /**
+ * Matches an IOS line
+ * 
+ * @param line 
+ * @returns {(MatchResult | undefined)}
+ */
+export function matchLineIOS(line: string): MatchResult | undefined {
+  IOS_RGX.lastIndex = 0;
+  const results = IOS_RGX.exec(line);
+
+  if (results && results.length === 4) {
+    // Expected format: MM/DD/YY, HH:mm:ss ?AM|PM'
+    const momentValue = new Date(results[1]).valueOf();
+
+    const oldLevel = results[2];
+    let newLevel: string;
+
+    if (oldLevel.includes('ERR')) {
+      newLevel = 'error';
+    } else if (oldLevel.includes('WARN')) {
+      newLevel = 'warn';
+    } else if (oldLevel === '-') {
+      newLevel = 'info';
+    } else {
+      newLevel = oldLevel;
+    }
+ 
+    return {
+      timestamp: results[1],
+      level: newLevel,
+      message: results[3],
+      momentValue
+    };
+  }
+
+  return;
+}
+
+/**
  * Matches a Call line
  *
  * @param {string} line
@@ -587,7 +630,7 @@ export function matchLineCall(line: string): MatchResult | undefined {
 
     return {
       timestamp: results[1],
-      level: results[2].toLowerCase(),
+      level: results[2],
       message: results[3],
       momentValue
     };
@@ -618,6 +661,8 @@ export function getMatchFunction(
     } else {
       return matchLineShipItMac;
     }
+  } else if (logType === LogType.IOS) {
+    return matchLineIOS;
   } else {
     return matchLineElectron;
   }

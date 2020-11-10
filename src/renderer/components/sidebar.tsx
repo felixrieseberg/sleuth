@@ -31,7 +31,8 @@ const enum NODE_ID {
   CALLS = 'calls',
   INSTALLER = 'installer',
   NETWORK = 'network',
-  CACHE = 'cache'
+  CACHE = 'cache',
+  MOBILE = 'mobile'
 }
 
 const DEFAULT_NODES: Array<ITreeNode> = [
@@ -107,7 +108,12 @@ const DEFAULT_NODES: Array<ITreeNode> = [
     icon: 'projects',
     label: 'Cache',
     nodeData: { type: 'cache' }
-  }
+  }, {
+    id: NODE_ID.MOBILE,
+    hasCaret: false,
+    icon: 'mobile-phone',
+    label: 'Mobile',
+  isExpanded: true  }
 ];
 
 @observer
@@ -125,6 +131,8 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
     Sidebar.setChildNodes(NODE_ID.CALLS, state, processedLogFiles.call.map((file) => Sidebar.getFileNode(file, props)));
     Sidebar.setChildNodes(NODE_ID.INSTALLER, state, processedLogFiles.installer.map((file) => Sidebar.getInstallerFileNode(file, props)));
     Sidebar.setChildNodes(NODE_ID.NETWORK, state, processedLogFiles.netlog.map((file, i) => Sidebar.getNetlogFileNode(file, props, i)));
+    Sidebar.setChildNodes(NODE_ID.MOBILE, state, processedLogFiles.mobile.map((file) => Sidebar.getFileNode(file, props)));
+    
 
     return { nodes: state.nodes };
   }
