@@ -576,8 +576,8 @@ export function matchLineElectron(line: string): MatchResult | undefined {
 
 /**
  * Matches an IOS line
- * 
- * @param line 
+ *
+ * @param line
  * @returns {(MatchResult | undefined)}
  */
 export function matchLineIOS(line: string): MatchResult | undefined {
@@ -600,7 +600,7 @@ export function matchLineIOS(line: string): MatchResult | undefined {
     } else {
       newLevel = oldLevel;
     }
- 
+
     return {
       timestamp: results[1],
       level: newLevel,
