@@ -1,4 +1,3 @@
-import { file } from 'tmp';
 import { ProcessedLogFiles, Tool, SelectableLogFile } from '../interfaces';
 
 export function getFirstLogFile(files: ProcessedLogFiles | undefined): SelectableLogFile {
