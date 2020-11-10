@@ -42,7 +42,7 @@ export class CooperComments {
       comment
     });
 
-    log = log === 'browser' || log === 'renderer' ? 'browser-renderer' : log;
+    log = log === 'browser' || log === 'mobile' || log === 'renderer' ? 'browser-renderer' : log;
 
     debug(`Posting comment for log ${log}, line ${line}`);
 
@@ -63,7 +63,7 @@ export class CooperComments {
       }
     });
 
-    log = log === 'browser' || log === 'renderer' ? 'browser-renderer' : log;
+    log = log === 'browser' || log === 'mobile' || log === 'renderer' ? 'browser-renderer' : log;
 
     debug(`Updating comment for log ${log}, line ${lineId}, comment ${commentId}`);
 
@@ -78,7 +78,7 @@ export class CooperComments {
   public getComments(line: string, log: string): Promise<void | IGetCommentResponse> {
     const qs = queryString.stringify({line});
 
-    log = log === 'browser' || log === 'renderer' ? 'browser-renderer' : log;
+    log = log === 'browser' || log === 'mobile' || log === 'renderer' ? 'browser-renderer' : log;
 
     debug(`Grabbing comments for log ${log}, line ${line}`);
 
