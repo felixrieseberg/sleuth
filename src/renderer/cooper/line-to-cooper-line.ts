@@ -103,7 +103,11 @@ const filters: Array<Replacer> = [
   }, {
     name: 'ios-path',
     rgx: /\/private\/var\/mobile\/\S*/g,
-    replacer: `{iOS file path}`
+    replacer: `{iOS File Path}`
+  }, {
+    name: 'data-transfer-rate',
+    rgx: /\d\.\d*kbps/g,
+    replacer: `{Data Transfer Rate}`
   }
 ];
 
