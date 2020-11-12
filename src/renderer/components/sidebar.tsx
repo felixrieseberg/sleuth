@@ -110,7 +110,7 @@ const DEFAULT_NODES: Array<ITreeNode> = [
     nodeData: { type: 'cache' }
   }, {
     id: NODE_ID.MOBILE,
-    hasCaret: false,
+    hasCaret: true,
     icon: 'mobile-phone',
     label: 'Mobile',
   isExpanded: true  }
