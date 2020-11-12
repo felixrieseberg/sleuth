@@ -66,7 +66,6 @@ const options = {
           authors: 'Felix Rieseberg',
           exe: 'sleuth.exe',
           noMsi: true,
-          remoteReleases: 'https://github.com/felixrieseberg/sleuth',
           setupExe: `sleuth-${version}-${arch}-setup.exe`,
           setupIcon: path.resolve(iconDir, 'sleuth-icon.ico'),
           certificateFile: process.env['WINDOWS_CODESIGN_FILE'],
