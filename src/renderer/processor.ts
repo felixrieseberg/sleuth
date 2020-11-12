@@ -151,7 +151,7 @@ export function getTypeForFile(logFile: UnzippedFile): LogType {
     return LogType.NETLOG;
   } else if (fileName.startsWith('ShipIt') || fileName.includes('SquirrelSetup')) {
     return LogType.INSTALLER;
-  } else if (fileName.includes('Default_logs')) {
+  } else if (fileName.includes('Default_logs') || /\w{9,}_\w{9,}_\d{16,}\.txt/.test(fileName)) {
     return LogType.IOS;
   }
 

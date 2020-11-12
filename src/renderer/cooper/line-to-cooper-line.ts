@@ -100,6 +100,10 @@ const filters: Array<Replacer> = [
     name: 'api-descriptor',
     rgx: /noversion-[\d]{10}\.[\d]{3}/g,
     replacer: `{API Version}-{Timestamp}`
+  }, {
+    name: 'ios-path',
+    rgx: /\/private\/var\/mobile\/\S*/g,
+    replacer: `{iOS file path}`
   }
 ];
 
