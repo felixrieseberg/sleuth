@@ -17,6 +17,7 @@ export const enum LogType {
   NETLOG = 'netlog',
   INSTALLER = 'installer',
   ALL = 'all',
+  IOS = 'mobile',
   UNKNOWN = ''
 }
 
@@ -28,7 +29,8 @@ export const ALL_LOG_TYPES = [
   LogType.PRELOAD,
   LogType.NETLOG,
   LogType.INSTALLER,
-  LogType.ALL
+  LogType.ALL,
+  LogType.IOS
 ];
 
 export const LOG_TYPES_TO_PROCESS = [
@@ -37,7 +39,8 @@ export const LOG_TYPES_TO_PROCESS = [
   LogType.WEBAPP,
   LogType.PRELOAD,
   LogType.CALL,
-  LogType.INSTALLER
+  LogType.INSTALLER,
+  LogType.IOS
 ];
 
 export interface Bookmark {
@@ -115,6 +118,7 @@ export interface MergedLogFiles {
   webapp: MergedLogFile;
   preload: MergedLogFile;
   call: MergedLogFile;
+  mobile: MergedLogFile;
   type: 'MergedLogFiles';
 }
 
@@ -136,6 +140,7 @@ export interface ProcessedLogFiles {
   call: Array<ProcessedLogFile>;
   netlog: Array<UnzippedFile>;
   installer: Array<UnzippedFile>;
+  mobile: Array<UnzippedFile>;
 }
 
 export interface MergedLogFile extends BaseFile {
@@ -154,6 +159,7 @@ export interface SortedUnzippedFiles {
   call: Array<UnzippedFile>;
   netlog: Array<UnzippedFile>;
   installer: Array<UnzippedFile>;
+  mobile: Array<UnzippedFile>;
 }
 
 export interface MergedFilesLoadStatus {
@@ -163,6 +169,7 @@ export interface MergedFilesLoadStatus {
   preload: boolean;
   webapp: boolean;
   call: boolean;
+  mobile: boolean;
 }
 
 export interface Suggestion extends fs.Stats {

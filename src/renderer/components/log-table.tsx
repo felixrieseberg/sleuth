@@ -550,6 +550,8 @@ export class LogTable extends React.Component<LogTableProps, Partial<LogTableSta
       prefix = <i title='Preload Log' className='Meta Color-Preload ts_icon ts_icon_all_files_alt'/>;
     } else if (entry.logType === 'call') {
       prefix = <i title='Call Log' className='Meta Color-Call ts_icon ts_icon_phone'/>;
+    } else if (entry.logType === 'mobile') {
+      prefix = <i title='Mobile Log' className='Meta Color-Mobile ts_icon ts_icon_phone'/>;
     }
 
     return (<span title={entry.timestamp}>{prefix}{timestamp}</span>);

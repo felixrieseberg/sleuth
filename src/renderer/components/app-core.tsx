@@ -52,7 +52,8 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
         state: [],
         call: [],
         installer: [],
-        netlog: []
+        netlog: [],
+        mobile: [],
       },
       loadingMessage: '',
       loadedLogFiles: false,
@@ -200,6 +201,7 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
       preload: !!(mergedLogFiles && mergedLogFiles.preload && mergedLogFiles.preload.logEntries),
       webapp: !!(mergedLogFiles && mergedLogFiles.webapp && mergedLogFiles.webapp.logEntries),
       call: !!(mergedLogFiles && mergedLogFiles.call && mergedLogFiles.call.logEntries),
+      mobile: !!(mergedLogFiles && mergedLogFiles.mobile && mergedLogFiles.mobile.logEntries)
     };
   }
 

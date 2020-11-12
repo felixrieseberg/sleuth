@@ -10,6 +10,7 @@ export function getFirstLogFile(files: ProcessedLogFiles | undefined): Selectabl
     if (files.netlog && files.netlog.length > 0) return files.netlog[0];
     if (files.installer && files.installer.length > 0) return files.installer[0];
     if (files.state && files.state.length > 0) return files.state[0];
+    if (files.mobile && files.mobile.length > 0) return files.mobile[0];
   }
 
   return Tool.cache;
