@@ -41,7 +41,7 @@ export class Unzipper {
   }
 
   public open(): Promise<any> {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       yauzl.open(this.url, { lazyEntries: true }, (error: Error, zip: any) => {
         if (error) {
           return reject(error);
@@ -75,7 +75,7 @@ export class Unzipper {
   }
 
   public handleFile(entry: YauzlZipEntry): Promise<any> {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       const targetPath = path.join(this.output, entry.fileName);
 
       debug(`Found file: ${entry.fileName}, Size: ${entry.compressedSize}.`);
@@ -101,7 +101,7 @@ export class Unzipper {
           debug(`Successfully unzipped ${entry.fileName} to ${targetPath}`);
           resolve();
         });
-    });
+      });
     });
   }
 
