@@ -903,12 +903,12 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@blueprintjs/core@^3.32.1":
-  version "3.32.1"
-  resolved "https://registry.yarnpkg.com/@blueprintjs/core/-/core-3.32.1.tgz#16a2034727b2a71e492538193e31d38cd40fc61c"
-  integrity sha512-rJoBQEZaE3o3dKgow7ZVFnVDBoR0zUNzg94AfR3jTiSdWNyNHWpXHAv0/RSCxUF4nA4+jP+iqidfxZoKyYEZIg==
+"@blueprintjs/core@^3.36.0":
+  version "3.36.0"
+  resolved "https://registry.yarnpkg.com/@blueprintjs/core/-/core-3.36.0.tgz#0a271092050c17b84f29426594708180a1b5401a"
+  integrity sha512-7VUyF+qWelDysajK0Xowlou+iqbGAFfGaM3znpmm7OEEIli5XRWjG9rhNuEk3sP7zbdOJpyqh5PAPDQvm5Sxmg==
   dependencies:
-    "@blueprintjs/icons" "^3.21.0"
+    "@blueprintjs/icons" "^3.23.0"
     "@types/dom4" "^2.0.1"
     classnames "^2.2"
     dom4 "^2.1.5"
@@ -920,31 +920,31 @@
     resize-observer-polyfill "^1.5.1"
     tslib "~1.13.0"
 
-"@blueprintjs/datetime@^3.19.1":
-  version "3.19.1"
-  resolved "https://registry.yarnpkg.com/@blueprintjs/datetime/-/datetime-3.19.1.tgz#d7030f6389a850a4080e1fbc7fc6aa5447885497"
-  integrity sha512-AmJJsAZdPWgEOjNzDCSr+m0sdut9TM23UX6ctZWmqmrA13irSX4Vg7IUt90IHKlIxucXOZXWlPhkii8C2TULuQ==
+"@blueprintjs/datetime@^3.20.0":
+  version "3.20.0"
+  resolved "https://registry.yarnpkg.com/@blueprintjs/datetime/-/datetime-3.20.0.tgz#e755620c00c8114ae2e1d01cc1356e0fa260bac7"
+  integrity sha512-WJlS1j2qfBdUK2IziVqorO6vguISYosn3s/7r7fJwoma3B+asFTTHaeU7CtsZu7B6BIdtOhiaM387fDHV490zQ==
   dependencies:
-    "@blueprintjs/core" "^3.32.1"
+    "@blueprintjs/core" "^3.36.0"
     classnames "^2.2"
     react-day-picker "7.4.8"
     react-lifecycles-compat "^3.0.4"
     tslib "~1.13.0"
 
-"@blueprintjs/icons@^3.21.0":
-  version "3.21.0"
-  resolved "https://registry.yarnpkg.com/@blueprintjs/icons/-/icons-3.21.0.tgz#1cab6d2de069674fd4909ca10fefa94d3563ea5f"
-  integrity sha512-5vszPkRNaCctDRp2wDLJLTzqQ1Qlp8gr2BqkjPcPBDVMGlYCdM1/LaBZazMgj+/52n7Z+kJzQ5rRNv9DX5LJoA==
+"@blueprintjs/icons@^3.23.0":
+  version "3.23.0"
+  resolved "https://registry.yarnpkg.com/@blueprintjs/icons/-/icons-3.23.0.tgz#4cfe0db4363971ac5d8a0a59590a6efc16115dc6"
+  integrity sha512-QOQ3P5bU1FiEwnMBl5Chn433ONSSTIMgC+zZJttyXV0m8R7D1bPBJJqIMuANXtRld/Fj+8IzoQ6jfaVUG16slA==
   dependencies:
     classnames "^2.2"
     tslib "~1.13.0"
 
-"@blueprintjs/select@^3.14.1":
-  version "3.14.1"
-  resolved "https://registry.yarnpkg.com/@blueprintjs/select/-/select-3.14.1.tgz#1b29bc73bb33a393c0139080655fce5693427d2f"
-  integrity sha512-4z+1PB1CnnzfcxIjqjC9v1uamuwdJskoeI+XVYLA3PWScenKvk+29XoitiWUM6TcupdyNXhNRHM8ijva937vCg==
+"@blueprintjs/select@^3.15.0":
+  version "3.15.0"
+  resolved "https://registry.yarnpkg.com/@blueprintjs/select/-/select-3.15.0.tgz#6307017df896fbd7b523fc08e41097b475be0831"
+  integrity sha512-pRiCVqzrJ+bV/Aac9OouxniD2DJVCVNnkk6KJET7PU9ZxD7Bo/42W9xmTlUCSd7r6FRRarYyKbRRjRXGP7U78g==
   dependencies:
-    "@blueprintjs/core" "^3.32.1"
+    "@blueprintjs/core" "^3.36.0"
     classnames "^2.2"
     tslib "~1.13.0"
 
@@ -1761,6 +1761,13 @@
   dependencies:
     "@types/node" "*"
 
+"@types/fs-extra@^9.0.4":
+  version "9.0.4"
+  resolved "https://registry.yarnpkg.com/@types/fs-extra/-/fs-extra-9.0.4.tgz#12553138cf0438db9a31cdc8b0a3aa9332eb67aa"
+  integrity sha512-50GO5ez44lxK5MDH90DYHFFfqxH7+fTqEEnvguQRzJ/tY9qFrMSHLiYHite+F3SNmf7+LHC1eMXojuD+E3Qcyg==
+  dependencies:
+    "@types/node" "*"
+
 "@types/glob@^7.1.1":
   version "7.1.3"
   resolved "https://registry.yarnpkg.com/@types/glob/-/glob-7.1.3.tgz#e6ba80f36b7daad2c685acd9266382e68985c183"
@@ -1917,17 +1924,17 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react-dom@^16.9.9":
-  version "16.9.9"
-  resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-16.9.9.tgz#d2d0a6f720a0206369ccbefff752ba37b9583136"
-  integrity sha512-jE16FNWO3Logq/Lf+yvEAjKzhpST/Eac8EMd1i4dgZdMczfgqC8EjpxwNgEe3SExHYLliabXDh9DEhhqnlXJhg==
+"@types/react-dom@^17.0.0":
+  version "17.0.0"
+  resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-17.0.0.tgz#b3b691eb956c4b3401777ee67b900cb28415d95a"
+  integrity sha512-lUqY7OlkF/RbNtD5nIq7ot8NquXrdFrjSOR6+w9a9RFQevGi1oZO1dcJbXMeONAPKtZ2UrZOEJ5UOCVsxbLk/g==
   dependencies:
     "@types/react" "*"
 
-"@types/react-test-renderer@^16.9.3":
-  version "16.9.3"
-  resolved "https://registry.yarnpkg.com/@types/react-test-renderer/-/react-test-renderer-16.9.3.tgz#96bab1860904366f4e848b739ba0e2f67bcae87e"
-  integrity sha512-wJ7IlN5NI82XMLOyHSa+cNN4Z0I+8/YaLl04uDgcZ+W+ExWCmCiVTLT/7fRNqzy4OhStZcUwIqLNF7q+AdW43Q==
+"@types/react-test-renderer@^17.0.0":
+  version "17.0.0"
+  resolved "https://registry.yarnpkg.com/@types/react-test-renderer/-/react-test-renderer-17.0.0.tgz#9be47b375eeb906fced37049e67284a438d56620"
+  integrity sha512-nvw+F81OmyzpyIE1S0xWpLonLUZCMewslPuA8BtjSKc5XEbn8zEQBXS7KuOLHTNnSOEM2Pum50gHOoZ62tqTRg==
   dependencies:
     "@types/react" "*"
 
@@ -2148,6 +2155,11 @@ argparse@^1.0.7:
   integrity sha512-o5Roy6tNG4SL/FOkCAN6RzjiakZS25RLYFrcMttJqbdd8BWrnA+fGz57iN5Pb06pvBGvl5gQ0B48dJlslXvoTg==
   dependencies:
     sprintf-js "~1.0.2"
+
+argparse@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/argparse/-/argparse-2.0.1.tgz#246f50f3ca78a3240f6c997e8a9bd1eac49e4b38"
+  integrity sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==
 
 arr-diff@^4.0.0:
   version "4.0.0"
@@ -4565,7 +4577,7 @@ electron-rebuild@^2.0.3:
     fs-extra "^9.0.1"
     got "^11.7.0"
     lzma-native "^6.0.1"
-    node-abi "^2.19.3"
+    node-abi "^2.19.1"
     node-gyp "^7.1.0"
     ora "^5.1.0"
     tar "^6.0.5"
@@ -4651,10 +4663,15 @@ entities@^1.1.1, entities@^1.1.2, entities@~1.1.1:
   resolved "https://registry.yarnpkg.com/entities/-/entities-1.1.2.tgz#bdfa735299664dfafd34529ed4f8522a275fea56"
   integrity sha512-f2LZMYl1Fzu7YSBKg+RoROelpOaNrcGmE9AZubeDfrCEia483oW4MI4VyFd5VNHIgQ/7qm1I0wUHK1eJnn2y2w==
 
-entities@^2.0.0, entities@~2.0.0:
+entities@^2.0.0:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/entities/-/entities-2.0.3.tgz#5c487e5742ab93c15abb5da22759b8590ec03b7f"
   integrity sha512-MyoZ0jgnLvB2X3Lg5HqpFmn1kybDiIfEQmKzTb5apr51Rb+T3KdmMiqa70T+bhGnyv7bQ6WMj2QMHpGMmlrUYQ==
+
+entities@~2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/entities/-/entities-2.1.0.tgz#992d3129cf7df6870b96c57858c249a120f8b8b5"
+  integrity sha512-hCx1oky9PFrJ611mf0ifBLBRW8lUUVRlFolb5gWRfIELabBlbp9xZvrqZLZAs+NxFnbfQoeGd8wDkygjg7U85w==
 
 env-paths@^2.2.0:
   version "2.2.0"
@@ -7287,10 +7304,10 @@ map-visit@^1.0.0:
   dependencies:
     object-visit "^1.0.0"
 
-markdown-it-emoji@1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/markdown-it-emoji/-/markdown-it-emoji-1.4.0.tgz#9bee0e9a990a963ba96df6980c4fddb05dfb4dcc"
-  integrity sha1-m+4OmpkKljupbfaYDE/dsF37Tcw=
+markdown-it-emoji@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/markdown-it-emoji/-/markdown-it-emoji-2.0.0.tgz#3164ad4c009efd946e98274f7562ad611089a231"
+  integrity sha512-39j7/9vP/CPCKbEI44oV8yoPJTpvfeReTn/COgRhSpNrjWF3PfP/JUxxB0hxV6ynOY8KH8Y8aX9NMDdo6z+6YQ==
 
 markdown-it-highlightjs@3.4.0:
   version "3.4.0"
@@ -7300,13 +7317,13 @@ markdown-it-highlightjs@3.4.0:
     highlight.js "^10.2.0"
     lodash.flow "^3.5.0"
 
-markdown-it@11.0.1:
-  version "11.0.1"
-  resolved "https://registry.yarnpkg.com/markdown-it/-/markdown-it-11.0.1.tgz#b54f15ec2a2193efa66dda1eb4173baea08993d6"
-  integrity sha512-aU1TzmBKcWNNYvH9pjq6u92BML+Hz3h5S/QpfTFwiQF852pLT+9qHsrhM9JYipkOXZxGn+sGH8oyJE9FD9WezQ==
+markdown-it@12.0.3:
+  version "12.0.3"
+  resolved "https://registry.yarnpkg.com/markdown-it/-/markdown-it-12.0.3.tgz#8d1e47daf1d716d63610495eb93f6665573e4abe"
+  integrity sha512-M57RsMv+QQmJHz1yCu0gTJRMx/LlxRPtrrw+2kb/CpDVK/graCmWO0qfNnz/SE1FCNdyq3pkMMZ+itTnyT/YGA==
   dependencies:
-    argparse "^1.0.7"
-    entities "~2.0.0"
+    argparse "^2.0.1"
+    entities "~2.1.0"
     linkify-it "^3.0.1"
     mdurl "^1.0.1"
     uc.micro "^1.0.5"
