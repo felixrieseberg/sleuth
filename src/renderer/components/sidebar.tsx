@@ -313,7 +313,7 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
       // Not empty? Add a space
       if (content) content += ` `;
 
-      const line = plural('lines', excessiveRepeats);
+      const line = plural('line', excessiveRepeats);
       const has = plural('has', excessiveRepeats, 'have');
 
       content += `${excessiveRepeats} log ${line} ${has} been excessively repeated.`;
