@@ -94,7 +94,8 @@ async function getSuggestions(input: Array<string>): Promise<Array<Suggestion>> 
     // have named it T8KJ1FXTL_U8KCVGGLR_1580765146766674.txt
     const serverFormat = /\w{9,}_\w{9,}_\d{16,}\.(zip|txt)/;
     const logsFormat = /.*logs.*\.zip/;
-    const shouldAdd = logsFormat.test(file) || serverFormat.test(file);
+    const iosLogsFormat = /Default_logs?.{0,5}.txt/;
+    const shouldAdd = logsFormat.test(file) || serverFormat.test(file) || iosLogsFormat.test(file);
 
     if (shouldAdd) {
       try {

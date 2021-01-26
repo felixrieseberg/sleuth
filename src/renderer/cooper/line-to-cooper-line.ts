@@ -108,6 +108,14 @@ const filters: Array<Replacer> = [
     name: 'data-transfer-rate',
     rgx: /\d\.\d*kbps/g,
     replacer: `{Data Transfer Rate}`
+  }, {
+    name: 'android-timestamp-no-date',
+    rgx: /[0-9]{2}:[0-9]{2}:[0-9]{2}:[0-9]{3}\t?\s*.*/g,
+    replacer: ''
+  }, {
+    name: 'android-states-from-team',
+    rgx: /\ team: T[A-Z0-9]{8,}/g,
+    replacer: ` team: {TEAM ID}`
   }
 ];
 

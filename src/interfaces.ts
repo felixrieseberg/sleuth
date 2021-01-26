@@ -17,7 +17,7 @@ export const enum LogType {
   NETLOG = 'netlog',
   INSTALLER = 'installer',
   ALL = 'all',
-  IOS = 'mobile',
+  MOBILE = 'mobile',
   UNKNOWN = ''
 }
 
@@ -30,7 +30,7 @@ export const ALL_LOG_TYPES = [
   LogType.NETLOG,
   LogType.INSTALLER,
   LogType.ALL,
-  LogType.IOS
+  LogType.MOBILE
 ];
 
 export const LOG_TYPES_TO_PROCESS = [
@@ -40,7 +40,7 @@ export const LOG_TYPES_TO_PROCESS = [
   LogType.PRELOAD,
   LogType.CALL,
   LogType.INSTALLER,
-  LogType.IOS
+  LogType.MOBILE
 ];
 
 export interface Bookmark {
