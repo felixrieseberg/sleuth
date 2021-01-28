@@ -8,12 +8,12 @@ import { getIdForLogFiles } from '../utils/id-for-logfiles';
 
 const debug = require('debug')('sleuth:processor');
 
-const DESKTOP_RGX = /^\s*\[([\d\/\,\s\:]{22})\] ([A-Za-z]{0,20})\: (.*)$/g;
+const DESKTOP_RGX = /^\s*\[([\d\/\,\s\:]{22,24})\] ([A-Za-z]{0,20})\:?(.*)$/g;
 
 const WEBAPP_A_RGX = /^(\w*): (.{3}-\d{1,2} \d{2}:\d{2}:\d{2}.\d{0,3}) (.*)$/;
 const WEBAPP_B_RGX = /^(\w*): (\d{4}\/\d{1,2}\/\d{1,2} \d{2}:\d{2}:\d{2}.\d{0,3}) (.*)$/;
 
-const IOS_RGX = /^\s*\[((?:[0-9]{1,2}\/?){3}, [0-9]{1,2}:[0-9]{2}:[0-9]{2}\s?(?:AM|PM)?)\] (-|.{0,2}<\w+>)(.+)$/;
+const IOS_RGX = /^\s*\[((?:[0-9]{1,4}(?:\/|\-)?){3}, [0-9]{1,2}:[0-9]{2}:[0-9]{2}\s?(?:AM|PM)?)\] (-|.{0,2}<\w+>)(.+)$/;
 
 // Mar-26 09:29:38.460 []
 const WEBAPP_NEW_TIMESTAMP_RGX = /^\w{3}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} .*$/;
@@ -412,10 +412,11 @@ export function readFile(
  */
 export function matchLineWebApp(line: string): MatchResult | undefined {
   // Matcher for the webapp, which is a bit dirty. This beast of a regex
-  // matches two possible timestamps:
+  // matches three possible timestamps:
   //
   // info: 2017/2/22 16:02:37.178 didStartLoading called TSSSB.timeout_tim set for ms:60000
   // info: Mar-19 13:50:41.676 [FOCUS-EVENT] Window focused
+  // [01/12/2021, 24:13:05:353] INFO [COUNTS] (T29KZ003T)
   //
   // Matcher for webapp logs that don't have a timestamp, but do have a level 🙄
   // info: ╔═══════════════════════════════════════════════════════════════════════╗
@@ -430,8 +431,9 @@ export function matchLineWebApp(line: string): MatchResult | undefined {
 
   // First, try the expected default format
   if (results && results.length === 4) {
-    // Expected format: MM/DD/YY, HH:mm:ss:SSS'
-    const momentValue = new Date(results[1]).valueOf();
+
+    // Expected format: MM/DD/YY(YY), HH:mm:ss:SSS'
+    const momentValue = new Date(results[1].replace(', 24:', ', 00:')).valueOf();
     let message = results[3];
 
     // If we have two timestamps, cut that from the message
@@ -441,7 +443,7 @@ export function matchLineWebApp(line: string): MatchResult | undefined {
 
     return {
       timestamp: results[1],
-      level: results[2],
+      level: results[2].toLowerCase(),
       message,
       momentValue
     };
@@ -561,11 +563,11 @@ export function matchLineElectron(line: string): MatchResult | undefined {
 
   if (results && results.length === 4) {
     // Expected format: MM/DD/YY, HH:mm:ss:SSS'
-    const momentValue = new Date(results[1]).valueOf();
+    const momentValue = new Date(results[1].replace(', 24:', ', 00:')).valueOf();
 
     return {
       timestamp: results[1],
-      level: results[2],
+      level: results[2].toLowerCase(),
       message: results[3],
       momentValue
     };
