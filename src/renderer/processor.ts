@@ -646,10 +646,10 @@ export function matchLineMobile(line: string): MatchResult | undefined {
   // Let's pretend some of the debugging metadata is a log line so we can search for it
   if (line.startsWith('UsersCounts') || line.startsWith('Messag') && !line.startsWith('MessageGap(')) {
     return {
-      timestamp: new Date().toString(),
+      timestamp: new Date('Jan-01-70 00:00:00').toString(),
       level: 'info',
       message: line,
-      momentValue: new Date().valueOf(),
+      momentValue: new Date('Jan-01-70 00:00:00').valueOf(),
     };
   }
 
