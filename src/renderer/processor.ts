@@ -14,6 +14,7 @@ const WEBAPP_A_RGX = /^(\w*): (.{3}-\d{1,2} \d{2}:\d{2}:\d{2}.\d{0,3}) (.*)$/;
 const WEBAPP_B_RGX = /^(\w*): (\d{4}\/\d{1,2}\/\d{1,2} \d{2}:\d{2}:\d{2}.\d{0,3}) (.*)$/;
 
 const IOS_RGX = /^\s*\[((?:[0-9]{1,4}(?:\/|\-)?){3}, [0-9]{1,2}:[0-9]{2}:[0-9]{2}\s?(?:AM|PM)?)\] (-|.{0,2}<\w+>)(.+)$/;
+const ANDROID_RGX = /^\s*([0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}:[0-9]{3}) (.+)$/;
 
 // Mar-26 09:29:38.460 []
 const WEBAPP_NEW_TIMESTAMP_RGX = /^\w{3}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} .*$/;
@@ -151,8 +152,8 @@ export function getTypeForFile(logFile: UnzippedFile): LogType {
     return LogType.NETLOG;
   } else if (fileName.startsWith('ShipIt') || fileName.includes('SquirrelSetup')) {
     return LogType.INSTALLER;
-  } else if (fileName.includes('Default_logs') || /\w{9,}_\w{9,}_\d{16,}\.txt/.test(fileName)) {
-    return LogType.IOS;
+  } else if (fileName.includes('Default_logs') || fileName.startsWith('attachment') || /\w{9,}_\w{9,}_\d{16,}\.txt/.test(fileName)) {
+    return LogType.MOBILE;
   }
 
   return LogType.UNKNOWN;
@@ -359,7 +360,7 @@ export function readFile(
     function readLine(line: string) {
       lines = lines + 1;
 
-      if (!line || line.length === 0) {
+      if (!line || line.length === 0 || (logType === 'mobile' && line.startsWith('====='))) {
         return;
       }
 
@@ -382,6 +383,9 @@ export function readFile(
         if (isCall && current) {
           // Call logs sometimes have random newlines
           current.message += line;
+        } else if (logType === 'mobile' && current) {
+          // Android logs do too
+          current.message += '\n' + line;
         } else {
           // This is (hopefully) part of a meta object
           toParse += line + '\n';
@@ -577,14 +581,18 @@ export function matchLineElectron(line: string): MatchResult | undefined {
 }
 
 /**
- * Matches an IOS line
+ * Matches a mobile (iOS or Android) line
  *
  * @param line
  * @returns {(MatchResult | undefined)}
  */
-export function matchLineIOS(line: string): MatchResult | undefined {
+export function matchLineMobile(line: string): MatchResult | undefined {
+
+  if (line.startsWith('=====')) { return; } // We're ignoring these lines
+
+  // Let's see if it's an iOS log first
   IOS_RGX.lastIndex = 0;
-  const results = IOS_RGX.exec(line);
+  let results = IOS_RGX.exec(line);
 
   if (results && results.length === 4) {
     // Expected format: MM/DD/YY, HH:mm:ss ?AM|PM'
@@ -597,10 +605,8 @@ export function matchLineIOS(line: string): MatchResult | undefined {
       newLevel = 'error';
     } else if (oldLevel.includes('WARN')) {
       newLevel = 'warn';
-    } else if (oldLevel === '-') {
-      newLevel = 'info';
     } else {
-      newLevel = oldLevel;
+      newLevel = 'info';
     }
 
     return {
@@ -608,6 +614,42 @@ export function matchLineIOS(line: string): MatchResult | undefined {
       level: newLevel,
       message: results[3],
       momentValue
+    };
+  }
+
+  // Not iOS? Try Android
+  ANDROID_RGX.lastIndex = 0;
+  results = ANDROID_RGX.exec(line);
+
+  if (results && results.length === 3) {
+
+    // Android timestamps have no year, so we gotta add one
+    const currentDate = new Date();
+    const newTimestamp = new Date(results[1]);
+    newTimestamp.setFullYear(currentDate.getFullYear());
+
+    if (newTimestamp > currentDate) { // If the date is in the future, change the year by -1
+      newTimestamp.setFullYear(newTimestamp.getFullYear() - 1);
+    }
+
+    // Expected format: MM-DD HH:mm:ss:sss
+    const momentValue = newTimestamp.valueOf();
+
+    return {
+      timestamp: newTimestamp.toString(),
+      level: 'info',
+      message: results[2],
+      momentValue
+    };
+  }
+
+  // Let's pretend some of the debugging metadata is a log line so we can search for it
+  if (line.startsWith('UsersCounts') || line.startsWith('Messag') && !line.startsWith('MessageGap(')) {
+    return {
+      timestamp: new Date('Jan-01-70 00:00:00').toString(),
+      level: 'info',
+      message: line,
+      momentValue: new Date('Jan-01-70 00:00:00').valueOf(),
     };
   }
 
@@ -663,8 +705,8 @@ export function getMatchFunction(
     } else {
       return matchLineShipItMac;
     }
-  } else if (logType === LogType.IOS) {
-    return matchLineIOS;
+  } else if (logType === LogType.MOBILE) {
+    return matchLineMobile;
   } else {
     return matchLineElectron;
   }
