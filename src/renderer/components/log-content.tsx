@@ -6,12 +6,14 @@ import { LogTable } from './log-table';
 import { observer } from 'mobx-react';
 import React from 'react';
 
+
 import { LogLineDetails } from './log-line-details/details';
 import { Scrubber } from './scrubber';
 import { getFontForCSS } from './preferences-font';
 import { getTypeForFile } from '../processor';
 import { NetLogView } from './net-log-view';
 import { ToolView } from './tool-view';
+import { LogTimeView } from './log-time-view';
 
 export interface LogContentProps {
   state: SleuthState;
@@ -54,14 +56,13 @@ export class LogContent extends React.Component<LogContentProps, Partial<LogCont
 
     if (!selectedLogFile) return null;
     const isLog = isLogFile(selectedLogFile);
-    const tableStyle = isDetailsVisible ? { height: this.state.tableHeight } : { flexGrow: 1 };
     const scrubber = <Scrubber elementSelector='LogTableContainer' onResizeHandler={this.resizeHandler} />;
 
     // In most cases, we're dealing with a log file
     if (isLog) {
       return (
         <div className='LogContent' style={{ fontFamily: getFontForCSS(font) }}>
-          <div id='LogTableContainer' style={tableStyle}>
+          <div id='LogTableContainer' style={{ height: this.state.tableHeight }}>
             <LogTable
               state={this.props.state}
               dateTimeFormat={dateTimeFormat}
@@ -74,8 +75,9 @@ export class LogContent extends React.Component<LogContentProps, Partial<LogCont
               selectedEntry={selectedEntry}
             />
           </div>
-          {isDetailsVisible ? scrubber : null}
+          {scrubber}
           <LogLineDetails state={this.props.state} />
+          <LogTimeView height={this.state.tableHeight ? window.innerHeight - 60 - this.state.tableHeight : 0} isVisible={!isDetailsVisible} state={this.props.state} logFile={selectedLogFile as ProcessedLogFile} />
         </div>
       );
     }
