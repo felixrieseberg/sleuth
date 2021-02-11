@@ -26,7 +26,7 @@ const filters: Array<Replacer> = [
     replacer: ` {User IDs} `
   }, {
     name: 'channel-ids',
-    rgx: /((?:\(| |^|')*(?:"{0,1}C[A-Z0-9]{8,}"{0,1})(?:\)|,| |'|$)){2,}/g,
+    rgx: /((?:\(| |^|')*(?:"{0,1}[CDG][A-Z0-9]{8,}"{0,1})(?:\)|,| |'|$)){2,}/g,
     replacer: ` {Channel IDs} `
   }, {
     name: 'team-id',
@@ -34,7 +34,7 @@ const filters: Array<Replacer> = [
     replacer: ' {Team ID} '
   }, {
     name: 'user-id',
-    rgx: /( |^)("{0,1}(?:U|W|B)[A-Z0-9]{8,}"{0,1})( |$)/g,
+    rgx: /( |^)("{0,1}(?:U|W|B|A)[A-Z0-9]{8,}"{0,1})( |$)/g,
     replacer: ' {User} '
   }, {
     name: 'ms',
@@ -54,7 +54,7 @@ const filters: Array<Replacer> = [
     replacer: ' {id} '
   }, {
     name: 'channel-id',
-    rgx: /( |^|\()("{0,1}(C|D)[A-Z0-9]{8,}"{0,1})( |\)|:|$)/g,
+    rgx: /( |^|\()("{0,1}(C|D|G)[A-Z0-9]{8,}"{0,1})( |\)|:|$|,)/g,
     replacer: ' {Channel} '
   }, {
     name: 'was-active',
@@ -66,7 +66,7 @@ const filters: Array<Replacer> = [
     replacer: '$1{Time}'
   }, {
     name: 'deep-link',
-    rgx: /slack:\/\/channel\?team=(T[A-Z0-9]{8,})&id=(C|D)[A-Z0-9]{8,}/,
+    rgx: /slack:\/\/channel\?team=(T[A-Z0-9]{8,})&id=(C|D|G)[A-Z0-9]{8,}/,
     replacer: 'slack://channel?team={Team ID}&id={Channel ID}'
   }, {
     name: 'double-space',
@@ -116,6 +116,30 @@ const filters: Array<Replacer> = [
     name: 'android-states-from-team',
     rgx: /\ team: T[A-Z0-9]{8,}/g,
     replacer: ` team: {TEAM ID}`
+  }, {
+    name: 'console-stack-trace',
+    rgx: /\n +.+/g,
+    replacer: ''
+  }, {
+    name: 'pixels',
+    rgx: /\d+px/g,
+    replacer: '{Pixels}'
+  }, {
+    name: 'source',
+    rgx: /\ .+\.slack\.com.+\:1/g,
+    replacer: ' {Source}'
+  }, {
+    name: 'timestamp-with-xxxxx',
+    rgx: /\:\ \d{10}\.x{5}\d/g,
+    replacer: ': {Timestamp}'
+  }, {
+    name: 'source-in-brackets',
+    rgx: /\ \<\S+\:1\>/g,
+    replacer: ''
+  }, {
+    name: 'probably-gantry',
+    rgx: /\ \S+\.min\.js\?.+\:1/g,
+    replacer: ' {Source}'
   }
 ];
 

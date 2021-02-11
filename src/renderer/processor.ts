@@ -16,7 +16,7 @@ const WEBAPP_B_RGX = /^(\w*): (\d{4}\/\d{1,2}\/\d{1,2} \d{2}:\d{2}:\d{2}.\d{0,3}
 const IOS_RGX = /^\s*\[((?:[0-9]{1,4}(?:\/|\-)?){3}, [0-9]{1,2}:[0-9]{2}:[0-9]{2}\s?(?:AM|PM)?)\] (-|.{0,2}<\w+>)(.+)$/;
 const ANDROID_RGX = /^\s*([0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}:[0-9]{3}) (.+)$/;
 
-const CONSOLE_A_RGX = /(\S*:1)?(?:[\u200B\t ]?)([A-Za-z]{3}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}) (.+)/g;
+const CONSOLE_A_RGX = /(\S*:1)?(?:[\u200B\t ]?)([A-Za-z]{3}-[0-9]{1,2} [0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}) (.+)/g;
 const CONSOLE_B_RGX = /^(\S*:1) (.+)/g;
 const CONSOLE_C_RGX = /^([0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}) (\S*:1)? ?(?:\u200B )?(.+)/g;
 
@@ -366,9 +366,9 @@ export function readFile(
 
         } else if (previous && previous.timestamp && previous.momentValue && entry.timestamp.startsWith('No Date')) {
           // In this case, the line has a timestamp only, but no date. If possible, give it the date of the line before!
-          const newTimestamp = previous.timestamp.substring(0,16) + entry.timestamp.substring(7); 
+          const newTimestamp = previous.timestamp.substring(0,16) + entry.timestamp.substring(7);
           const newDate = new Date(newTimestamp);
-          
+
           entry.timestamp = newTimestamp;
           entry.momentValue = newDate.valueOf();
         }
@@ -404,17 +404,17 @@ export function readFile(
         } else if (logType === 'mobile' && current) {
           // Android logs do too
           current.message += '\n' + line;
-        } else if (current && logFile.fileName.startsWith('app.slack')) { 
+        } else if (current && logFile.fileName.startsWith('app.slack')) {
           // For console logs:
-          if (toParse && toParse.length > 0) { 
+          if (toParse && toParse.length > 0) {
             // If there's already a meta, just add to the meta
             toParse += line + '\n';
-          } else if (line.includes("@") || line.includes("(async)") || line.match(/Show [\d]+ more frames/)) { 
+          } else if (line.includes('@') || line.includes('(async)') || line.match(/Show [\d]+ more frames/)) {
             // This is part of a stack trace - I could add it to the above line but that's a mouthful
             toParse += line + '\n';
           } else {
             current.message += '\n' + line;
-          } 
+          }
         } else {
           // This is (hopefully) part of a meta object
           toParse += line + '\n';
@@ -612,28 +612,33 @@ export function matchLineElectron(line: string): MatchResult | undefined {
 
 /**
  * Matches a console log line (Chrome or Firefox)
- * 
- * @param line 
+ *
+ * @param line
  * @returns ({MatchResult | undefined})
  */
 export function matchLineConsole(line: string): MatchResult | undefined {
   // This monster recognizes several cases, including but not limited to:
-  // 
+  //
   // CONSOLE_A_RGX:
-  //  Sep-24 14:36:07.809 [API-Q] (T34263EUF) e437fee7-1600983367.809 conversations.history called with reason: message-pane/requestHistory
-  // a.slack-edge.com/bv1-8/gantry-shared.75d2ab5.min.js?cacheKey=gantry-1600974368:1 Sep-24 14:40:32.318 (T34263EUF) Notification (message) suppressed because:
-  // 11:50:19.372 service-worker.js:1 Jan-19 11:50:19.372 [SERVICE-WORKER] checking if asset is in an existing cache bucket: gantry-1611070538 https://a.slack-edge.com/
-  // 11:50:19.377 ​ Jan-19 11:50:19.377 [SERVICE-WORKER] checking if asset is in an existing cache bucket: gantry-1611070538 https://a.slack-edge.com/
+  //  Sep-24 14:36:07.809 [API-Q] (T34263EUF) e437fee7-1600983367.809
+  // (cont.) conversations.history called with reason: message-pane/requestHistory
+  // a.slack-edge.com/bv1-8/gantry-shared.75d2ab5.min.js?cacheKey=gantry-1600974368:1
+  // (cont.) Sep-24 14:40:32.318 (T34263EUF) Notification (message) suppressed because:
+  // 11:50:19.372 service-worker.js:1 Jan-19 11:50:19.372 [SERVICE-WORKER] checking if asset
+  // (cont.) is in an existing cache bucket: gantry-1611070538 https://a.slack-edge.com/
+  // 11:50:19.377 ​ Jan-19 11:50:19.377 [SERVICE-WORKER] checking if asset is in an existing
+  // (cont.) cache bucket: gantry-1611070538 https://a.slack-edge.com/
   //
   // CONSOLE_B_RGX:
   // edgeapi.slack.com/cache/E12KS1G65/T34263EUF/users/info:1 Failed to load resource: net::ERR_TIMED_OUT
-  // 
+  //
   // CONSOLE_C_RGX:
   // 11:50:09.731 ​ Exposing workspace desktop delegate for  {
   // 11:50:10.297 ​ [API-Q] (T34263EUF) noversion-1611085810.297 Flannel users/info is ENQUEUED
-  // 11:50:18.322 gantry-shared.f1348ec.min.js?cacheKey=gantry-1611070538:1 [API-Q] (T34263EUF) noversion-1611085818.279 Flannel users/info is RESOLVED
+  // 11:50:18.322 gantry-shared.f1348ec.min.js?cacheKey=gantry-1611070538:1
+  // (cont.) [API-Q] (T34263EUF) noversion-1611085818.279 Flannel users/info is RESOLVED
 
-  if (line.includes("@") || line.includes('(async)') || line.match(/Show [\d]+ more frames/)) { return };
+  if (line.includes('@') || line.includes('(async)') || line.match(/Show [\d]+ more frames/)) { return; }
   // These lines are part of a stack trace, let's skip the regex so we can add them to the meta
 
   CONSOLE_A_RGX.lastIndex = 0;
@@ -655,7 +660,7 @@ export function matchLineConsole(line: string): MatchResult | undefined {
       level: 'info',
       message: results[1] ? results[3] + ' <' + results[1] + '>' : results[3],
       momentValue,
-   }
+   };
   }
 
   CONSOLE_B_RGX.lastIndex = 0;
@@ -681,11 +686,10 @@ export function matchLineConsole(line: string): MatchResult | undefined {
       momentValue: 0,
     };
   }
-    
 
 
-  return; 
-};
+  return;
+}
 
 
 /**
