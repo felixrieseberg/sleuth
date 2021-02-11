@@ -156,7 +156,7 @@ export function getTypeForFile(logFile: UnzippedFile): LogType {
     return LogType.NETLOG;
   } else if (fileName.startsWith('ShipIt') || fileName.includes('SquirrelSetup')) {
     return LogType.INSTALLER;
-  } else if (fileName.includes('Default_logs') || fileName.includes('attachment') || /\w{9,}_\w{9,}_\d{16,}\.txt/.test(fileName)) {
+  } else if (fileName.includes('Default_logs') || fileName.startsWith('attachment') || /\w{9,}_\w{9,}_\d{16,}\.txt/.test(fileName)) {
     return LogType.MOBILE;
   }
 
@@ -766,10 +766,10 @@ export function matchLineAndroid(line: string): MatchResult | undefined {
   // Let's pretend some of the debugging metadata is a log line so we can search for it
   if (line.startsWith('UsersCounts') || line.startsWith('Messag') && !line.startsWith('MessageGap(')) {
     return {
-      timestamp: new Date().toString(),
+      timestamp: new Date('Jan-01-70 00:00:00').toString(),
       level: 'info',
       message: line,
-      momentValue: new Date().valueOf(),
+      momentValue: new Date('Jan-01-70 00:00:00').valueOf(),
     };
   }
   return;
