@@ -591,7 +591,7 @@ export function matchLineIOS(line: string): MatchResult | undefined {
   if (line.startsWith('=====')) { return; } // We're ignoring these lines
 
   IOS_RGX.lastIndex = 0;
-  let results = IOS_RGX.exec(line);
+  const results = IOS_RGX.exec(line);
 
   if (results && results.length === 4) {
     // Expected format: MM/DD/YY, HH:mm:ss ?AM|PM'
@@ -628,7 +628,7 @@ export function matchLineIOS(line: string): MatchResult | undefined {
 export function matchLineAndroid(line: string): MatchResult | undefined {
 
   ANDROID_RGX.lastIndex = 0;
-  let results = ANDROID_RGX.exec(line);
+  const results = ANDROID_RGX.exec(line);
 
   if (results && results.length === 3) {
     // Android timestamps have no year, so we gotta add one
