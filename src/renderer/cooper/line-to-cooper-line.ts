@@ -138,8 +138,12 @@ const filters: Array<Replacer> = [
     replacer: ''
   }, {
     name: 'probably-gantry',
-    rgx: /\ \S+\.min\.js\?.+\:1/g,
+    rgx: /\ \S+\.min\.js\?.+\:1(?:\:\d+)/g,
     replacer: ' {Source}'
+  }, {
+    name: 'firefox-source-in-theoretical-brackets',
+    rgx: /\ \S+\.min\.js\:1\:[\d]{1,}/g,
+    replacer: ''
   }
 ];
 

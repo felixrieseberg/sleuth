@@ -148,7 +148,7 @@ export function getTypeForFile(logFile: UnzippedFile): LogType {
     || fileName.startsWith('unknown')
     || fileName.endsWith('window-console.log')) {
     return LogType.RENDERER;
-  } else if (fileName.startsWith('webapp') || fileName.startsWith('app.slack')) {
+  } else if (fileName.startsWith('webapp') || fileName.startsWith('app.slack') || fileName.startsWith('console-export')) {
     return LogType.WEBAPP;
   } else if (fileName.startsWith('call')) {
     return LogType.CALL;
@@ -366,7 +366,7 @@ export function readFile(
 
         } else if (previous && previous.timestamp && previous.momentValue && entry.timestamp.startsWith('No Date')) {
           // In this case, the line has a timestamp only, but no date. If possible, give it the date of the line before!
-          const newTimestamp = previous.timestamp.substring(0,16) + entry.timestamp.substring(7);
+          const newTimestamp = previous.timestamp.substring(0, 16) + entry.timestamp.substring(7);
           const newDate = new Date(newTimestamp);
 
           entry.timestamp = newTimestamp;
@@ -404,7 +404,7 @@ export function readFile(
         } else if (logType === 'mobile' && current) {
           // Android logs do too
           current.message += '\n' + line;
-        } else if (current && logFile.fileName.startsWith('app.slack')) {
+        } else if (current && (logFile.fileName.startsWith('app.slack') || logFile.fileName.startsWith('console-export-'))) {
           // For console logs:
           if (toParse && toParse.length > 0) {
             // If there's already a meta, just add to the meta
@@ -808,7 +808,7 @@ export function getMatchFunction(
   logFile: UnzippedFile
 ): (line: string) => MatchResult | undefined {
   if (logType === LogType.WEBAPP) {
-    if (logFile.fileName.includes('app.slack')) {
+    if (logFile.fileName.startsWith('app.slack') || logFile.fileName.startsWith('console-export-')) {
       return matchLineConsole;
     } else {
       return matchLineWebApp;
