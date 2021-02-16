@@ -581,18 +581,17 @@ export function matchLineElectron(line: string): MatchResult | undefined {
 }
 
 /**
- * Matches a mobile (iOS or Android) line
+ * Matches an iOS line
  *
  * @param line
  * @returns {(MatchResult | undefined)}
  */
-export function matchLineMobile(line: string): MatchResult | undefined {
+export function matchLineIOS(line: string): MatchResult | undefined {
 
   if (line.startsWith('=====')) { return; } // We're ignoring these lines
 
-  // Let's see if it's an iOS log first
   IOS_RGX.lastIndex = 0;
-  let results = IOS_RGX.exec(line);
+  const results = IOS_RGX.exec(line);
 
   if (results && results.length === 4) {
     // Expected format: MM/DD/YY, HH:mm:ss ?AM|PM'
@@ -616,13 +615,22 @@ export function matchLineMobile(line: string): MatchResult | undefined {
       momentValue
     };
   }
+  return;
+}
 
-  // Not iOS? Try Android
+
+/**
+ * Matches an Android line
+ *
+ * @param line
+ * @returns {(MatchResult | undefined)}
+ */
+export function matchLineAndroid(line: string): MatchResult | undefined {
+
   ANDROID_RGX.lastIndex = 0;
-  results = ANDROID_RGX.exec(line);
+  const results = ANDROID_RGX.exec(line);
 
   if (results && results.length === 3) {
-
     // Android timestamps have no year, so we gotta add one
     const currentDate = new Date();
     const newTimestamp = new Date(results[1]);
@@ -652,7 +660,6 @@ export function matchLineMobile(line: string): MatchResult | undefined {
       momentValue: new Date('Jan-01-70 00:00:00').valueOf(),
     };
   }
-
   return;
 }
 
@@ -706,7 +713,11 @@ export function getMatchFunction(
       return matchLineShipItMac;
     }
   } else if (logType === LogType.MOBILE) {
-    return matchLineMobile;
+    if (logFile.fileName.startsWith('attachment')) {
+      return matchLineAndroid;
+    } else {
+      return matchLineIOS;
+    }
   } else {
     return matchLineElectron;
   }
