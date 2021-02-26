@@ -29,12 +29,12 @@ export async function changeIcon(iconName: ICON_NAMES) {
 }
 
 function changeIconDarwin(iconName: ICON_NAMES) {
-  const destPath = path.join(process.resourcesPath, 'electron.icns');
+//  const destPath = path.join(process.resourcesPath, 'electron.icns');
   const iconPath = getIconPath(iconName);
 
   if (iconPath) {
-    console.log(`Replacing icon: Copying from ${iconPath} to ${destPath}`);
-    return fs.copyFile(iconPath, destPath);
+    console.log(`Setting icon to ${iconPath}`);
+    app.dock.setIcon(iconPath);  
   }
 
   return Promise.resolve();
@@ -42,6 +42,6 @@ function changeIconDarwin(iconName: ICON_NAMES) {
 
 function getExtension() {
   if (process.platform === 'win32') return 'ico';
-  if (process.platform === 'darwin') return 'icns';
+  if (process.platform === 'darwin') return 'png';
   return 'png';
 }
