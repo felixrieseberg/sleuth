@@ -19,6 +19,8 @@ export function getMenuTemplate(options: MenuTemplateOptions) {
         }, {
           role: 'paste'
         }, {
+          role: 'selectAll'
+        }, {
           type: 'separator'
         }, {
           label: 'Find',
