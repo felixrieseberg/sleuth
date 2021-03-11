@@ -34,7 +34,7 @@ function changeIconDarwin(iconName: ICON_NAMES) {
 
   if (iconPath) {
     console.log(`Setting icon to ${iconPath}`);
-    app.dock.setIcon(iconPath);  
+    app.dock.setIcon(iconPath);
   }
 
   return Promise.resolve();
