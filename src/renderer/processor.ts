@@ -21,7 +21,7 @@ const CONSOLE_B_RGX = /^(\S*:1) (.+)/g;
 const CONSOLE_C_RGX = /^([0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}) (\S*:1)? ?(?:\u200B )?(.+)/g;
 
 // Mar-26 09:29:38.460 []
-const WEBAPP_NEW_TIMESTAMP_RGX = /^\w{3}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} .*$/;
+const WEBAPP_NEW_TIMESTAMP_RGX = /^ ?\w{3}-\d{1,2} \d{1,2}:\d{2}:\d{2}\.\d{3}/g;
 
 // 2019-01-08 08:29:56.504 ShipIt[4680:172321] Beginning installation
 const SHIPIT_MAC_RGX = /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}) (.*)$/;
@@ -470,8 +470,9 @@ export function matchLineWebApp(line: string): MatchResult | undefined {
     let message = results[3];
 
     // If we have two timestamps, cut that from the message
+    WEBAPP_NEW_TIMESTAMP_RGX.lastIndex = 0;
     if (WEBAPP_NEW_TIMESTAMP_RGX.test(results[3])) {
-      message = message.slice(20);
+      message = message.slice(WEBAPP_NEW_TIMESTAMP_RGX.lastIndex);
     }
 
     return {
