@@ -776,6 +776,19 @@ export function matchLineAndroid(line: string): MatchResult | undefined {
 }
 
 /**
+ *
+ * @param {string} line
+ * @returns  {(MatchResult | undefined)}
+ */
+export function matchLineMobile(line: string): MatchResult | undefined {
+  let results = matchLineIOS(line);
+  if (!results) {
+    results = matchLineAndroid(line);
+  }
+  return results;
+}
+
+/**
  * Matches a Call line
  *
  * @param {string} line
@@ -831,8 +844,10 @@ export function getMatchFunction(
   } else if (logType === LogType.MOBILE) {
     if (logFile.fileName.startsWith('attachment')) {
       return matchLineAndroid;
-    } else {
+    } else if (logFile.fileName.startsWith('Default_logs')){
       return matchLineIOS;
+    } else {
+      return matchLineMobile;
     }
   } else {
     return matchLineElectron;
