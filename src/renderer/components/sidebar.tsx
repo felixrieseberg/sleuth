@@ -249,10 +249,12 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
    */
   public static getLogFileNode(file: ProcessedLogFile, props: SidebarProps): ITreeNode {
     const { selectedLogFileName } = props;
-    const isSelected = (selectedLogFileName === file.logFile.fileName);
-    const options: Partial<ITreeNode> = { secondaryLabel: this.getLogNodeHint(file) };
+    const name = file.logFile.fileName;
+    const isSelected = (selectedLogFileName === name);
+    const hoverText = name.length > 20 ? <Tooltip content={name} hoverOpenDelay={800}>{name}</Tooltip> : name;
+    const options: Partial<ITreeNode> = { secondaryLabel: this.getLogNodeHint(file), label: hoverText};
 
-    return Sidebar.getNode(file.logFile.fileName, { file }, isSelected, options);
+    return Sidebar.getNode(name, { file }, isSelected, options);
   }
 
   /**
