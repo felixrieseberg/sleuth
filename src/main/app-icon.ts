@@ -29,7 +29,6 @@ export async function changeIcon(iconName: ICON_NAMES) {
 }
 
 function changeIconDarwin(iconName: ICON_NAMES) {
-//  const destPath = path.join(process.resourcesPath, 'electron.icns');
   const iconPath = getIconPath(iconName);
 
   if (iconPath) {
