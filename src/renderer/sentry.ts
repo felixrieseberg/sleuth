@@ -3,9 +3,9 @@ import fs from 'fs-extra';
 import { showMessageBox } from './ipc';
 import { shell } from 'electron';
 
-const debug = require('debug')('sleuth:backtrace');
+const debug = require('debug')('sleuth:sentry');
 
-export async function openBacktrace(installationFilePath?: string): Promise<void> {
+export async function openSentry(installationFilePath?: string): Promise<void> {
   // No file? Do nothing
   if (!installationFilePath) {
     showMessageBox({
@@ -22,10 +22,10 @@ export async function openBacktrace(installationFilePath?: string): Promise<void
     const id = convertInstallation(data);
 
     if (id) {
-      shell.openExternal(getBacktraceHref(id));
+      shell.openExternal(getSentryHref(id));
     }
   } catch (error) {
-    debug(`Failed to read backtrace link`);
+    debug(`Failed to read Sentry link`);
   }
 }
 
@@ -33,9 +33,6 @@ export function convertInstallation(data: string): string {
   return new Buffer(data, 'base64').toString('ascii');
 }
 
-export function getBacktraceHref(installationId: string) {
-  const base = `https://backtrace.tinyspeck.com/p/desktop/list?aperture=`;
-  const query = `[[%22relative%22,[%22floating%22,%22all%22]],[[%22instanceUid%22,[%22equal%22,%22${installationId}%22]]]]`;
-
-  return `${base}${query}`;
+export function getSentryHref(installationId: string) {
+  return `https://sentry.io/organizations/tinyspeck/issues/?project=5277886&query=is%3Aunresolved+uuid%3A${installationId}`;
 }

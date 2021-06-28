@@ -14,7 +14,7 @@ import { parseJSON } from '../../utils/parse-json';
 import { getFontForCSS } from './preferences-font';
 import { isTruthy } from '../../utils/is-truthy';
 import { plural } from '../../utils/pluralize';
-import { getBacktraceHref, convertInstallation } from '../backtrace';
+import { getSentryHref, convertInstallation } from '../sentry';
 
 const debug = require('debug')('sleuth:statetable');
 
@@ -272,11 +272,11 @@ export class StateTable extends React.Component<StateTableProps, StateTableState
 
     if (Array.isArray(data) && data.length > 0) {
       const id = convertInstallation(data[0]);
-      const href = getBacktraceHref(id);
+      const href = getSentryHref(id);
 
       return (
         <Card className='StateTable-Info'>
-          See exceptions in Backtrace: <a onClick={() => shell.openExternal(href)}>{id}</a>
+          See exceptions in Sentry: <a onClick={() => shell.openExternal(href)}>{id}</a>
         </Card>
       );
     }

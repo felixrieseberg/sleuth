@@ -10,7 +10,7 @@ import { CoreApplication } from './app-core';
 import { MacTitlebar } from './mac-titlebar';
 import { Preferences } from './preferences';
 import { sendWindowReady } from '../ipc';
-import { openBacktrace } from '../backtrace';
+import { openSentry } from '../sentry';
 import { SleuthState } from '../state/sleuth';
 import { shouldIgnoreFile } from '../../utils/should-ignore-file';
 import { isCacheDir } from '../../utils/is-cache';
@@ -52,7 +52,7 @@ export class App extends React.Component<{}, Partial<AppState>> {
 
     this.setupFileDrop();
     this.setupBusyResponse();
-    this.setupOpenBacktrace();
+    this.setupOpenSentry();
     this.setupWindowTitle();
   }
 
@@ -228,15 +228,15 @@ export class App extends React.Component<{}, Partial<AppState>> {
     ipcRenderer.on('file-dropped', (_event: any, url: string) => this.openFile(url));
   }
 
-  private setupOpenBacktrace() {
-    ipcRenderer.on('open-backtrace', () => {
+  private setupOpenSentry() {
+    ipcRenderer.on('open-sentry', () => {
       // Get the file path to the installation file. Only app-* classes know.
       const installationFile = this.state.unzippedFiles?.find((file) => {
         return (file.fileName === 'installation');
       });
 
       // Then, let the utility handle the details
-      openBacktrace(installationFile?.fullPath);
+      openSentry(installationFile?.fullPath);
     });
   }
 
