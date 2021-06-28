@@ -121,9 +121,9 @@ export function getMenuTemplate(options: MenuTemplateOptions) {
       label: 'Utilities',
       submenu: [
         {
-          label: 'Open Backtrace',
+          label: 'Open Sentry',
           click(_item: Electron.MenuItem, browserWindow: BrowserWindow) {
-            browserWindow.webContents.send('open-backtrace');
+            browserWindow.webContents.send('open-sentry');
           }
         },
         { type: 'separator' },
