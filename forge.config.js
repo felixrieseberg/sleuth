@@ -35,7 +35,7 @@ const options = {
       'entitlements': 'static/entitlements.plist',
       'entitlements-inherit': 'static/entitlements.plist',
       'signature-flags': 'library',
-      requirements: path.resolve(__dirname, 'tools', 'certs', 'designated-requirements')
+      requirements: path.resolve(__dirname, 'tools', 'certs', 'designated-requirements.rqset')
     },
     ignore: [
       /^\/\.vscode/,
