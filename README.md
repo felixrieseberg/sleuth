@@ -1,3 +1,5 @@
+> :warning: While I loved working at Slack, all of us must eventually move on, and so I have. The wonderful people still there are now in charge of Sleuth, so please find it over at https://github.com/tinyspeck/sleuth.
+
 # Sleuth
 
 A Slack Log Viewer.
