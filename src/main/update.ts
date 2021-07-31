@@ -8,7 +8,7 @@ export function setupUpdates() {
     const updateApp = require('update-electron-app');
 
     updateApp({
-      repo: 'felixrieseberg/sleuth',
+      repo: 'tinyspeck/sleuth',
       updateInterval: '1 hour',
     });
   }, 10000);

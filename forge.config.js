@@ -34,7 +34,8 @@ const options = {
       'gatekeeper-assess': true,
       'entitlements': 'static/entitlements.plist',
       'entitlements-inherit': 'static/entitlements.plist',
-      'signature-flags': 'library'
+      'signature-flags': 'library',
+      requirements: path.resolve(__dirname, 'tools', 'certs', 'designated-requirements.rqset')
     },
     ignore: [
       /^\/\.vscode/,
