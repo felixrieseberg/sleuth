@@ -125,7 +125,18 @@ export class AppMenu {
       }
     };
 
-    const openItems: Array<Electron.MenuItemConstructorOptions> = [ openItem ];
+    const openRecentItem = {
+      label: 'Open Recent',
+      role: 'recentDocuments' as 'recentDocuments',
+      submenu: [
+        {
+          label: 'Clear Recent',
+          role: 'clearRecentDocuments' as 'clearRecentDocuments'
+        }
+      ]
+    };
+
+    const openItems: Array<Electron.MenuItemConstructorOptions> = [ openItem, openRecentItem ];
 
     // Windows and Linux don't understand combo dialogs
     if (process.platform !== 'darwin') {
@@ -224,6 +235,7 @@ export class AppMenu {
   private async handleFilePaths(filePaths: Array<string>): Promise<void> {
     if (filePaths && filePaths.length > 0) {
       const { webContents } = await getCurrentWindow();
+      app.addRecentDocument(filePaths[0]);
       webContents.send('file-dropped', filePaths[0]);
     }
   }
