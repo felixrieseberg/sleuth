@@ -39,7 +39,7 @@
     "jsonic": "1.0.1",
     "lodash.throttle": "^4.1.1",
     "lz-string": "^1.4.4",
-    "markdown-it": "12.0.3",
+    "markdown-it": "12.3.2",
     "markdown-it-emoji": "2.0.0",
     "markdown-it-highlightjs": "3.4.0",
     "mobx": "5.15.7",
